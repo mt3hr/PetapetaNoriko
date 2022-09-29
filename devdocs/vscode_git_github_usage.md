@@ -21,7 +21,7 @@ VSCodeからGitを使う方法、Githubと連携する方法の説明。
    ![ディレクトリの選択](https://raw.githubusercontent.com/mt3hr/PetapetaNoriko/main/devdocs/resources/screenshot.1664349013.png)  
 
 3. 「クローンしたリポジトリを開きますか」で「開く」をクリックする  
-   ![クローンしたリポジトリを開きますか](https://raw.githubusercontent.com/mt3hr/PetapetaNoriko/main/devdocs/resources\screenshot.1664349023.png)  
+   ![クローンしたリポジトリを開きますか](https://raw.githubusercontent.com/mt3hr/PetapetaNoriko/main/devdocs/resources/screenshot.1664349023.png)  
 
 以上の操作でリポジトリのダウンロードが完了する  
 
