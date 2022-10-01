@@ -37,7 +37,7 @@ git checkout sanekata;git pull --all;
 ![ターミナルを開く](https://raw.githubusercontent.com/mt3hr/PetapetaNoriko/develop/devdocs/resources/screenshot.1664588794.png)    
 2. 以下のコマンドを実行する（「～～を変更しました\n\n詳細詳細詳細」の部分は自分で変える必要あり）  
 ```complete.ps1:powershell
-git add *; git commit * "～～を更新しました\n\n詳細詳細詳細";git push;ush;
+git add *; git commit "～～を更新しました\n\n詳細詳細詳細";git push;ush;
 ```
 ![変更を保存しアップロードする](https://raw.githubusercontent.com/mt3hr/PetapetaNoriko/develop/devdocs/resources/screenshot.1664589026.png)    
   
