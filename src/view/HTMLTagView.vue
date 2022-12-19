@@ -1,6 +1,6 @@
 <template>
-    <div draggable="true" :ondragstart="on_drag_start">
-        <H1TagView v-if="tagdata.tagname == 'h1'" :tagdata="tagdata" />
+    <div>
+        <H1TagView v-if="tagdata.tagname == 'h1'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start" />
     </div>
 </template>
 <script lang="ts">
@@ -16,8 +16,12 @@ import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
 })
 export default class HTMLTagView extends Vue {
     @Prop({ require: true }) tagdata: HTMLTagDataBase
+
     on_drag_start(e: DragEvent) {
         e.dataTransfer.setData("ppmk/move_tag_id", this.tagdata.tagid)
+        e.dataTransfer.setData("ppmk/move_tag_offset_x", e.offsetX.toString())
+        e.dataTransfer.setData("ppmk/move_tag_offset_y", e.offsetY.toString())
+        console.log(e)
     }
 }
 </script>

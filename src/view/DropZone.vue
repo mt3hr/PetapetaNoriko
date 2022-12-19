@@ -51,8 +51,12 @@ export default class DropZone extends Vue {
             for (let i = 0; i < this.htmltag_datas.length; i++) {
                 let htmltag_data = this.htmltag_datas[i]
                 if (target_tag_id == htmltag_data.tagid) {
-                    htmltag_data.position_x = e.x
-                    htmltag_data.position_y = e.y
+                    let offset_x = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
+                    let offset_y = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
+                    htmltag_data.position_x = e.x - offset_x
+                    htmltag_data.position_y = e.y - offset_y
+
+                    console.log(e)
                     break
                 }
             }
@@ -99,5 +103,6 @@ export default class DropZone extends Vue {
 .dropzone {
     height: 1000px;
     width: 900px;
+    overflow-block: hidden; /*absoluteがあると効かないらしい？ */
 }
 </style>
