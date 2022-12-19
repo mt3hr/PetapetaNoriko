@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import RootPanel from '@/views/RootPanel.vue'
+import RootPanel from '@/view/PutPullMockRootPage.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
