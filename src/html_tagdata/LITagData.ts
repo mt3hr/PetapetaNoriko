@@ -7,4 +7,8 @@ export default class LITagData extends HTMLTagDataBase {
         super()
         this.tagname = "li"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

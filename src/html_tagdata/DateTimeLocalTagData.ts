@@ -14,4 +14,8 @@ export default class DateTimeLocalTagData extends HTMLTagDataBase {
         super()
         this.tagname = "datetime-local"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

@@ -13,4 +13,8 @@ export default class TimeTagData extends HTMLTagDataBase {
         super()
         this.tagname = "time"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

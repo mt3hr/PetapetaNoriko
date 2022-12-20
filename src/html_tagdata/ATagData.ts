@@ -17,4 +17,8 @@ export default class ATagData extends HTMLTagDataBase {
         super()
         this.tagname = "a"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

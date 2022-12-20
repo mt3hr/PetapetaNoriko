@@ -13,4 +13,8 @@ export default class FormTagData extends HTMLTagDataBase {
         super()
         this.tagname = "form"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

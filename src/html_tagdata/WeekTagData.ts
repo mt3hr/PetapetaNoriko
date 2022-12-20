@@ -14,4 +14,8 @@ export default class WeekTagData extends HTMLTagDataBase {
         super()
         this.tagname = "week"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

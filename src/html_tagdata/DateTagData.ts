@@ -14,4 +14,8 @@ export default class DateTagData extends HTMLTagDataBase {
         super()
         this.tagname = "date"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

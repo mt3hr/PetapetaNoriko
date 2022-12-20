@@ -9,4 +9,8 @@ export default class OptionTagData extends HTMLTagDataBase {
         super()
         this.tagname = "option"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

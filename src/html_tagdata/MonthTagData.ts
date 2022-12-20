@@ -14,4 +14,8 @@ export default class MonthTagData extends HTMLTagDataBase {
         super()
         this.tagname = "month"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

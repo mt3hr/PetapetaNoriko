@@ -14,4 +14,8 @@ export default class PasswordTagData extends HTMLTagDataBase {
         super()
         this.tagname = "password"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

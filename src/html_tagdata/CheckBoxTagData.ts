@@ -8,4 +8,8 @@ export default class CheckBoxTagData extends HTMLTagDataBase {
         super()
         this.tagname = "checkbox"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

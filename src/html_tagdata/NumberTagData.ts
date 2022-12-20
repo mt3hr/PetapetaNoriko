@@ -14,4 +14,8 @@ export default class NumberTagData extends HTMLTagDataBase {
         super()
         this.tagname = "number"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

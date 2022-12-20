@@ -15,4 +15,8 @@ export default class URLTagData extends HTMLTagDataBase {
         super()
         this.tagname = "url"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

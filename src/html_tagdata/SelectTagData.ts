@@ -10,4 +10,8 @@ export default class SelectTagData extends HTMLTagDataBase {
         super()
         this.tagname = "select"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

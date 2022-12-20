@@ -6,4 +6,13 @@ export default class H2TagData extends HTMLTagDataBase {
         super()
         this.tagname = "h2"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        let html = ""
+        html += "<h2"
+        if (print_id_for_css) html += " id=\""+this.tagid+"\""
+        if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
+        html += ">" + this.text + "</h2>"
+        return html
+    }
+
 }

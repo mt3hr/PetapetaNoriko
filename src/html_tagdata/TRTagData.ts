@@ -5,4 +5,8 @@ export default class TRTagData extends HTMLTagDataBase {
         super()
         this.tagname = "tr"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

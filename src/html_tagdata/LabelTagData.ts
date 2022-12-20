@@ -7,4 +7,8 @@ export default class LabelTagData extends HTMLTagDataBase {
         super()
         this.tagname = "label"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

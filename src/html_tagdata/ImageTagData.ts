@@ -16,4 +16,8 @@ export default class ImageTagData extends HTMLTagDataBase {
         super()
         this.tagname = "image"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

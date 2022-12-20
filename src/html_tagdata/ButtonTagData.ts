@@ -7,4 +7,8 @@ export default class ButtonTagData extends HTMLTagDataBase {
         super()
         this.tagname = "button"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

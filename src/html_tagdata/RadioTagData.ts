@@ -9,4 +9,8 @@ export default class RadioTagData extends HTMLTagDataBase {
         super()
         this.tagname = "radio"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }

@@ -16,4 +16,8 @@ export default class TextAreaTagData extends HTMLTagDataBase {
         super()
         this.tagname = "textarea"
     }
+    override generate_html(print_id_for_css: boolean): string {
+        // TODO 
+        return ""
+    }
 }
