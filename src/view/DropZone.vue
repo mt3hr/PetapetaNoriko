@@ -42,8 +42,8 @@ export default class DropZone extends Vue {
                     tag_data = new H1TagData()
                     break
             }
-            tag_data.position_x = e.x
-            tag_data.position_y = e.y
+            tag_data.position_x = e.pageX
+            tag_data.position_y = e.pageY
             this.htmltag_datas.push(tag_data)
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
             // すでに配置されたコンポーネントの移動
@@ -53,8 +53,8 @@ export default class DropZone extends Vue {
                 if (target_tag_id == htmltag_data.tagid) {
                     let offset_x = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
                     let offset_y = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
-                    htmltag_data.position_x = e.x - offset_x
-                    htmltag_data.position_y = e.y - offset_y
+                    htmltag_data.position_x = e.pageX - offset_x
+                    htmltag_data.position_y = e.pageY - offset_y
 
                     console.log(e)
                     break
