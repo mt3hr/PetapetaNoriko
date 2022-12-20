@@ -1,5 +1,7 @@
+import { serializable } from "@/serializable/serializable"
 import generateUUID from "@/uuid"
 
+@serializable
 export default class HTMLTagDataBase {
     tagname: string
     tagid = generateUUID()

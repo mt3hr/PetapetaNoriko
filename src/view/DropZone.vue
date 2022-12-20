@@ -14,6 +14,11 @@ import { Vue, Options } from 'vue-class-component'
 import HTMLTagData from '@/html_tagdata/HTMLTagDataBase'
 import HTMLTagView from '@/view/HTMLTagView.vue'
 import H1TagData from '@/html_tagdata/H1TagData'
+import H2TagData from '@/html_tagdata/H2TagData'
+import H3TagData from '@/html_tagdata/H3TagData'
+import H4TagData from '@/html_tagdata/H4TagData'
+import H5TagData from '@/html_tagdata/H5TagData'
+import H6TagData from '@/html_tagdata/H6TagData'
 
 @Options({
     components: {
@@ -41,6 +46,21 @@ export default class DropZone extends Vue {
                 case "h1":
                     tag_data = new H1TagData()
                     break
+                case "h2":
+                    tag_data = new H2TagData()
+                    break
+                case "h3":
+                    tag_data = new H3TagData()
+                    break
+                case "h4":
+                    tag_data = new H4TagData()
+                    break
+                case "h5":
+                    tag_data = new H5TagData()
+                    break
+                case "h6":
+                    tag_data = new H6TagData()
+                    break
             }
             tag_data.position_x = e.pageX
             tag_data.position_y = e.pageY
@@ -55,8 +75,6 @@ export default class DropZone extends Vue {
                     let offset_y = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
                     htmltag_data.position_x = e.pageX - offset_x
                     htmltag_data.position_y = e.pageY - offset_y
-
-                    console.log(e)
                     break
                 }
             }
@@ -72,7 +90,7 @@ export default class DropZone extends Vue {
         html += "<html>"
         for (let i = 0; i < this.htmltag_datas.length; i++) {
             const component = this.htmltag_datas[i]
-            html += "  " + component.generate_html()
+            html += "  " + component.generate_html(false)
         }
         html += "</html>"
         return html
@@ -83,7 +101,7 @@ export default class DropZone extends Vue {
         html += "<html>\n"
         for (let i = 0; i < this.htmltag_datas.length; i++) {
             const component = this.htmltag_datas[i]
-            html += "  " + component.generate_html_with_id() + "\n"
+            html += "  " + component.generate_html(true) + "\n"
         }
         html += "</html>"
         return html
@@ -103,6 +121,7 @@ export default class DropZone extends Vue {
 .dropzone {
     height: 1000px;
     width: 900px;
-    overflow-block: hidden; /*absoluteがあると効かないらしい？ */
+    overflow-block: hidden;
+    /*absoluteがあると効かないらしい？ */
 }
 </style>

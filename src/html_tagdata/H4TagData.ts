@@ -1,5 +1,7 @@
+import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase from "./HTMLTagDataBase";
 
+@serializable
 export default class H4TagData extends HTMLTagDataBase {
     text = "見出し4"
     constructor() {
