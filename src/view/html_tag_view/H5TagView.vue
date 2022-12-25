@@ -1,5 +1,5 @@
 <template>
-    <h5 :style="position_css">{{ text }}</h5>
+    <h5 :style="position_css" @click="onclick_tag">{{ text }}</h5>
 </template>
 
 <script lang="ts">
@@ -25,6 +25,10 @@ export default class H5TagView extends HTMLTagViewBase {
 
     created(): void {
         this.update_view()
+    }
+
+    onclick_tag() {
+        this.$emit("onclick_tag", this.tagdata_typed)
     }
 }
 </script>

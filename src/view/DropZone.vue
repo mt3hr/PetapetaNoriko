@@ -3,7 +3,7 @@
         <h2>ドロップゾーン</h2>
         <div class="dropzone" @drop.stop="on_drop" @dragover.prevent="on_dragover">
             <div v-for="tagdata, index in html_tagdatas" :key="index">
-                <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" />
+                <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag" />
             </div>
         </div>
     </div>
@@ -81,13 +81,12 @@ export default class DropZone extends Vue {
                     break
                 }
             }
-            let html_tagdatas = this.html_tagdatas
-            this.html_tagdatas = new Array<HTMLTagDataBase>()
-            this.$nextTick(() => {
-                this.html_tagdatas = html_tagdatas
-                this.updated_tagdata(null)
-            })
+            this.updated_tagdata(null)
         }
+    }
+
+    onclick_tag(tagdata: HTMLTagData) {
+        this.$emit('onclick_tag', tagdata)
     }
 
     updated_tagdata(tagdata: HTMLTagDataBase) {
@@ -111,8 +110,8 @@ export default class DropZone extends Vue {
 </script>
 <style scoped>
 .dropzone {
-    height: 1000px;
-    width: 900px;
+    height: 750px;
+    width: 750px;
     overflow-block: hidden;
     /*absoluteがあると効かないらしい？ */
 }

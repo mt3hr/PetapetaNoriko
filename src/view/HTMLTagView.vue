@@ -1,16 +1,16 @@
 <template>
     <H1TagView v-if="tagdata.tagname == 'h1'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @updated_tagdata="updated_tagdata" />
+        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
     <H2TagView v-if="tagdata.tagname == 'h2'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @updated_tagdata="updated_tagdata" />
+        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
     <H3TagView v-if="tagdata.tagname == 'h3'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @updated_tagdata="updated_tagdata" />
+        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
     <H4TagView v-if="tagdata.tagname == 'h4'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @updated_tagdata="updated_tagdata" />
+        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
     <H5TagView v-if="tagdata.tagname == 'h5'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @updated_tagdata="updated_tagdata" />
+        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
     <H6TagView v-if="tagdata.tagname == 'h6'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @updated_tagdata="updated_tagdata" />
+        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
 </template>
 <script lang="ts">
 import { Vue, Options } from 'vue-class-component';
@@ -42,9 +42,12 @@ export default class HTMLTagView extends Vue {
         e.dataTransfer.setData("ppmk/move_tag_offset_y", e.offsetY.toString())
     }
 
+    onclick_tag(tagdata: HTMLTagDataBase) {
+        this.$emit('onclick_tag', tagdata)
+    }
+
     updated_tagdata(tagdata: HTMLTagDataBase) {
         this.$emit("updated_tagdata", tagdata)
-        console.log(tagdata)
     }
 }
 </script>

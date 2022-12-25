@@ -1,5 +1,4 @@
 <template>
-
     <v-container>
         <v-row>
             <v-col cols="auto">
@@ -28,7 +27,8 @@
 
             <!--ドロップゾーン-->
             <v-col cols="auto" class="dropzone">
-                <DropZone class="component" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"></DropZone>
+                <DropZone class="component" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"
+                    @onclick_tag="onclick_tag"></DropZone>
                 <!--TODO-->
             </v-col>
 
@@ -38,7 +38,9 @@
                     <v-row>
                         <v-col cols="auto">
                             <!--プロパティビュー-->
-                            <HTMLTagPropertyView class="component"></HTMLTagPropertyView> <!--TODO-->
+                            <HTMLTagPropertyView class="component" ref="property_view"
+                                @updated_html_tag_property="updated_html_tag_property"></HTMLTagPropertyView>
+                            <!--TODO-->
                         </v-col>
                     </v-row>
                 </v-container>
@@ -78,15 +80,30 @@ export default class PutPullMockRootPage extends Vue {
         let page_index = page_list_view.selected_index
         let pagedata = page_list_view.pagedatas[page_index]
         pagedata.html_tagdatas = html_tagdatas
-        console.log(pagedata)
     }
     clicked_page(pagedata: PageData) {
         let dropzone: any = this.$refs["dropzone"]
         let html_tagdatas = pagedata.html_tagdatas
-        console.log(dropzone)
-
-        dropzone.html_tagdatas = new Array<HTMLTagDataBase>()
         dropzone.html_tagdatas = html_tagdatas
+    }
+    onclick_tag(tagdata: HTMLTagDataBase) {
+        let property_view: any = this.$refs["property_view"]
+        console.log(property_view)
+        property_view.html_tagdata = tagdata
+    }
+    updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
+        let dropzone: any = this.$refs["dropzone"]
+        let index = -1
+        console.log(html_tagdata)
+        for (let i = 0; i < dropzone.html_tagdatas.length; i++) {
+            if (html_tagdata.tagid == dropzone.html_tagdatas[i].tagid) {
+                index = i
+                break
+            }
+        }
+        if (index != -1) {
+            dropzone.html_tagdatas.splice(index, 1, html_tagdata)
+        }
     }
 }
 </script>
