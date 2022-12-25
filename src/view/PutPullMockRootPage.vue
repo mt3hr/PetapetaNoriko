@@ -16,7 +16,8 @@
                 <v-container>
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
-                        <PageListView class="component"></PageListView> <!--TODO-->
+                        <PageListView class="component" ref="page_list_view" @clicked_page="clicked_page">
+                        </PageListView> <!--TODO-->
                     </v-row>
                     <v-row>
                         <!--タグリストビュー。ここからタグをドラッグしてドロップゾーンに貼り付ける-->
@@ -27,7 +28,8 @@
 
             <!--ドロップゾーン-->
             <v-col cols="auto" class="dropzone">
-                <DropZone class="component"></DropZone> <!--TODO-->
+                <DropZone class="component" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"></DropZone>
+                <!--TODO-->
             </v-col>
 
             <!--プロパティビュー-->
@@ -58,6 +60,8 @@ import PageListView from '@/view/PageListView.vue'
 import TagListView from '@/view/TagListView.vue'
 import DropZone from '@/view/DropZone.vue'
 import HTMLTagPropertyView from '@/view/HTMLTagPropertyView.vue'
+import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase'
+import PageData from '@/page/PageData'
 
 @Options({
     components: {
@@ -68,17 +72,33 @@ import HTMLTagPropertyView from '@/view/HTMLTagPropertyView.vue'
     }
 })
 
-
 export default class PutPullMockRootPage extends Vue {
+    updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>) {
+        let page_list_view: any = this.$refs["page_list_view"]
+        let page_index = page_list_view.selected_index
+        let pagedata = page_list_view.pagedatas[page_index]
+        pagedata.html_tagdatas = html_tagdatas
+        console.log(pagedata)
+    }
+    clicked_page(pagedata: PageData) {
+        let dropzone: any = this.$refs["dropzone"]
+        let html_tagdatas = pagedata.html_tagdatas
+        console.log(dropzone)
 
+        dropzone.html_tagdatas = new Array<HTMLTagDataBase>()
+        dropzone.html_tagdatas = html_tagdatas
+    }
 }
 </script>
 <style scoped>
 .component {
     border: 1px black solid;
 }
-.v-container, .v-row, .v-col {
-  padding: 0px;
-  margin: 0px;
+
+.v-container,
+.v-row,
+.v-col {
+    padding: 0px;
+    margin: 0px;
 }
 </style>

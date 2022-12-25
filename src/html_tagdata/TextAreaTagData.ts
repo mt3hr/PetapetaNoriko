@@ -2,7 +2,7 @@ import HTMLTagDataBase from "./HTMLTagDataBase";
 
 export default class TextAreaTagData extends HTMLTagDataBase {
     autofocus = false
-    cols = "20"
+    cols = ""
     disabled = false
     form = ""
     maxlength = ""
@@ -10,7 +10,7 @@ export default class TextAreaTagData extends HTMLTagDataBase {
     placeholder = ""
     readonly = false
     required = false
-    rows = "2"
+    rows = ""
     wrap = ""
     constructor() {
         super()

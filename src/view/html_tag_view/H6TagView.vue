@@ -4,10 +4,27 @@
 
 <script lang="ts">
 import H6TagData from '@/html_tagdata/H6TagData';
+import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
 export default class H6TagView extends HTMLTagViewBase {
-    get text(): string { return this.tagdata_typed.text }
+    text: string
+    @Watch('text')
+    update_tagdata() {
+        let tagdata: H6TagData = new H6TagData()
+        tagdata.tagid = this.tagdata.tagid
+        tagdata.text = this.text
+        this.$emit("updated_tagdata", tagdata)
+    }
+
     get tagdata_typed(): H6TagData { return this.tagdata as H6TagData }
+    @Watch('tagdata')
+    update_view() {
+        this.text = this.tagdata_typed.text
+    }
+
+    created(): void {
+        this.update_view()
+    }
 }
 </script>

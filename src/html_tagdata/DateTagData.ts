@@ -3,13 +3,13 @@ import HTMLTagDataBase from "./HTMLTagDataBase";
 export default class DateTagData extends HTMLTagDataBase {
     name = ""
     value = ""
-    autocomplete = "default"
+    autocomplete = ""
     list = ""
     max = ""
     min = ""
     readonly = false
     required = false
-    step = "1"
+    step = ""
     constructor() {
         super()
         this.tagname = "date"

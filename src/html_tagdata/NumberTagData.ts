@@ -3,7 +3,7 @@ import HTMLTagDataBase from "./HTMLTagDataBase";
 export default class NumberTagData extends HTMLTagDataBase {
     name = ""
     value = ""
-    autocomplete = "default"
+    autocomplete = ""
     list = ""
     max = ""
     min = ""

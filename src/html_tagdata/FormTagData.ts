@@ -3,9 +3,9 @@ import HTMLTagDataBase from "./HTMLTagDataBase";
 export default class FormTagData extends HTMLTagDataBase {
     acceptcharset = ""
     action = ""
-    autocomplete = "on"
-    enctype = "application/x-www-form-urlencoded"
-    method = "get"
+    autocomplete = ""
+    enctype = ""
+    method = ""
     name = ""
     novalidate = true
     target = ""

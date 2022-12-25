@@ -5,7 +5,7 @@ export default class PasswordTagData extends HTMLTagDataBase {
     value = ""
     size = ""
     maxlength = ""
-    autocomplete = "default"
+    autocomplete = ""
     pattern = ""
     placeholder = ""
     readonly = false

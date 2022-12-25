@@ -3,9 +3,9 @@ import HTMLTagDataBase from "./HTMLTagDataBase";
 export default class EmailTagData extends HTMLTagDataBase {
     name = ""
     value = ""
-    size = "1"
+    size = ""
     maxlength = ""
-    autocomplete = "default"
+    autocomplete = ""
     multiple = false
     pattern = ""
     placeholder = ""

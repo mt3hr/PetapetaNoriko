@@ -3,13 +3,13 @@ import HTMLTagDataBase from "./HTMLTagDataBase";
 export default class DateTimeLocalTagData extends HTMLTagDataBase {
     name = ""
     value = ""
-    autocomplete = "default"
+    autocomplete = ""
     list = ""
     max = ""
     min = ""
     readonly = false
     required = false
-    step = "60"
+    step = ""
     constructor() {
         super()
         this.tagname = "datetime-local"

@@ -8,8 +8,8 @@ export default class ImageTagData extends HTMLTagDataBase {
     height = ""
     width = ""
     formaciton = ""
-    formenctype = "application/x-www-form-urlencoded"
-    formmethod = "get"
+    formenctype = ""
+    formmethod = ""
     formnovalidate = true
     formtarget = ""
     constructor() {

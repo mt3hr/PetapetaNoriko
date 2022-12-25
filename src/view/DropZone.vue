@@ -2,8 +2,8 @@
     <div>
         <h2>ドロップゾーン</h2>
         <div class="dropzone" @drop.stop="on_drop" @dragover.prevent="on_dragover">
-            <div v-for="tagdata, index in htmltag_datas" :key="index">
-                <HTMLTagView :tagdata="tagdata" />
+            <div v-for="tagdata, index in html_tagdatas" :key="index">
+                <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" />
             </div>
         </div>
     </div>
@@ -19,6 +19,7 @@ import H3TagData from '@/html_tagdata/H3TagData'
 import H4TagData from '@/html_tagdata/H4TagData'
 import H5TagData from '@/html_tagdata/H5TagData'
 import H6TagData from '@/html_tagdata/H6TagData'
+import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase'
 
 @Options({
     components: {
@@ -29,7 +30,8 @@ import H6TagData from '@/html_tagdata/H6TagData'
 
 
 export default class DropZone extends Vue {
-    htmltag_datas: Array<HTMLTagData> = new Array<HTMLTagData>()
+    html_tagdatas: Array<HTMLTagData> = new Array<HTMLTagData>()
+
     on_dragover(e: DragEvent) {
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             e.dataTransfer.dropEffect = "copy"
@@ -37,6 +39,7 @@ export default class DropZone extends Vue {
             e.dataTransfer.dropEffect = "move"
         }
     }
+
     on_drop(e: DragEvent) {
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             let tagname = e.dataTransfer.getData("ppmk/htmltag")
@@ -64,56 +67,45 @@ export default class DropZone extends Vue {
             }
             tag_data.position_x = e.pageX
             tag_data.position_y = e.pageY
-            this.htmltag_datas.push(tag_data)
+            this.html_tagdatas.push(tag_data)
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
             // すでに配置されたコンポーネントの移動
             let target_tag_id = e.dataTransfer.getData("ppmk/move_tag_id")
-            for (let i = 0; i < this.htmltag_datas.length; i++) {
-                let htmltag_data = this.htmltag_datas[i]
-                if (target_tag_id == htmltag_data.tagid) {
+            for (let i = 0; i < this.html_tagdatas.length; i++) {
+                let html_tagdata = this.html_tagdatas[i]
+                if (target_tag_id == html_tagdata.tagid) {
                     let offset_x = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
                     let offset_y = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
-                    htmltag_data.position_x = e.pageX - offset_x
-                    htmltag_data.position_y = e.pageY - offset_y
+                    html_tagdata.position_x = e.pageX - offset_x
+                    html_tagdata.position_y = e.pageY - offset_y
                     break
                 }
             }
-            let htmltag_datas = this.htmltag_datas
-            this.htmltag_datas = new Array<HTMLTagData>()
+            let html_tagdatas = this.html_tagdatas
+            this.html_tagdatas = new Array<HTMLTagDataBase>()
             this.$nextTick(() => {
-                this.htmltag_datas = htmltag_datas
+                this.html_tagdatas = html_tagdatas
+                this.updated_tagdata(null)
             })
         }
     }
-    generateHTML(): string {
-        let html = ""
-        html += "<html>"
-        for (let i = 0; i < this.htmltag_datas.length; i++) {
-            const component = this.htmltag_datas[i]
-            html += "  " + component.generate_html(false)
-        }
-        html += "</html>"
-        return html
-    }
 
-    generateHTMLWithID(): string {
-        let html = ""
-        html += "<html>\n"
-        for (let i = 0; i < this.htmltag_datas.length; i++) {
-            const component = this.htmltag_datas[i]
-            html += "  " + component.generate_html(true) + "\n"
+    updated_tagdata(tagdata: HTMLTagDataBase) {
+        if (tagdata) {
+            for (let i = 0; i < this.html_tagdatas.length; i++) {
+                if (tagdata.tagid == this.html_tagdatas[i].tagid) {
+                    this.html_tagdatas[i] = tagdata
+                    break
+                }
+            }
         }
-        html += "</html>"
-        return html
-    }
-
-    generateCSS(): string {
-        let css = ""
-        for (let i = 0; i < this.htmltag_datas.length; i++) {
-            const component = this.htmltag_datas[i]
-            css += component.generate_position_css()
-        }
-        return css
+        let html_tagdatas = this.html_tagdatas
+        this.html_tagdatas = new Array<HTMLTagDataBase>()
+        this.$nextTick(() => {
+            this.html_tagdatas = html_tagdatas
+            this.$emit('updated_htmltagdatas')
+        })
+        console.log(tagdata)
     }
 }
 </script>
