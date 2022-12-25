@@ -71,8 +71,9 @@ export default class DropZone extends Vue {
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
             // すでに配置されたコンポーネントの移動
             let target_tag_id = e.dataTransfer.getData("ppmk/move_tag_id")
+            let html_tagdata: HTMLTagData
             for (let i = 0; i < this.html_tagdatas.length; i++) {
-                let html_tagdata = this.html_tagdatas[i]
+                html_tagdata = this.html_tagdatas[i]
                 if (target_tag_id == html_tagdata.tagid) {
                     let offset_x = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
                     let offset_y = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
@@ -81,7 +82,7 @@ export default class DropZone extends Vue {
                     break
                 }
             }
-            this.updated_tagdata(null)
+            this.updated_tagdata(html_tagdata)
         }
     }
 
@@ -90,21 +91,18 @@ export default class DropZone extends Vue {
     }
 
     updated_tagdata(tagdata: HTMLTagDataBase) {
-        if (tagdata) {
-            for (let i = 0; i < this.html_tagdatas.length; i++) {
-                if (tagdata.tagid == this.html_tagdatas[i].tagid) {
-                    this.html_tagdatas[i] = tagdata
-                    break
-                }
+        for (let i = 0; i < this.html_tagdatas.length; i++) {
+            if (tagdata.tagid == this.html_tagdatas[i].tagid) {
+                this.html_tagdatas[i] = tagdata
+                break
             }
         }
         let html_tagdatas = this.html_tagdatas
         this.html_tagdatas = new Array<HTMLTagDataBase>()
         this.$nextTick(() => {
             this.html_tagdatas = html_tagdatas
-            this.$emit('updated_htmltagdatas')
+            this.$emit('updated_htmltagdatas', html_tagdatas, tagdata)
         })
-        console.log(tagdata)
     }
 }
 </script>

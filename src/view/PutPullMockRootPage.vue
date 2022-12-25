@@ -64,6 +64,7 @@ import DropZone from '@/view/DropZone.vue'
 import HTMLTagPropertyView from '@/view/HTMLTagPropertyView.vue'
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase'
 import PageData from '@/page/PageData'
+import { nextTick } from 'vue'
 
 @Options({
     components: {
@@ -75,26 +76,29 @@ import PageData from '@/page/PageData'
 })
 
 export default class PutPullMockRootPage extends Vue {
-    updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>) {
+    updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase) {
         let page_list_view: any = this.$refs["page_list_view"]
         let page_index = page_list_view.selected_index
         let pagedata = page_list_view.pagedatas[page_index]
         pagedata.html_tagdatas = html_tagdatas
+        this.onclick_tag(tagdata)
     }
     clicked_page(pagedata: PageData) {
         let dropzone: any = this.$refs["dropzone"]
         let html_tagdatas = pagedata.html_tagdatas
         dropzone.html_tagdatas = html_tagdatas
+        this.onclick_tag(null)
     }
     onclick_tag(tagdata: HTMLTagDataBase) {
         let property_view: any = this.$refs["property_view"]
-        console.log(property_view)
-        property_view.html_tagdata = tagdata
+        property_view.html_tagdata = new HTMLTagDataBase()
+        this.$nextTick(() => {
+            property_view.html_tagdata = tagdata
+        })
     }
     updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
         let dropzone: any = this.$refs["dropzone"]
         let index = -1
-        console.log(html_tagdata)
         for (let i = 0; i < dropzone.html_tagdatas.length; i++) {
             if (html_tagdata.tagid == dropzone.html_tagdatas[i].tagid) {
                 index = i

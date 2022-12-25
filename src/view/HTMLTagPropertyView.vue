@@ -2,9 +2,10 @@
     <div>
         <h2>プロパティ</h2>
         <table>
-            <tr v-for="property, index in properties" :key="index">
-                <td>{{ property.name }}:</td>
-                <td><input type="text" :value="property.value" @change="(e) => updated_property_value(e, property.name)" /> </td>
+            <tr v-for="property, index in properties" :key="index" :style="generate_style(property)">
+                <td>{{ get_property_name_jp(property.name) }}:</td>
+                <td><input type="text" :value="property.value" :disabled="is_editable_property(property)"
+                        @change="(e) => updated_property_value(e, property.name)" /> </td>
             </tr>
         </table>
     </div>
@@ -27,6 +28,9 @@ export default class HTMLTagPropertyView extends Vue {
     @Watch("html_tagdata")
     update_properties() {
         this.properties.splice(0)
+        if (!this.html_tagdata) {
+            return
+        }
         // 型変換しんどいので一度JSONにまるめてしまおう
         let json = JSON.stringify(this.html_tagdata)
         let html_tagdata = JSON.parse(json, deserialize)
@@ -48,6 +52,40 @@ export default class HTMLTagPropertyView extends Vue {
         html_tagdata[property_name] = value
 
         this.$emit('updated_html_tag_property', html_tagdata)
+    }
+
+    is_editable_property(property: Property): boolean {
+        switch (property.name) {
+            case "tagname":
+            case "tagid":
+                return true
+        }
+        return false
+    }
+
+    generate_style(property: Property): any {
+        switch (property.name) {
+            case "tagid":
+                return {
+                    "display": "none"
+                }
+        }
+        return {}
+    }
+    get_property_name_jp(name: string) {
+        switch (name) {
+            case "tagname":
+                return "タグ"
+            case "tagclass":
+                return "クラス"
+            case "position_x":
+                return "位置（x）"
+            case "position_y":
+                return "位置（y）"
+            case "text":
+                return "テキスト"
+        }
+        return name
     }
 }
 </script>
