@@ -1,5 +1,8 @@
 <template>
-    <input type="button" :style="position_css" @click="onclick_tag">
+    <input type="button" :style="position_css" @click="onclick_tag"
+    :name="name"
+    :value="value"
+    >
 </template>
 
 <script lang="ts">

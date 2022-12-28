@@ -1,6 +1,6 @@
 <template>
     <input type="radio" :style="position_css" @click="onclick_tag" :name="name" :value="value" :checked="checked"
-        :required="required">
+        :required="required"/>
 </template>
 
 <script lang="ts">

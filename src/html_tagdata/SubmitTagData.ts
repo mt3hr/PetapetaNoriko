@@ -12,7 +12,7 @@ export default class RadioTagData extends HTMLTagDataBase {
     formtarget = ""
     constructor() {
         super()
-        this.tagname = "radio"
+        this.tagname = "submit"
     }
     override generate_html(print_id_for_css: boolean): string {
         let html = ""

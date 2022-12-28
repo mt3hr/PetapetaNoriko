@@ -2,7 +2,7 @@ import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase from "./HTMLTagDataBase";
 
 @serializable
-export default class RadioTagData extends HTMLTagDataBase {
+export default class RangeTagData extends HTMLTagDataBase {
     name = ""
     value = ""
     autocomplete = ""
@@ -12,7 +12,7 @@ export default class RadioTagData extends HTMLTagDataBase {
     step = ""
     constructor() {
         super()
-        this.tagname = "radio"
+        this.tagname = "range"
     }
     override generate_html(print_id_for_css: boolean): string {
         let html = ""

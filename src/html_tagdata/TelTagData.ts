@@ -15,7 +15,7 @@ export default class RadioTagData extends HTMLTagDataBase {
     list = ""
     constructor() {
         super()
-        this.tagname = "radio"
+        this.tagname = "tel"
     }
     override generate_html(print_id_for_css: boolean): string {
         let html = ""
