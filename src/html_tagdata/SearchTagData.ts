@@ -2,38 +2,36 @@ import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase from "./HTMLTagDataBase";
 
 @serializable
-export default class TextAreaTagData extends HTMLTagDataBase {
-    autofocus = false
-    cols = ""
-    disabled = false
-    form = ""
-    maxlength = ""
+export default class RadioTagData extends HTMLTagDataBase {
     name = ""
+    value = ""
+    size = ""
+    maxlength = ""
+    autocomplete = ""
+    pattern = ""
     placeholder = ""
     readonly = false
     required = false
-    rows = ""
-    wrap = ""
+    list = ""
     constructor() {
         super()
-        this.tagname = "textarea"
+        this.tagname = "radio"
     }
     override generate_html(print_id_for_css: boolean): string {
         let html = ""
-        html += "<textarea"
+        html += "<input type=\"search\""
         if (print_id_for_css) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
-        if (this.autofocus) html += " autofocus"
-        if (this.cols != "") html += " cols=\"" + this.cols + "\""
-        if (this.disabled) html += " disabled"
-        if (this.form != "") html += " form=\"" + this.form + "\""
-        if (this.maxlength != "") html += " maxlength=\"" + this.maxlength + "\""
         if (this.name != "") html += " name=\"" + this.name + "\""
+        if (this.value != "") html += " value=\"" + this.value + "\""
+        if (this.size != "") html += " size=\"" + this.size + "\""
+        if (this.maxlength != "") html += " maxlength=\"" + this.maxlength + "\""
+        if (this.autocomplete != "") html += " autocomplete=\"" + this.autocomplete + "\""
+        if (this.pattern != "") html += " pattern=\"" + this.pattern + "\""
         if (this.placeholder != "") html += " placeholder=\"" + this.placeholder + "\""
         if (this.readonly) html += " readonly"
         if (this.required) html += " required"
-        if (this.rows != "") html += " rows=\"" + this.rows + "\""
-        if (this.wrap != "") html += " wrap=\"" + this.wrap + "\""
+        if (this.list != "") html += " list=\"" + this.list + "\""
         html += ">"
         return html
     }

@@ -1,16 +1,23 @@
 <template>
-    <H1TagView v-if="tagdata.tagname == 'h1'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <H2TagView v-if="tagdata.tagname == 'h2'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <H3TagView v-if="tagdata.tagname == 'h3'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <H4TagView v-if="tagdata.tagname == 'h4'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <H5TagView v-if="tagdata.tagname == 'h5'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <H6TagView v-if="tagdata.tagname == 'h6'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <div>
+        <H1TagView v-if="tagdata.tagname == 'h1'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+            @contextmenu="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+        <H2TagView v-if="tagdata.tagname == 'h2'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+            @contextmenu="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+        <H3TagView v-if="tagdata.tagname == 'h3'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+            @contextmenu="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+        <H4TagView v-if="tagdata.tagname == 'h4'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+            @contextmenu="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+        <H5TagView v-if="tagdata.tagname == 'h5'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+            @contextmenu="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+        <H6TagView v-if="tagdata.tagname == 'h6'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+            @contextmenu="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+        <v-menu v-model="is_show_contextmenu" :activator="this">
+            <v-list>
+                <v-list-item @click="delete_tag(tagdata)">削除</v-list-item>
+            </v-list>
+        </v-menu>
+    </div>
 </template>
 <script lang="ts">
 import { Vue, Options } from 'vue-class-component';
@@ -35,6 +42,12 @@ import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
 })
 export default class HTMLTagView extends Vue {
     @Prop({ require: true }) tagdata: HTMLTagDataBase
+    is_show_contextmenu = false
+
+    show_contextmenu(e: MouseEvent) {
+        e.preventDefault()
+        this.is_show_contextmenu = true
+    }
 
     on_drag_start(e: DragEvent) {
         e.dataTransfer.setData("ppmk/move_tag_id", this.tagdata.tagid)
@@ -48,6 +61,10 @@ export default class HTMLTagView extends Vue {
 
     updated_tagdata(tagdata: HTMLTagDataBase) {
         this.$emit("updated_tagdata", tagdata)
+    }
+
+    delete_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("delete_tagdata", tagdata)
     }
 }
 </script>

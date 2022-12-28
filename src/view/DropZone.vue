@@ -3,7 +3,8 @@
         <h2>ドロップゾーン</h2>
         <div class="dropzone" @drop.stop="on_drop" @dragover.prevent="on_dragover">
             <div v-for="tagdata, index in html_tagdatas" :key="index">
-                <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag" />
+                <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
+                    @delete_tagdata="delete_tagdata" />
             </div>
         </div>
     </div>
@@ -68,6 +69,7 @@ export default class DropZone extends Vue {
             tag_data.position_x = e.pageX
             tag_data.position_y = e.pageY
             this.html_tagdatas.push(tag_data)
+            this.updated_tagdata(tag_data)
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
             // すでに配置されたコンポーネントの移動
             let target_tag_id = e.dataTransfer.getData("ppmk/move_tag_id")
@@ -103,6 +105,19 @@ export default class DropZone extends Vue {
             this.html_tagdatas = html_tagdatas
             this.$emit('updated_htmltagdatas', html_tagdatas, tagdata)
         })
+    }
+
+    delete_tagdata(html_tagdata: HTMLTagDataBase) {
+        let index = -1
+        for (let i = 0; i < this.html_tagdatas.length; i++) {
+            if (html_tagdata.tagid == this.html_tagdatas[i].tagid) {
+                index = i
+                break
+            }
+        }
+        if (index != -1) {
+            this.html_tagdatas.splice(index, 1)
+        }
     }
 }
 </script>

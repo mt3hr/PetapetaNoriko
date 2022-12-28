@@ -13,6 +13,7 @@ export default class H1TagView extends HTMLTagViewBase {
     update_tagdata() {
         let tagdata: H1TagData = new H1TagData()
         tagdata.tagid = this.tagdata.tagid
+        tagdata.tagclass = this.tagdata.tagclass
         tagdata.text = this.text
         this.$emit("updated_tagdata", tagdata)
     }

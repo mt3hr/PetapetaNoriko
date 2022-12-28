@@ -38,7 +38,6 @@ export default class HTMLTagPropertyView extends Vue {
             let property: Property = new Property()
             property.name = key
             property.value = html_tagdata[key]
-            console.log(property.value)
             this.properties.push(property)
         })
     }
@@ -82,6 +81,8 @@ export default class HTMLTagPropertyView extends Vue {
                 return "位置（x）"
             case "position_y":
                 return "位置（y）"
+            case "scale":
+                return "大きさ"
             case "text":
                 return "テキスト"
         }

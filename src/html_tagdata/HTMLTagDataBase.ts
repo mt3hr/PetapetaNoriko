@@ -8,6 +8,7 @@ export default class HTMLTagDataBase {
     tagclass = ""
     position_x: number
     position_y: number
+    scale: number
     generate_html(print_id_for_css: boolean): string {
         return ""
     }

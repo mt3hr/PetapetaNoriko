@@ -17,6 +17,7 @@ export default class HTMLTagViewBase extends Vue {
         style.position = "absolute"
         style.left = this.tagdata.position_x + "px"
         style.top = this.tagdata.position_y + "px"
+        style.scale = this.tagdata.scale
         this.position_css = style
     }
 }

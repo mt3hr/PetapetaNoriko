@@ -1,49 +1,41 @@
 <template>
-    <input type="file" :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
-        :accept="accept" :multiple="multiple" :required="required">
+    <input type="radio" :style="position_css" @click="onclick_tag" :name="name" :value="value" :checked="checked"
+        :required="required">
 </template>
 
 <script lang="ts">
-import FileTagData from '@/html_tagdata/FileTagData';
+import RadioTagData from '@/html_tagdata/RadioTagData';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
-export default class FileTagView extends HTMLTagViewBase {
+export default class RadioTagView extends HTMLTagViewBase {
     name: string
     value: string
-    size: string
-    accept: string
-    multiple: boolean
+    checked: boolean
     required: boolean
 
     @Watch('name')
     @Watch('value')
-    @Watch('size')
-    @Watch('accept')
-    @Watch('multiple')
+    @Watch('checked')
     @Watch('required')
     update_tagdata() {
-        let tagdata: FileTagData = new FileTagData()
+        let tagdata: RadioTagData = new RadioTagData()
         tagdata.tagid = this.tagdata.tagid
         tagdata.tagclass = this.tagdata.tagclass
         tagdata.name = this.name
         tagdata.value = this.value
-        tagdata.size = this.size
-        tagdata.accept = this.accept
-        tagdata.multiple = this.multiple
+        tagdata.checked = this.checked
         tagdata.required = this.required
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): FileTagData { return this.tagdata as FileTagData }
+    get tagdata_typed(): RadioTagData { return this.tagdata as RadioTagData }
 
     @Watch('tagdata')
     update_view() {
         this.name = this.tagdata_typed.name
         this.value = this.tagdata_typed.value
-        this.size = this.tagdata_typed.size
-        this.accept = this.tagdata_typed.accept
-        this.multiple = this.tagdata_typed.multiple
+        this.checked = this.tagdata_typed.checked
         this.required = this.tagdata_typed.required
     }
 
