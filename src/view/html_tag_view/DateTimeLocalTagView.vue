@@ -1,5 +1,5 @@
 <template>
-    <input type="date-time-local" :style="position_css" @click="onclick_tag" :name="name" :value="value"
+    <input type="datetime-local" :style="position_css" @click="onclick_tag" :name="name" :value="value"
         :autocomplete="autocomplete" :list="list" :max="max" :min="min" :readonly="readonly" :required="required"
         :step="step">
 </template>

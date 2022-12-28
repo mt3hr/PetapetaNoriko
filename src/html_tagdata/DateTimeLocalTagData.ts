@@ -14,7 +14,7 @@ export default class DateTimeLocalTagData extends HTMLTagDataBase {
     step = ""
     constructor() {
         super()
-        this.tagname = "datetime-local"
+        this.tagname = "datetimelocal"
     }
     override generate_html(print_id_for_css: boolean): string {
         let html = ""

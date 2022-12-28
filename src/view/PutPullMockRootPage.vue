@@ -50,7 +50,7 @@
             <v-spacer />
             <v-col cols="auto">
                 <v-btn>読み込み</v-btn>
-                <v-btn>書き出し</v-btn>
+                <v-btn @click="print_html">書き出し</v-btn>
             </v-col>
         </v-row>
     </v-container>
@@ -64,7 +64,6 @@ import DropZone from '@/view/DropZone.vue'
 import HTMLTagPropertyView from '@/view/HTMLTagPropertyView.vue'
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase'
 import PageData from '@/page/PageData'
-import { nextTick } from 'vue'
 
 @Options({
     components: {
@@ -76,6 +75,13 @@ import { nextTick } from 'vue'
 })
 
 export default class PutPullMockRootPage extends Vue {
+    print_html() {
+        let page_list_view: any = this.$refs['page_list_view']
+        page_list_view.pagedatas.forEach(pagedata => {
+            console.log(pagedata.pagename)
+            console.log(pagedata.generate_html(false))
+        })
+    }
     updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase) {
         let page_list_view: any = this.$refs["page_list_view"]
         let page_index = page_list_view.selected_index
@@ -121,5 +127,10 @@ export default class PutPullMockRootPage extends Vue {
 .v-col {
     padding: 0px;
     margin: 0px;
+}
+</style>
+<style>
+input {
+    border: solid 1px silver !important;
 }
 </style>

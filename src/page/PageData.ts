@@ -6,10 +6,10 @@ export default class PageData {
 
     generate_html(print_id_for_css: boolean): string {
         let html = ""
-        html += "<html>"
+        html += "<html>\n"
         for (let i = 0; i < this.html_tagdatas.length; i++) {
             const tagdata = this.html_tagdatas[i]
-            html += "  " + tagdata.generate_html(print_id_for_css)
+            html += "  " + tagdata.generate_html(print_id_for_css) + "\n"
         }
         html += "</html>"
         return html
