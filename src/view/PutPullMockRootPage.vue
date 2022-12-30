@@ -150,6 +150,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 </script>
 <style scoped>
+
 .component {
     border: 1px black solid;
 }

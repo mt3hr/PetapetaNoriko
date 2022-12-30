@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2>ドロップゾーン</h2>
-        <div class="dropzone" @drop.prevent="on_drop" @dragover.prevent="on_dragover" :style="dropzone_style">
+        <div id="dropzone" class="dropzone" @drop.prevent="on_drop" @dragover.prevent="on_dragover" :style="dropzone_style">
             <div v-for="tagdata, index in html_tagdatas" :key="index">
                 <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
                     @delete_tagdata="delete_tagdata" />
@@ -208,8 +208,8 @@ export default class DropZone extends Vue {
                     tag_data = new LabelTagData()
                     break
             }
-            tag_data.position_x = e.pageX
-            tag_data.position_y = e.pageY
+            tag_data.position_x = e.offsetX
+            tag_data.position_y = e.offsetY
             this.html_tagdatas.push(tag_data)
             this.updated_tagdata(tag_data)
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
@@ -219,10 +219,12 @@ export default class DropZone extends Vue {
             for (let i = 0; i < this.html_tagdatas.length; i++) {
                 html_tagdata = this.html_tagdatas[i]
                 if (target_tag_id == html_tagdata.tagid) {
-                    let offset_x = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
-                    let offset_y = Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
-                    html_tagdata.position_x = e.pageX - offset_x
-                    html_tagdata.position_y = e.pageY - offset_y
+                    let dropzone_x = document.getElementById("dropzone").offsetLeft
+                    let dropzone_y = document.getElementById("dropzone").offsetTop
+                    html_tagdata.position_x = e.pageX - dropzone_x
+                    html_tagdata.position_y = e.pageY - dropzone_y
+                    html_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
+                    html_tagdata.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
                     break
                 }
             }
@@ -232,8 +234,8 @@ export default class DropZone extends Vue {
             reader.onload = (event: any) => {
                 let tag_data = new IMGTagData()
                 tag_data.src = event.currentTarget.result
-                tag_data.position_x = e.pageX
-                tag_data.position_y = e.pageY
+                tag_data.position_x = e.offsetX
+                tag_data.position_y = e.offsetY
                 this.html_tagdatas.push(tag_data)
                 this.updated_tagdata(tag_data)
             }
@@ -277,9 +279,7 @@ export default class DropZone extends Vue {
 </script>
 <style scoped>
 .dropzone {
-    /* height: 750px; */
-    /* width: 750px; */
-    overflow-block: hidden;
-    /*absoluteがあると効かないらしい？ */
+    overflow: hidden;
+    position: relative;
 }
 </style>

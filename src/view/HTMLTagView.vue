@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="tagwrap">
         <H1TagView v-if="tagdata.tagname == 'h1'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
             @contextmenu="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
         <H2TagView v-if="tagdata.tagname == 'h2'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
@@ -223,3 +223,8 @@ export default class HTMLTagView extends Vue {
     }
 }
 </script>
+<style scoped>
+.tagwrap {
+    position: relative;
+}
+</style>
