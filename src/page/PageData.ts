@@ -1,7 +1,13 @@
 import HTMLTagDataBase from "@/html_tagdata/HTMLTagDataBase"
+import { serializable } from "@/serializable/serializable"
+import generateUUID from "@/uuid"
 
+@serializable
 export default class PageData {
-    pagename = ""
+    pageid = generateUUID()
+    pagename = "ページ"
+    width = 700
+    height = 750
     html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
 
     generate_html(print_id_for_css: boolean): string {

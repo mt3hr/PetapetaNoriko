@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2>ドロップゾーン</h2>
-        <div class="dropzone" @drop.stop="on_drop" @dragover.prevent="on_dragover">
+        <div class="dropzone" @drop.prevent="on_drop" @dragover.prevent="on_dragover" :style="dropzone_style">
             <div v-for="tagdata, index in html_tagdatas" :key="index">
                 <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
                     @delete_tagdata="delete_tagdata" />
@@ -56,6 +56,7 @@ import TRTagData from '@/html_tagdata/TRTagData'
 import ULTagData from '@/html_tagdata/ULTagData'
 import CheckBoxTagData from '@/html_tagdata/CheckBoxTagData'
 import EmailTagData from '@/html_tagdata/EmailTagData'
+import { Prop } from 'vue-property-decorator'
 
 @Options({
     components: {
@@ -63,13 +64,14 @@ import EmailTagData from '@/html_tagdata/EmailTagData'
     }
 })
 
-
-
 export default class DropZone extends Vue {
     html_tagdatas: Array<HTMLTagData> = new Array<HTMLTagData>()
+    @Prop() dropzone_style: string
 
     on_dragover(e: DragEvent) {
-        if (e.dataTransfer.getData("ppmk/htmltag")) {
+        if (e.dataTransfer.items.length != 0) {
+            e.dataTransfer.dropEffect = "copy"
+        } else if (e.dataTransfer.getData("ppmk/htmltag")) {
             e.dataTransfer.dropEffect = "copy"
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
             e.dataTransfer.dropEffect = "move"
@@ -100,7 +102,6 @@ export default class DropZone extends Vue {
                 case "h6":
                     tag_data = new H6TagData()
                     break
-
                 case "p":
                     tag_data = new PTagData()
                     break
@@ -226,7 +227,19 @@ export default class DropZone extends Vue {
                 }
             }
             this.updated_tagdata(html_tagdata)
+        } else if (e.dataTransfer.items.length != 0) {
+            const reader = new FileReader()
+            reader.onload = (event: any) => {
+                let tag_data = new IMGTagData()
+                tag_data.src = event.currentTarget.result
+                tag_data.position_x = e.pageX
+                tag_data.position_y = e.pageY
+                this.html_tagdatas.push(tag_data)
+                this.updated_tagdata(tag_data)
+            }
+            reader.readAsDataURL(e.dataTransfer.files[0])
         }
+        e.preventDefault()
     }
 
     onclick_tag(tagdata: HTMLTagData) {
@@ -264,8 +277,8 @@ export default class DropZone extends Vue {
 </script>
 <style scoped>
 .dropzone {
-    height: 750px;
-    width: 750px;
+    /* height: 750px; */
+    /* width: 750px; */
     overflow-block: hidden;
     /*absoluteがあると効かないらしい？ */
 }

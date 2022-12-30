@@ -1,36 +1,58 @@
 <template>
     <div>
-        <h2>ページ一覧</h2>
+        <h2>
+            ページ一覧
+            <v-btn @click="add_page">+</v-btn>
+        </h2>
         <ul>
-            <li v-for="(pagedata, index) in pagedatas" @click="clicked_page(index)" :key="index"
-                :style="generate_style(index)">{{ pagedata.pagename }}</li>
+            <PageListItem v-for="(pagedata, index) in pagedatas" :pagedata="pagedata" :key="index"
+                :style="generate_style(index)" @clicked_page="clicked_page" @delete_page="delete_page" />
         </ul>
     </div>
 </template>
 <script lang="ts">
 import PageData from '@/page/PageData';
-import { Vue } from 'vue-class-component';
+import PageListItem from '@/page/PageListItem.vue';
+import { Options, Vue } from 'vue-class-component';
 
+
+@Options({
+    components: {
+        PageListItem,
+    }
+})
 export default class Page extends Vue {
     selected_index = 0
     pagedatas: Array<PageData> = new Array<PageData>()
 
-    clicked_page(index: number) {
-        this.selected_index = index
-        this.$emit('clicked_page', this.pagedatas[index])
+    is_show_contextmenu: Array<Boolean> = new Array<Boolean>()
+
+    clicked_page(pagedata: PageData) {
+        for (let i = 0; i < this.pagedatas.length; i++) {
+            if (pagedata.pageid == this.pagedatas[i].pageid) {
+                this.selected_index = i
+                break
+            }
+        }
+        this.$emit('clicked_page', pagedata)
+    }
+
+    delete_page(pagedata: PageData) {
+        let deleteindex = -1
+        for (let i = 0; i < this.pagedatas.length; i++) {
+            if (pagedata.pageid == this.pagedatas[i].pageid) {
+                deleteindex = i
+                break
+            }
+        }
+        if (deleteindex != -1) {
+            this.pagedatas.splice(deleteindex, 1)
+            this.$emit('delete_page', pagedata)
+        }
     }
 
     created(): void {
-        //TODO けして
-        let page1 = new PageData()
-        page1.pagename = "ページ1"
-        let page2 = new PageData()
-        page2.pagename = "ページ2"
-        this.pagedatas.push(page1)
-        this.pagedatas.push(page2)
-        this.$nextTick(() => {
-            this.clicked_page(0)
-        })
+        this.add_page()
     }
 
     generate_style(index: number): any {
@@ -40,6 +62,15 @@ export default class Page extends Vue {
             }
         }
         return {}
+    }
+
+    add_page() {
+        let pagedata = new PageData()
+        this.pagedatas.push(pagedata)
+        this.$nextTick(() => {
+            this.clicked_page(pagedata)
+        })
+        this.is_show_contextmenu = new Array<Boolean>(this.pagedatas.length)
     }
 }
 </script>

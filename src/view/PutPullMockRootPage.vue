@@ -15,12 +15,11 @@
                 <v-container>
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
-                        <PageListView class="component" ref="page_list_view" @clicked_page="clicked_page">
-                        </PageListView> <!--TODO-->
+                        <PageListView class="component" ref="page_list_view" @clicked_page="clicked_page" />
                     </v-row>
                     <v-row>
                         <!--タグリストビュー。ここからタグをドラッグしてドロップゾーンに貼り付ける-->
-                        <TagListView class="component"></TagListView> <!--TODO-->
+                        <TagListView class="component" />
                     </v-row>
                 </v-container>
             </v-col>
@@ -28,7 +27,7 @@
             <!--ドロップゾーン-->
             <v-col cols="auto" class="dropzone">
                 <DropZone class="component" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"
-                    @onclick_tag="onclick_tag"></DropZone>
+                    @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 <!--TODO-->
             </v-col>
 
@@ -37,12 +36,19 @@
                 <v-container>
                     <v-row>
                         <v-col cols="auto">
-                            <!--プロパティビュー-->
-                            <HTMLTagPropertyView class="component" ref="property_view"
-                                @updated_html_tag_property="updated_html_tag_property"></HTMLTagPropertyView>
-                            <!--TODO-->
+                            <!--ページプロパティビュー-->
+                            <PagePropertyView class="component" ref="page_property_view"
+                                @updated_page_property="updated_page_property" />
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col cols="auto">
+                            <!--プロパティビュー-->
+                            <HTMLTagPropertyView class="component" ref="property_view"
+                                @updated_html_tag_property="updated_html_tag_property" />
+                        </v-col>
+                    </v-row>
+                    <!--TODO-->
                 </v-container>
             </v-col>
         </v-row>
@@ -62,6 +68,7 @@ import PageListView from '@/view/PageListView.vue'
 import TagListView from '@/view/TagListView.vue'
 import DropZone from '@/view/DropZone.vue'
 import HTMLTagPropertyView from '@/view/HTMLTagPropertyView.vue'
+import PagePropertyView from '@/view/PagePropertyView.vue'
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase'
 import PageData from '@/page/PageData'
 
@@ -71,10 +78,14 @@ import PageData from '@/page/PageData'
         TagListView,
         DropZone,
         HTMLTagPropertyView,
+        PagePropertyView,
     }
 })
 
 export default class PutPullMockRootPage extends Vue {
+    width_dropzone = 100
+    height_dropzone = 100
+
     print_html() {
         let page_list_view: any = this.$refs['page_list_view']
         page_list_view.pagedatas.forEach(pagedata => {
@@ -93,6 +104,11 @@ export default class PutPullMockRootPage extends Vue {
         let dropzone: any = this.$refs["dropzone"]
         let html_tagdatas = pagedata.html_tagdatas
         dropzone.html_tagdatas = html_tagdatas
+
+        let page_property_view: any = this.$refs["page_property_view"]
+        page_property_view.page_data = pagedata
+        this.width_dropzone = pagedata.width
+        this.height_dropzone = pagedata.height
         this.onclick_tag(null)
     }
     onclick_tag(tagdata: HTMLTagDataBase) {
@@ -113,6 +129,22 @@ export default class PutPullMockRootPage extends Vue {
         }
         if (index != -1) {
             dropzone.html_tagdatas.splice(index, 1, html_tagdata)
+        }
+    }
+    updated_page_property(page_data: PageData) {
+        let page_list_view: any = this.$refs["page_list_view"]
+        for (let i = 0; i < page_list_view.pagedatas.length; i++) {
+            if (page_list_view.pagedatas[i].pageid == page_data.pageid) {
+                page_list_view.pagedatas.splice(i, 1, page_data)
+                break
+            }
+        }
+        page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
+    }
+    get dropzone_style(): any {
+        return {
+            "width": this.width_dropzone + "px",
+            "height": this.height_dropzone + "px",
         }
     }
 }
