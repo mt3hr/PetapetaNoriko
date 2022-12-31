@@ -25,8 +25,6 @@ export default class Page extends Vue {
     selected_index = 0
     pagedatas: Array<PageData> = new Array<PageData>()
 
-    is_show_contextmenu: Array<Boolean> = new Array<Boolean>()
-
     clicked_page(pagedata: PageData) {
         for (let i = 0; i < this.pagedatas.length; i++) {
             if (pagedata.pageid == this.pagedatas[i].pageid) {
@@ -70,7 +68,6 @@ export default class Page extends Vue {
         this.$nextTick(() => {
             this.clicked_page(pagedata)
         })
-        this.is_show_contextmenu = new Array<Boolean>(this.pagedatas.length)
     }
 }
 </script>
