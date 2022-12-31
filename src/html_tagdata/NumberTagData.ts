@@ -32,4 +32,7 @@ export default class NumberTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
+    override to_string(): string {
+        return this.name
+    }
 }

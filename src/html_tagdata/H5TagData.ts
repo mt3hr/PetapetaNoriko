@@ -16,4 +16,7 @@ export default class H5TagData extends HTMLTagDataBase {
         html += ">" + this.text + "</h5>"
         return html
     }
+    override to_string(): string {
+        return this.text
+    }
 }

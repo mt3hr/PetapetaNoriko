@@ -28,4 +28,6 @@ export default class IMGTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
-}
+override to_string(): string {
+        return this.alt
+    }}

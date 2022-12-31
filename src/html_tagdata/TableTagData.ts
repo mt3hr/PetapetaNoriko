@@ -13,4 +13,7 @@ export default class TableTagData extends HTMLTagDataBase {
         // TODO 
         return ""
     }
+    override to_string(): string {
+        return "table"
+    }
 }

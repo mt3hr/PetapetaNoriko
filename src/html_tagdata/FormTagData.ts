@@ -17,4 +17,7 @@ export default class FormTagData extends HTMLTagDataBase {
         // TODO 
         return ""
     }
+    override to_string(): string {
+        return this.name
+    }
 }

@@ -14,4 +14,7 @@ export default class SelectTagData extends HTMLTagDataBase {
         // TODO 
         return ""
     }
+    override to_string(): string {
+        return this.name
+    }
 }

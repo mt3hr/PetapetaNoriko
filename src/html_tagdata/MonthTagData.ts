@@ -33,4 +33,6 @@ export default class MonthTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
-}
+override to_string(): string {
+        return this.name
+    }}

@@ -21,4 +21,7 @@ export default class ColorTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
+    override to_string(): string {
+        return this.name
+    }
 }

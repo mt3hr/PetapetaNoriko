@@ -37,4 +37,7 @@ export default class TextAreaTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
+    override to_string(): string {
+        return this.name
+    }
 }

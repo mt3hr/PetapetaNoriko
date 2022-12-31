@@ -9,4 +9,6 @@ export default class ULTagData extends HTMLTagDataBase {
         // TODO 
         return ""
     }
-}
+override to_string(): string {
+        return "ul"
+    }}

@@ -16,4 +16,7 @@ export default class H3TagData extends HTMLTagDataBase {
         html += ">" + this.text + "</h3>"
         return html
     }
+    override to_string(): string {
+        return this.text
+    }
 }

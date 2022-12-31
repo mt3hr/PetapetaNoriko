@@ -39,4 +39,7 @@ export default class ATagData extends HTMLTagDataBase {
         html += "</a>"
         return html
     }
+    override to_string(): string {
+        return this.text
+    }
 }

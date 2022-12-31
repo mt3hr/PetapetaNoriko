@@ -3,6 +3,7 @@ import generateUUID from "@/uuid"
 
 @serializable
 export default class HTMLTagDataBase {
+    child_tags: Array<HTMLTagDataBase>
     tagname: string
     tagid = generateUUID()
     tagclass = ""
@@ -14,5 +15,8 @@ export default class HTMLTagDataBase {
     }
     generate_position_css(): string {
         return "#" + this.tagid + " {\n  position: relative;\n  left: " + this.position_x + "px;\n" + "  top: " + this.position_y + "px;\n}\n"
+    }
+    to_string(): string {
+        return "tagbase"
     }
 }

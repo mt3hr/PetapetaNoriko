@@ -17,4 +17,7 @@ export default class RadioTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
+    override to_string(): string {
+        return this.value
+    }
 }

@@ -31,4 +31,7 @@ export default class TimeTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
+    override to_string(): string {
+        return this.name
+    }
 }

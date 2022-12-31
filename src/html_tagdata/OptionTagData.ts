@@ -13,4 +13,7 @@ export default class OptionTagData extends HTMLTagDataBase {
         // TODO 
         return ""
     }
+    override to_string(): string {
+        return this.label
+    }
 }

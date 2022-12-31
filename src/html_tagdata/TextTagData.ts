@@ -24,7 +24,7 @@ export default class RadioTagData extends HTMLTagDataBase {
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
         if (this.name != "") html += " name=\"" + this.name + "\""
         if (this.value != "") html += " value=\"" + this.value + "\""
-        if (this.size!="") html += " size=\"" + this.size + "\""
+        if (this.size != "") html += " size=\"" + this.size + "\""
         if (this.maxlength != "") html += " maxlength=\"" + this.maxlength + "\""
         if (this.autocomplete != "") html += " autocomplete=\"" + this.autocomplete + "\""
         if (this.pattern) html += " pattern=\"" + this.pattern + "\""
@@ -34,5 +34,8 @@ export default class RadioTagData extends HTMLTagDataBase {
         if (this.list != "") html += " list=\"" + this.list + "\""
         html += ">"
         return html
+    }
+    override to_string(): string {
+        return this.name
     }
 }

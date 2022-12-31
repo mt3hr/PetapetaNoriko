@@ -11,4 +11,7 @@ export default class OLTagData extends HTMLTagDataBase {
         // TODO 
         return ""
     }
+    override to_string(): string {
+        return "ol"
+    }
 }

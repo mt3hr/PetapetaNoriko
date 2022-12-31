@@ -18,4 +18,7 @@ export default class LITagData extends HTMLTagDataBase {
         html += ">" + this.text + "</label>"
         return html
     }
+    override to_string(): string {
+        return this.text
+    }
 }

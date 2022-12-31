@@ -19,4 +19,7 @@ export default class ButtonTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
+    override to_string(): string {
+        return this.name
+    }
 }

@@ -16,4 +16,7 @@ export default class PTagData extends HTMLTagDataBase {
         html += ">" + this.text + "</p>"
         return html
     }
+    override to_string(): string {
+        return this.text
+    }
 }
