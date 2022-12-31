@@ -6,10 +6,10 @@
                 <td>{{ get_property_name_jp(property.name) }}:</td>
                 <td><input v-if="!use_textarea(property.name)" type="text" :value="property.value"
                         :disabled="is_editable_property(property)"
-                        @keypress="(e) => updated_property_value(e, property.name)" />
+                        @keyup="(e) => updated_property_value(e, property.name)" />
                     <textarea v-else :value="property.value"
                         :disabled="is_editable_property(property)"
-                        @keypress="(e) => updated_property_value(e, property.name)"></textarea>
+                        @keyup="(e) => updated_property_value(e, property.name)"></textarea>
                 </td>
             </tr>
         </table>
@@ -70,6 +70,7 @@ export default class HTMLTagPropertyView extends Vue {
     generate_style(property: Property): any {
         switch (property.name) {
             case "tagid":
+            case "child_tags":
                 return {
                     "display": "none"
                 }
