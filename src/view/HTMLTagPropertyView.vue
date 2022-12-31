@@ -96,12 +96,11 @@ export default class HTMLTagPropertyView extends Vue {
     }
 
     use_textarea(name: string): boolean {
+        switch (name) {
+            case "text":
+                return true
+        }
         return false
-        // switch (name) {
-        //     case "text":
-        //         return true
-        // }
-        // return false
     }
 }
 </script>

@@ -15,18 +15,19 @@
                 <v-container>
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
-                        <PageListView class="component" ref="page_list_view" @clicked_page="clicked_page" />
+                        <PageListView class="component page_list_view" ref="page_list_view"
+                            @clicked_page="clicked_page" />
                     </v-row>
                     <v-row>
                         <!--タグリストビュー。ここからタグをドラッグしてドロップゾーンに貼り付ける-->
-                        <TagListView class="component" />
+                        <TagListView class="component html_tag_list_view" />
                     </v-row>
                 </v-container>
             </v-col>
 
             <!--ドロップゾーン-->
-            <v-col cols="auto" class="dropzone">
-                <DropZone class="component" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"
+            <v-col cols="auto" class="dropzone_wrap">
+                <DropZone class="component dropzone_wrap" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"
                     @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 <!--TODO-->
             </v-col>
@@ -37,21 +38,21 @@
                     <v-row>
                         <v-col cols="auto">
                             <!--ページプロパティビュー-->
-                            <PagePropertyView class="component" ref="page_property_view"
+                            <PagePropertyView class="component page_property_view" ref="page_property_view"
                                 @updated_page_property="updated_page_property" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">
                             <!--プロパティビュー-->
-                            <HTMLTagPropertyView class="component" ref="property_view"
+                            <HTMLTagPropertyView class="component property_view" ref="property_view"
                                 @updated_html_tag_property="updated_html_tag_property" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">
                             <!--構造ビュー-->
-                            <HTMLTagStructView class="component" ref="struct_view"
+                            <HTMLTagStructView class="component struct_view" ref="struct_view"
                                 @updated_html_tagdatas="(html_tagdatas) => updated_htmltagdatas(html_tagdatas, null)" />
                         </v-col>
                     </v-row>
@@ -176,6 +177,14 @@ export default class PutPullMockRootPage extends Vue {
 <style scoped>
 .component {
     border: 1px black solid;
+    overflow: hidden;
+    width: 240px;
+}
+
+.dropzone_wrap {
+    white-space: pre-line;
+    width: fit-content;
+    height: fit-content;
 }
 
 .v-container,
@@ -183,6 +192,31 @@ export default class PutPullMockRootPage extends Vue {
 .v-col {
     padding: 0px;
     margin: 0px;
+}
+
+.page_list_view {
+    height: 150px;
+    overflow-y: scroll;
+}
+
+.html_tag_list_view {
+    height: 600px;
+    overflow-y: scroll;
+}
+
+.page_property_view {
+    height: 170px;
+    overflow-y: scroll;
+}
+
+.property_view {
+    height: 300px;
+    overflow-y: scroll;
+}
+
+.struct_view {
+    height: 300px;
+    overflow-y: scroll;
 }
 </style>
 <style>
