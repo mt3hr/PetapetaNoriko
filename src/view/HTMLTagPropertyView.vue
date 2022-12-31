@@ -4,8 +4,13 @@
         <table>
             <tr v-for="property, index in properties" :key="index" :style="generate_style(property)">
                 <td>{{ get_property_name_jp(property.name) }}:</td>
-                <td><input type="text" :value="property.value" :disabled="is_editable_property(property)"
-                        @change="(e) => updated_property_value(e, property.name)" /> </td>
+                <td><input v-if="!use_textarea(property.name)" type="text" :value="property.value"
+                        :disabled="is_editable_property(property)"
+                        @keypress="(e) => updated_property_value(e, property.name)" />
+                    <textarea v-else :value="property.value"
+                        :disabled="is_editable_property(property)"
+                        @keypress="(e) => updated_property_value(e, property.name)"></textarea>
+                </td>
             </tr>
         </table>
     </div>
@@ -87,6 +92,15 @@ export default class HTMLTagPropertyView extends Vue {
                 return "テキスト"
         }
         return name
+    }
+
+    use_textarea(name: string): boolean {
+        return false
+        // switch (name) {
+        //     case "text":
+        //         return true
+        // }
+        // return false
     }
 }
 </script>

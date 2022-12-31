@@ -48,7 +48,13 @@
                                 @updated_html_tag_property="updated_html_tag_property" />
                         </v-col>
                     </v-row>
-                    <!--TODO-->
+                    <v-row>
+                        <v-col cols="auto">
+                            <!--構造ビュー-->
+                            <HTMLTagStructView class="component" ref="struct_view"
+                                @updated_html_tagdatas="(html_tagdatas) => updated_htmltagdatas(html_tagdatas, null)" />
+                        </v-col>
+                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -71,6 +77,7 @@ import HTMLTagPropertyView from '@/view/HTMLTagPropertyView.vue'
 import PagePropertyView from '@/view/PagePropertyView.vue'
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase'
 import PageData from '@/page/PageData'
+import HTMLTagStructView from './HTMLTagStructView.vue'
 
 @Options({
     components: {
@@ -79,6 +86,7 @@ import PageData from '@/page/PageData'
         DropZone,
         HTMLTagPropertyView,
         PagePropertyView,
+        HTMLTagStructView,
     }
 })
 
@@ -98,8 +106,10 @@ export default class PutPullMockRootPage extends Vue {
         let page_index = page_list_view.selected_index
         let pagedata = page_list_view.pagedatas[page_index]
         pagedata.html_tagdatas = html_tagdatas
-        this.onclick_tag(tagdata)
+        if (tagdata) this.onclick_tag(tagdata)
+        this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
     }
+
     clicked_page(pagedata: PageData) {
         let dropzone: any = this.$refs["dropzone"]
         let html_tagdatas = pagedata.html_tagdatas
@@ -110,7 +120,11 @@ export default class PutPullMockRootPage extends Vue {
         this.width_dropzone = pagedata.width
         this.height_dropzone = pagedata.height
         this.onclick_tag(null)
+
+        let page_list_view: any = this.$refs["page_list_view"]
+        this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
     }
+
     onclick_tag(tagdata: HTMLTagDataBase) {
         let property_view: any = this.$refs["property_view"]
         property_view.html_tagdata = new HTMLTagDataBase()
@@ -118,18 +132,21 @@ export default class PutPullMockRootPage extends Vue {
             property_view.html_tagdata = tagdata
         })
     }
+
     updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
-        let dropzone: any = this.$refs["dropzone"]
+        let page_list_view: any = this.$refs["page_list_view"]
+        let tagdatas = page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas
         let index = -1
-        for (let i = 0; i < dropzone.html_tagdatas.length; i++) {
-            if (html_tagdata.tagid == dropzone.html_tagdatas[i].tagid) {
+        for (let i = 0; i < tagdatas.length; i++) {
+            if (html_tagdata.tagid == tagdatas[i].tagid) {
                 index = i
                 break
             }
         }
         if (index != -1) {
-            dropzone.html_tagdatas.splice(index, 1, html_tagdata)
+            tagdatas.splice(index, 1, html_tagdata)
         }
+        this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
     }
     updated_page_property(page_data: PageData) {
         let page_list_view: any = this.$refs["page_list_view"]
@@ -140,7 +157,14 @@ export default class PutPullMockRootPage extends Vue {
             }
         }
         page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
+        this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
     }
+
+    update_struct_view(tagdatas: Array<HTMLTagDataBase>) {
+        let struct_view: any = this.$refs["struct_view"]
+        struct_view.html_tagdatas = tagdatas
+    }
+
     get dropzone_style(): any {
         return {
             "width": this.width_dropzone + "px",
@@ -150,7 +174,6 @@ export default class PutPullMockRootPage extends Vue {
 }
 </script>
 <style scoped>
-
 .component {
     border: 1px black solid;
 }
@@ -163,7 +186,8 @@ export default class PutPullMockRootPage extends Vue {
 }
 </style>
 <style>
-input {
+input,
+textarea {
     border: solid 1px silver !important;
 }
 </style>
