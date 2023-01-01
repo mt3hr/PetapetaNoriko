@@ -1,7 +1,7 @@
 <template>
     <input type="week" :style="position_css" @click="onclick_tag" :name="name" :value="value"
         :autocomplete="autocomplete" :list="list" :max="max" :min="min" :readonly="readonly" :required="required"
-        :step="step">
+        :class="tagclass" :step="step">
 </template>
 
 <script lang="ts">
@@ -19,8 +19,10 @@ export default class WeekTagView extends HTMLTagViewBase {
     readonly: boolean
     required: boolean
     step: string
+    tagclass: string
 
     @Watch('name')
+    @Watch('tagclass')
     @Watch('value')
     @Watch('autocomplete')
     @Watch('list')
@@ -32,7 +34,7 @@ export default class WeekTagView extends HTMLTagViewBase {
     update_tagdata() {
         let tagdata: WeekTagData = new WeekTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.name = this.name
         tagdata.value = this.value
         tagdata.autocomplete = this.autocomplete
@@ -49,6 +51,7 @@ export default class WeekTagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.name = this.tagdata_typed.name
         this.value = this.tagdata_typed.value
         this.autocomplete = this.tagdata_typed.autocomplete

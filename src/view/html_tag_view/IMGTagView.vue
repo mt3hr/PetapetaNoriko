@@ -1,6 +1,6 @@
 <template>
-    <img :style="position_css" @click="onclick_tag" :src="src" :alt="alt" :usemap="usemap" :ismap="ismap" :width="width"
-        :height="height" />
+    <img :class="tagclass" :style="position_css" @click="onclick_tag" :src="src" :alt="alt" :usemap="usemap" :ismap="ismap"
+        :width="width" :height="height" />
 </template>
 
 <script lang="ts">
@@ -15,8 +15,10 @@ export default class IMGTagView extends HTMLTagViewBase {
     ismap: string
     width: string
     height: string
+    tagclass: string
 
     @Watch('src')
+    @Watch('tagclass')
     @Watch('alt')
     @Watch('usemap')
     @Watch('ismap')
@@ -25,7 +27,7 @@ export default class IMGTagView extends HTMLTagViewBase {
     update_tagdata() {
         let tagdata: IMGTagData = new IMGTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.src = this.src
         tagdata.alt = this.alt
         tagdata.usemap = this.usemap
@@ -39,6 +41,7 @@ export default class IMGTagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.src = this.tagdata_typed.src
         this.alt = this.tagdata_typed.alt
         this.usemap = this.tagdata_typed.usemap

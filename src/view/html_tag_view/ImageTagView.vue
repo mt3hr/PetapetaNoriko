@@ -1,7 +1,7 @@
 <template>
     <input type="image" :style="position_css" @click="onclick_tag" :name="name" :value="value" :src="src" :alt="alt"
-        :height="height" :width="width" :formaciton="formaciton" :formenctype="formenctype" :formmethod="formmethod"
-        :formnovalidate="formnovalidate" :formtarget="formtarget">
+        :class="tagclass" :height="height" :width="width" :formaciton="formaciton" :formenctype="formenctype"
+        :formmethod="formmethod" :formnovalidate="formnovalidate" :formtarget="formtarget">
 </template>
 
 <script lang="ts">
@@ -21,9 +21,10 @@ export default class TagView extends HTMLTagViewBase {
     formmethod: string
     formnovalidate: boolean
     formtarget: string
-
+    tagclass: string
 
     @Watch('name')
+    @Watch('tagclass')
     @Watch('value')
     @Watch('src')
     @Watch('alt')
@@ -37,7 +38,7 @@ export default class TagView extends HTMLTagViewBase {
     update_tagdata() {
         let tagdata: ImageTagData = new ImageTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.name = this.name
         tagdata.value = this.value
         tagdata.src = this.src
@@ -55,6 +56,7 @@ export default class TagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.name = this.tagdata_typed.name
         this.value = this.tagdata_typed.value
         this.src = this.tagdata_typed.src

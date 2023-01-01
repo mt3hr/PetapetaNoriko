@@ -1,6 +1,6 @@
 <template>
     <input type="file" :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
-        :accept="accept" :multiple="multiple" :required="required">
+        :class="tagclass" :accept="accept" :multiple="multiple" :required="required">
 </template>
 
 <script lang="ts">
@@ -15,8 +15,10 @@ export default class FileTagView extends HTMLTagViewBase {
     accept: string
     multiple: boolean
     required: boolean
+    tagclass: string
 
     @Watch('name')
+    @Watch('tagclass')
     @Watch('value')
     @Watch('size')
     @Watch('accept')
@@ -25,7 +27,7 @@ export default class FileTagView extends HTMLTagViewBase {
     update_tagdata() {
         let tagdata: FileTagData = new FileTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.name = this.name
         tagdata.value = this.value
         tagdata.size = this.size
@@ -39,6 +41,7 @@ export default class FileTagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.name = this.tagdata_typed.name
         this.value = this.tagdata_typed.value
         this.size = this.tagdata_typed.size

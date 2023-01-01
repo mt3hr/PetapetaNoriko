@@ -1,7 +1,11 @@
 <template>
     <div>
+        <component :is="'style'">
+            {{ style_user_edited_fixed }}
+        </component>
         <h2>ドロップゾーン</h2>
-        <div id="dropzone" class="dropzone" @drop.prevent="on_drop" @dragover.prevent="on_dragover" :style="dropzone_style">
+        <div id="dropzone" class="dropzone" @drop.prevent="on_drop" @dragover.prevent="on_dragover"
+            :style="dropzone_style">
             <div v-for="tagdata, index in html_tagdatas" :key="index">
                 <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
                     @delete_tagdata="delete_tagdata" />
@@ -66,7 +70,42 @@ import { Prop } from 'vue-property-decorator'
 
 export default class DropZone extends Vue {
     html_tagdatas: Array<HTMLTagData> = new Array<HTMLTagData>()
-    @Prop() dropzone_style: string
+    style_user_edited = ""
+    @Prop() dropzone_style: any
+
+    // https://stackoverflow.com/questions/3326494/parsing-css-in-javascript-jquery
+    rulesForCssText(styleContent) {
+        let doc = document.implementation.createHTMLDocument(""),
+            styleElement = document.createElement("style");
+        styleElement.textContent = styleContent;
+        doc.body.appendChild(styleElement);
+        return styleElement.sheet.cssRules;
+    }
+
+    get style_user_edited_fixed(): string {
+        try {
+
+            let style = ""
+            let css_rules: any = this.rulesForCssText(this.style_user_edited)
+            for (let i = 0; i < css_rules.length; i++) {
+                let css_element = css_rules[i]
+                let css_text = css_element.cssText
+                let css_text_spl = css_text.split("{")
+                let target = css_text_spl[0]
+                let rules = "{" + css_text_spl[1]
+
+                target = "#dropzone " + target
+                console.log(target)
+                console.log(rules)
+
+                style += target + rules + "\n"
+            }
+            return style
+        } catch (error) {
+            console.log(error)
+            return ""
+        }
+    }
 
     on_dragover(e: DragEvent) {
         if (e.dataTransfer.items.length != 0) {

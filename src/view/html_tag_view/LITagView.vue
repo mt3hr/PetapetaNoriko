@@ -1,5 +1,5 @@
 <template>
-    <li :style="position_css" @click="onclick_tag" :value="value">{{ text }}</li>
+    <li :class="tagclass" :style="position_css" @click="onclick_tag" :value="value">{{ text }}</li>
 </template>
 
 <script lang="ts">
@@ -10,12 +10,14 @@ import HTMLTagViewBase from './HTMLTagViewBase';
 export default class TagView extends HTMLTagViewBase {
     text: string
     value: string
+    tagclass: string
 
     @Watch('text')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: LITagData = new LITagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.text = this.text
         tagdata.value = this.value
         this.$emit("updated_tagdata", tagdata)
@@ -25,6 +27,7 @@ export default class TagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.text = this.tagdata_typed.text
         this.value = this.tagdata_typed.value
     }

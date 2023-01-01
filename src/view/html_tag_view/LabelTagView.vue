@@ -1,5 +1,6 @@
 <template>
-    <label :style="position_css" @click="onclick_tag" :form="form" :for="this.for" :text="text">{{ text }}</label>
+    <label :class="tagclass" :style="position_css" @click="onclick_tag" :form="form" :for="this.for" :text="text">{{ text
+        }}</label>
 </template>
 
 <script lang="ts">
@@ -11,14 +12,16 @@ export default class LabelTagView extends HTMLTagViewBase {
     form: string
     for: string
     text: string
+    tagclass: string
 
     @Watch('form')
+    @Watch('tagclass')
     @Watch('for')
     @Watch('text')
     update_tagdata() {
         let tagdata: LabelTagData = new LabelTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.form = this.form
         tagdata.for = this.for
         tagdata.text = this.text
@@ -29,6 +32,7 @@ export default class LabelTagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.form = this.tagdata_typed.form
         this.for = this.tagdata_typed.for
         this.text = this.tagdata_typed.text

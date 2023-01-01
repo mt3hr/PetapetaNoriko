@@ -1,6 +1,6 @@
 <template>
     <input type="text" :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
-        :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder"
+        :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder" :class="tagclass"
         :readonly="readonly" :required="required" :list="list">
 </template>
 
@@ -20,9 +20,10 @@ export default class TextTagView extends HTMLTagViewBase {
     readonly: boolean
     required: boolean
     list: string
-
+    tagclass: string
 
     @Watch('name')
+    @Watch('tagclass')
     @Watch('value')
     @Watch('size')
     @Watch('maxlength')
@@ -35,7 +36,7 @@ export default class TextTagView extends HTMLTagViewBase {
     update_tagdata() {
         let tagdata: TextTagData = new TextTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.name = this.name
         tagdata.value = this.value
         tagdata.size = this.size

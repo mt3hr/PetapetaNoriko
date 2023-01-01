@@ -1,8 +1,5 @@
 <template>
-    <input type="button" :style="position_css" @click="onclick_tag"
-    :name="name"
-    :value="value"
-    >
+    <input type="button" :style="position_css" @click="onclick_tag" :class="tagclass" :name="name" :value="value">
 </template>
 
 <script lang="ts">
@@ -13,13 +10,16 @@ import HTMLTagViewBase from './HTMLTagViewBase';
 export default class ButtonTagView extends HTMLTagViewBase {
     name: string
     value: string
+    tagclass: string
 
     @Watch('name')
+    @Watch('tagclass')
     @Watch('value')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: ButtonTagData = new ButtonTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.name = this.name
         tagdata.value = this.value
         this.$emit("updated_tagdata", tagdata)

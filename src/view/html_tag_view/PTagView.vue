@@ -1,5 +1,5 @@
 <template>
-    <p :style="position_css" @click="onclick_tag">{{ text }}</p>
+    <p :class="tagclass" :style="position_css" @click="onclick_tag">{{ text }}</p>
 </template>
 
 <script lang="ts">
@@ -9,12 +9,14 @@ import HTMLTagViewBase from './HTMLTagViewBase';
 
 export default class PTagView extends HTMLTagViewBase {
     text: string
+    tagclass: string
 
     @Watch('text')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: PTagData = new PTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.text = this.text
         this.$emit("updated_tagdata", tagdata)
     }
@@ -23,6 +25,7 @@ export default class PTagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.text = this.tagdata_typed.text
     }
 

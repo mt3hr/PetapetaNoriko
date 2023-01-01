@@ -1,6 +1,6 @@
 
 <template>
-    <input type="color" :style="position_css" @click="onclick_tag" :name="name" :value="value"
+    <input type="color" :style="position_css" @click="onclick_tag" :name="name" :value="value" :class="tagclass"
         :autocomplete="autocomplete">
 </template>
 
@@ -13,14 +13,16 @@ export default class ColorTagView extends HTMLTagViewBase {
     name: string
     value: string
     autocomplete: string
+    tagclass: string
 
     @Watch('name')
+    @Watch('tagclass')
     @Watch('value')
     @Watch('autocomplete')
     update_tagdata() {
         let tagdata: ColorTagData = new ColorTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.name = this.name
         tagdata.value = this.value
         tagdata.autocomplete = this.autocomplete
@@ -31,6 +33,7 @@ export default class ColorTagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.name = this.tagdata_typed.name
         this.value = this.tagdata_typed.value
         this.autocomplete = this.tagdata_typed.autocomplete

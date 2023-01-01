@@ -60,6 +60,9 @@
             </v-col>
         </v-row>
         <v-row>
+            <v-col cols="auto">
+                <v-btn @click="is_show_css_dialog = true">CSS編集</v-btn>
+            </v-col>
             <v-spacer />
             <v-col cols="auto">
                 <v-btn>読み込み</v-btn>
@@ -67,6 +70,21 @@
             </v-col>
         </v-row>
     </v-container>
+
+    <v-dialog v-model="is_show_css_dialog">
+        <v-card>
+            <v-card-title> ページCSS </v-card-title>
+            <v-textarea v-model="css" @keyup="updated_css"></v-textarea>
+            <v-container>
+                <v-row>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script lang="ts">
@@ -79,6 +97,7 @@ import PagePropertyView from '@/view/PagePropertyView.vue'
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase'
 import PageData from '@/page/PageData'
 import HTMLTagStructView from './HTMLTagStructView.vue'
+import { Watch } from 'vue-property-decorator'
 
 @Options({
     components: {
@@ -94,6 +113,8 @@ import HTMLTagStructView from './HTMLTagStructView.vue'
 export default class PutPullMockRootPage extends Vue {
     width_dropzone = 100
     height_dropzone = 100
+    is_show_css_dialog = false
+    css = ""
 
     print_html() {
         let page_list_view: any = this.$refs['page_list_view']
@@ -124,6 +145,7 @@ export default class PutPullMockRootPage extends Vue {
 
         let page_list_view: any = this.$refs["page_list_view"]
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
+        this.css = page_list_view.pagedatas[page_list_view.selected_index].css
     }
 
     onclick_tag(tagdata: HTMLTagDataBase) {
@@ -171,6 +193,14 @@ export default class PutPullMockRootPage extends Vue {
             "width": this.width_dropzone + "px",
             "height": this.height_dropzone + "px",
         }
+    }
+
+    @Watch('css')
+    updated_css() {
+        let page_list_view: any = this.$refs["page_list_view"]
+        page_list_view.pagedatas[page_list_view.selected_index].css = this.css
+        let dropzone: any = this.$refs["dropzone"]
+        dropzone.style_user_edited = this.css
     }
 }
 </script>

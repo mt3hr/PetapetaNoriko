@@ -1,5 +1,5 @@
 <template>
-    <input type="reset" :style="position_css" @click="onclick_tag" :value="value">
+    <input type="reset" :class="tagclass" :style="position_css" @click="onclick_tag" :value="value">
 </template>
 
 <script lang="ts">
@@ -9,11 +9,14 @@ import HTMLTagViewBase from './HTMLTagViewBase';
 
 export default class ResetTagView extends HTMLTagViewBase {
     value: string
+    tagclass: string
+
     @Watch('value')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: ResetTagData = new ResetTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.value = this.value
         this.$emit("updated_tagdata", tagdata)
     }
@@ -22,6 +25,7 @@ export default class ResetTagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.value = this.tagdata_typed.value
     }
 

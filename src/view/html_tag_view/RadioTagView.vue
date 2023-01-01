@@ -1,6 +1,6 @@
 <template>
     <input type="radio" :style="position_css" @click="onclick_tag" :name="name" :value="value" :checked="checked"
-        :required="required"/>
+        :class="tagclass" :required="required" />
 </template>
 
 <script lang="ts">
@@ -13,6 +13,7 @@ export default class RadioTagView extends HTMLTagViewBase {
     value: string
     checked: boolean
     required: boolean
+    tagclass: string
 
     @Watch('name')
     @Watch('value')
@@ -21,7 +22,7 @@ export default class RadioTagView extends HTMLTagViewBase {
     update_tagdata() {
         let tagdata: RadioTagData = new RadioTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.name = this.name
         tagdata.value = this.value
         tagdata.checked = this.checked
@@ -33,6 +34,7 @@ export default class RadioTagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.name = this.tagdata_typed.name
         this.value = this.tagdata_typed.value
         this.checked = this.tagdata_typed.checked

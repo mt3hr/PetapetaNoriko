@@ -1,7 +1,7 @@
 
 <template>
     <input type="email" :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
-        :maxlength="maxlength" :autocomplete="autocomplete" :multiple="multiple" :pattern="pattern"
+        :class="tagclass" :maxlength="maxlength" :autocomplete="autocomplete" :multiple="multiple" :pattern="pattern"
         :placeholder="placeholder" :readonly="readonly" :required="required">
 </template>
 
@@ -21,8 +21,10 @@ export default class EmailTagView extends HTMLTagViewBase {
     placeholder: string
     readonly: boolean
     required: boolean
+    tagclass: string
 
     @Watch('name')
+    @Watch('tagclass')
     @Watch('value')
     @Watch('size')
     @Watch('maxlength')
@@ -35,7 +37,7 @@ export default class EmailTagView extends HTMLTagViewBase {
     update_tagdata() {
         let tagdata: EmailTagData = new EmailTagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.name = this.name
         tagdata.value = this.value
         tagdata.size = this.size
@@ -52,6 +54,7 @@ export default class EmailTagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.name = this.tagdata_typed.name
         this.value = this.tagdata_typed.value
         this.size = this.tagdata_typed.size

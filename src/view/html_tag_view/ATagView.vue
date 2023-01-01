@@ -1,6 +1,6 @@
 <template>
     <a :style="position_css" @click="onclick_tag" :href="href" :name="name" :charset="charset" :hreflang="hreflang"
-        :type="type" :rel="rel" :rev="rev" :tabindex="tabindex" :accesskey="accesskey" :shape="shape"
+        :class="tagclass" :type="type" :rel="rel" :rev="rev" :tabindex="tabindex" :accesskey="accesskey" :shape="shape"
         :coords="coords">{{ text }}</a>
 </template>
 
@@ -22,6 +22,7 @@ export default class ATagView extends HTMLTagViewBase {
     accesskey: string
     shape: string
     coords: string
+    tagclass: string
 
     @Watch('text')
     @Watch('href')
@@ -35,10 +36,11 @@ export default class ATagView extends HTMLTagViewBase {
     @Watch('accesskey')
     @Watch('shape')
     @Watch('coords')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: ATagData = new ATagData()
         tagdata.tagid = this.tagdata.tagid
-        tagdata.tagclass = this.tagdata.tagclass
+        tagdata.tagclass = this.tagclass
         tagdata.text = this.text
         tagdata.href = this.href
         tagdata.name = this.name
@@ -59,6 +61,7 @@ export default class ATagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
+        this.tagclass = this.tagdata_typed.tagclass
         this.text = this.tagdata_typed.text
         this.href = this.tagdata_typed.href
         this.name = this.tagdata_typed.name

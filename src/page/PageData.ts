@@ -9,6 +9,7 @@ export default class PageData {
     width = 700
     height = 750
     html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
+    css: string
 
     generate_html(print_id_for_css: boolean): string {
         let html = ""
