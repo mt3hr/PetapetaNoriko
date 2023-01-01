@@ -63,8 +63,6 @@ export default class HTMLTagPropertyView extends Vue {
         let json = JSON.stringify(this.html_tagdata)
         let html_tagdata = JSON.parse(json, deserialize)
         html_tagdata[property.name] = property.value
-        console.log(property)
-        console.log(payload)
 
         this.$emit('updated_html_tag_property', html_tagdata)
     }
