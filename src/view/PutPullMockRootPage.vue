@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <v-row>
+        <v-row class="ppmk_row">
             <v-col cols="auto">
                 <h1>PutPullMock</h1>
             </v-col>
@@ -9,7 +9,7 @@
                 <v-btn>ログイン</v-btn>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row class="ppmk_row">
             <!--サイドバー-->
             <v-col cols="auto" class="sidebar">
                 <v-container>
@@ -27,7 +27,7 @@
 
             <!--ドロップゾーン-->
             <v-col cols="auto" class="dropzone_wrap">
-                <DropZone class="component dropzone_wrap" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"
+                <DropZone class="component dropzone" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"
                     @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 <!--TODO-->
             </v-col>
@@ -59,7 +59,7 @@
                 </v-container>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row class="ppmk_row">
             <v-col cols="auto">
                 <v-btn @click="is_show_css_dialog = true">CSS編集</v-btn>
             </v-col>
@@ -314,13 +314,18 @@ export default class PutPullMockRootPage extends Vue {
 .component {
     border: 1px black solid;
     overflow: hidden;
-    width: 240px;
+    width: 300px;
 }
 
 .dropzone_wrap {
     white-space: pre-line;
+    height: 770px;
     width: fit-content;
-    height: fit-content;
+    overflow: scroll;
+}
+
+.dropzone {
+    width: fit-content;
 }
 
 .v-container,
@@ -336,23 +341,27 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .html_tag_list_view {
-    height: 600px;
+    height: 620px;
     overflow-y: scroll;
 }
 
 .page_property_view {
     height: 170px;
-    overflow-y: scroll;
+    overflow: scroll;
 }
 
 .property_view {
     height: 300px;
-    overflow-y: scroll;
+    overflow: scroll;
 }
 
 .struct_view {
     height: 300px;
-    overflow-y: scroll;
+    overflow: scroll;
+}
+
+.ppmk_row {
+    width: 100vw;
 }
 </style>
 <style>
