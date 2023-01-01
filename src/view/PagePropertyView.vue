@@ -37,8 +37,8 @@ export default class PagePropertyView extends Vue {
         Object.keys(html_tagdata).forEach((key) => {
             switch (key) {
                 case "pageid":
-                    return
                 case "html_tagdatas":
+                case "css":
                     return
             }
             let property: Property = new Property()

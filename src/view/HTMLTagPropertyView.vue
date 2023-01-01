@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>プロパティ</h2>
+        <h2>タグプロパティ</h2>
         <table>
             <tr v-for="property, index in properties" :key="index" :style="generate_style(property)">
                 <td>{{ get_property_name_jp(property.name) }}:</td>

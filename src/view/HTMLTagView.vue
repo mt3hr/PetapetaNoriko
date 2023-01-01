@@ -96,7 +96,7 @@
             @dragstart.stop="on_drag_start" @contextmenu="show_contextmenu" @onclick_tag="onclick_tag"
             @updated_tagdata="updated_tagdata" />
 
-        <v-menu v-model="is_show_contextmenu" :activator="this">
+        <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
             <v-list>
                 <v-list-item @click="delete_tag(tagdata)">削除</v-list-item>
             </v-list>
@@ -198,9 +198,21 @@ import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
 export default class HTMLTagView extends Vue {
     @Prop({ require: true }) tagdata: HTMLTagDataBase
     is_show_contextmenu = false
+    x_contextmenu = 0
+    y_contextmenu = 0
+
+    get contextmenu_style(): any {
+        return {
+            position: "absolute",
+            left: this.x_contextmenu + "px",
+            top: this.y_contextmenu + "px",
+        }
+    }
 
     show_contextmenu(e: MouseEvent) {
         e.preventDefault()
+        this.x_contextmenu = e.clientX
+        this.y_contextmenu = e.clientY
         this.is_show_contextmenu = true
     }
 
