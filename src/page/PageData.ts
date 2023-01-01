@@ -11,14 +11,22 @@ export default class PageData {
     html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
     css: string
 
-    generate_html(print_id_for_css: boolean): string {
+    generate_html(print_id_for_css: boolean, print_head: boolean): string {
         let html = ""
         html += "<html>\n"
+        if (print_head) {
+            html += "  <head>\n"
+            html += "    <title>" + this.pagename + "</title>\n"
+            html += "    <link rel=\"stylesheet\" href=\"" + this.pagename + ".css\">\n"
+            html += "  </head>\n"
+        }
+        html += "  <body>\n"
         for (let i = 0; i < this.html_tagdatas.length; i++) {
             const tagdata = this.html_tagdatas[i]
-            html += "  " + tagdata.generate_html(print_id_for_css) + "\n"
+            html += "    " + tagdata.generate_html(print_id_for_css) + "\n"
         }
-        html += "</html>"
+        html += "  </body>\n"
+        html += "</html>\n"
         return html
     }
 

@@ -97,8 +97,6 @@ export default class DropZone extends Vue {
                 let rules = "{" + css_text_spl[1]
 
                 target = "#dropzone " + target
-                console.log(target)
-                console.log(rules)
 
                 style += target + rules + "\n"
             }

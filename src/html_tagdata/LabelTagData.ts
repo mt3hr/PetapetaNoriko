@@ -5,7 +5,7 @@ import HTMLTagDataBase from "./HTMLTagDataBase";
 export default class LabelTagData extends HTMLTagDataBase {
     form = ""
     for = ""
-    text = ""
+    text = "ラベル"
     constructor() {
         super()
         this.tagname = "label"

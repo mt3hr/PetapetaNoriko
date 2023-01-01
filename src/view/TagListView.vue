@@ -38,7 +38,7 @@
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'tel')">tel</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'text')">text</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'time')">time</li>
-            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'url')">ulr</li>
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'url')">url</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'week')">week</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'textarea')">textarea</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'select')">select</li>

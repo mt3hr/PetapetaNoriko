@@ -65,8 +65,8 @@
             </v-col>
             <v-spacer />
             <v-col cols="auto">
-                <v-btn>読み込み</v-btn>
-                <v-btn @click="print_html">書き出し</v-btn>
+                <v-btn @click="show_readin_dialog">読み込み</v-btn>
+                <v-btn @click="show_writeout_dialog">書き出し</v-btn>
             </v-col>
         </v-row>
     </v-container>
@@ -74,12 +74,46 @@
     <v-dialog v-model="is_show_css_dialog">
         <v-card>
             <v-card-title> ページCSS </v-card-title>
-            <v-textarea v-model="css" @keyup="updated_css"></v-textarea>
+            <v-textarea v-model="css" @keyup="updated_css" :rows="20"></v-textarea>
             <v-container>
                 <v-row>
                     <v-spacer />
                     <v-col cols="auto">
                         <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </v-card>
+    </v-dialog>
+    <v-dialog v-model="is_show_readin_dialog">
+        <v-card>
+            <input type="file" @change="read_ppmk_project" />
+            <v-container>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                </v-row>
+            </v-container>
+        </v-card>
+
+    </v-dialog>
+    <v-dialog v-model="is_show_writeout_dialog">
+        <v-card>
+            <v-card-title>ページHTML</v-card-title>
+            <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
+            <v-container>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="save_ppmk_html_css">すべてのページをHTMLファイルに保存</v-btn>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
                     </v-col>
                 </v-row>
             </v-container>
@@ -98,6 +132,7 @@ import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase'
 import PageData from '@/page/PageData'
 import HTMLTagStructView from './HTMLTagStructView.vue'
 import { Watch } from 'vue-property-decorator'
+import { deserialize } from '@/serializable/serializable'
 
 @Options({
     components: {
@@ -114,15 +149,86 @@ export default class PutPullMockRootPage extends Vue {
     width_dropzone = 100
     height_dropzone = 100
     is_show_css_dialog = false
+    is_show_writeout_dialog = false
+    is_show_readin_dialog = false
     css = ""
+    page_html = ""
 
-    print_html() {
-        let page_list_view: any = this.$refs['page_list_view']
-        page_list_view.pagedatas.forEach(pagedata => {
-            console.log(pagedata.pagename)
-            console.log(pagedata.generate_html(false))
+    read_ppmk_project(e) {
+        let reader = new FileReader()
+        reader.addEventListener('load', (e) => {
+            let pagedatas = JSON.parse(e.target.result.toString(), deserialize)
+            let page_list_view: any = this.$refs['page_list_view']
+            page_list_view.pagedatas = pagedatas
+            page_list_view.clicked_page(page_list_view.pagedatas[0])
+            this.is_show_readin_dialog = false
         })
+        reader.readAsText(e.target.files[0])
     }
+
+    save_ppmk_project() {
+        let page_list_view: any = this.$refs['page_list_view']
+        let ppmk_data = JSON.stringify(page_list_view.pagedatas)
+        let ppmk_data_blob = new Blob([ppmk_data])
+        let url = URL.createObjectURL(ppmk_data_blob)
+
+        const a = document.createElement("a");
+        document.body.appendChild(a);
+        a.download = 'ppmk_project.json';
+        a.href = url;
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    save_ppmk_html_css() {
+        let page_list_view: any = this.$refs['page_list_view']
+        page_list_view.pagedatas.forEach((pagedata: PageData) => {
+            let html = pagedata.generate_html(false, true)
+            let css = pagedata.css
+
+            {
+                let html_data_blob = new Blob([html])
+                let url = URL.createObjectURL(html_data_blob)
+                let a = document.createElement("a");
+                document.body.appendChild(a);
+                a.download = pagedata.pagename + '.html';
+                a.href = url;
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            }
+            {
+                let css_data_blob = new Blob([css])
+                let url = URL.createObjectURL(css_data_blob)
+                let a = document.createElement("a");
+                document.body.appendChild(a);
+                a.download = pagedata.pagename + '.css';
+                a.href = url;
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            }
+        });
+
+    }
+
+    show_writeout_dialog() {
+        this.update_page_html()
+        this.is_show_writeout_dialog = true
+    }
+
+    show_readin_dialog() {
+        this.is_show_readin_dialog = true
+    }
+
+    update_page_html() {
+        let page_list_view: any = this.$refs["page_list_view"]
+        let page_index = page_list_view.selected_index
+        let pagedata: PageData = page_list_view.pagedatas[page_index]
+        this.page_html = pagedata.generate_html(false, false)
+    }
+
     updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase) {
         let page_list_view: any = this.$refs["page_list_view"]
         let page_index = page_list_view.selected_index

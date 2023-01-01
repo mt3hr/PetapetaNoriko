@@ -115,14 +115,14 @@ import H6TagView from '@/view/html_tag_view/H6TagView.vue'
 
 import PTagView from '@/view/html_tag_view/PTagView.vue'
 import ATagView from '@/view/html_tag_view/ATagView.vue'
-import ULTagView from '@/view/html_tag_view/ULTagView.vue'
-import OLTagView from '@/view/html_tag_view/OLTagView.vue'
+// import ULTagView from '@/view/html_tag_view/ULTagView.vue'
+// import OLTagView from '@/view/html_tag_view/OLTagView.vue'
 import LITagView from '@/view/html_tag_view/LITagView.vue'
 import IMGTagView from '@/view/html_tag_view/IMGTagView.vue'
-import TableTagView from '@/view/html_tag_view/TableTagView.vue'
-import TRTagView from '@/view/html_tag_view/TRTagView.vue'
-import TDTagView from '@/view/html_tag_view/TDTagView.vue'
-import FormTagView from '@/view/html_tag_view/FormTagView.vue'
+// import TableTagView from '@/view/html_tag_view/TableTagView.vue'
+// import TRTagView from '@/view/html_tag_view/TRTagView.vue'
+// import TDTagView from '@/view/html_tag_view/TDTagView.vue'
+// import FormTagView from '@/view/html_tag_view/FormTagView.vue'
 import ButtonTagView from '@/view/html_tag_view/ButtonTagView.vue'
 import CheckBoxTagView from '@/view/html_tag_view/CheckBoxTagView.vue'
 import ColorTagView from '@/view/html_tag_view/ColorTagView.vue'
@@ -145,8 +145,8 @@ import TimeTagView from '@/view/html_tag_view/TimeTagView.vue'
 import URLTagView from '@/view/html_tag_view/URLTagView.vue'
 import WeekTagView from '@/view/html_tag_view/WeekTagView.vue'
 import TextAreaTagView from '@/view/html_tag_view/TextTagView.vue'
-import SelectTagView from '@/view/html_tag_view/SelectTagView.vue'
-import OptionTagView from '@/view/html_tag_view/OptionTagView.vue'
+// import SelectTagView from '@/view/html_tag_view/SelectTagView.vue'
+// import OptionTagView from '@/view/html_tag_view/OptionTagView.vue'
 import LabelTagView from '@/view/html_tag_view/LabelTagView.vue'
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
 
@@ -160,14 +160,14 @@ import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
         H6TagView,
         PTagView,
         ATagView,
-        ULTagView,
-        OLTagView,
+        // ULTagView,
+        // OLTagView,
         LITagView,
         IMGTagView,
-        TableTagView,
-        TRTagView,
-        TDTagView,
-        FormTagView,
+        // TableTagView,
+        // TRTagView,
+        // TDTagView,
+        // FormTagView,
         ButtonTagView,
         CheckBoxTagView,
         ColorTagView,
@@ -190,8 +190,8 @@ import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
         URLTagView,
         WeekTagView,
         TextAreaTagView,
-        SelectTagView,
-        OptionTagView,
+        // SelectTagView,
+        // OptionTagView,
         LabelTagView,
     }
 })

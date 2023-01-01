@@ -2,7 +2,7 @@ import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase from "./HTMLTagDataBase";
 
 @serializable
-export default class RadioTagData extends HTMLTagDataBase {
+export default class TelTagData extends HTMLTagDataBase {
     name = ""
     value = ""
     size = ""

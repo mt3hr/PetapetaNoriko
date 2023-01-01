@@ -4,12 +4,15 @@
         <table>
             <tr v-for="property, index in properties" :key="index" :style="generate_style(property)">
                 <td>{{ get_property_name_jp(property.name) }}:</td>
-                <td><input v-if="!use_textarea(property.name)" type="text" :value="property.value"
+                <td>
+                    <input v-if="use_checkbox(property)" type="checkbox" v-model="property.value"
                         :disabled="is_editable_property(property)"
-                        @keyup="(e) => updated_property_value(e, property.name)" />
-                    <textarea v-else :value="property.value"
+                        @change="(e) => updated_property_value(e, property)" />
+                    <textarea v-else-if="use_textarea(property)" :value="property.value"
                         :disabled="is_editable_property(property)"
-                        @keyup="(e) => updated_property_value(e, property.name)"></textarea>
+                        @keyup="(e) => updated_property_value(e, property)"></textarea>
+                    <input v-else type="text" :value="property.value" :disabled="is_editable_property(property)"
+                        @keyup="(e) => updated_property_value(e, property)" />
                 </td>
             </tr>
         </table>
@@ -23,7 +26,8 @@ import { Watch } from 'vue-property-decorator';
 
 class Property {
     name: string
-    value: string
+    value: any
+    type: string
 }
 
 export default class HTMLTagPropertyView extends Vue {
@@ -43,17 +47,24 @@ export default class HTMLTagPropertyView extends Vue {
             let property: Property = new Property()
             property.name = key
             property.value = html_tagdata[key]
+            if (html_tagdata[key] !== undefined) {
+                if (typeof (html_tagdata[key]) == "boolean") {
+                    property.type = "boolean"
+                } else {
+                    property.type = "string"
+                }
+            }
             this.properties.push(property)
         })
     }
 
-    updated_property_value(payload: any, property_name: string) {
-        let value = payload.target.value
-
+    updated_property_value(payload: any, property: Property) {
         // cloneだるいから一度JSONにまるめてしまおう
         let json = JSON.stringify(this.html_tagdata)
         let html_tagdata = JSON.parse(json, deserialize)
-        html_tagdata[property_name] = value
+        html_tagdata[property.name] = property.value
+        console.log(property)
+        console.log(payload)
 
         this.$emit('updated_html_tag_property', html_tagdata)
     }
@@ -95,12 +106,16 @@ export default class HTMLTagPropertyView extends Vue {
         return name
     }
 
-    use_textarea(name: string): boolean {
-        switch (name) {
+    use_textarea(property: Property): boolean {
+        switch (property.name) {
             case "text":
                 return true
         }
         return false
+    }
+
+    use_checkbox(property: Property): boolean {
+        return property.type == "boolean"
     }
 }
 </script>
