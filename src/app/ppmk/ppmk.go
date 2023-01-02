@@ -19,6 +19,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func init() {
+	cobra.MousetrapHelpText = "" // Windowsでマウスから起動しても怒られないようにする
+}
+
 var (
 	//go:embed dist
 	htmlFS embed.FS // htmlファイル郡
