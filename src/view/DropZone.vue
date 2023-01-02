@@ -321,4 +321,7 @@ export default class DropZone extends Vue {
     overflow: hidden;
     position: relative;
 }
+body {
+    overflow-y: hidden !important;
+}
 </style>
