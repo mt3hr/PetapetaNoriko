@@ -51,7 +51,7 @@ var (
 				a, err := astilectron.New(nil, astilectron.Options{
 					AppName:            "ppmk",
 					VersionAstilectron: "0.51.0",
-					VersionElectron:    "20.0.0",
+					VersionElectron:    "22.0.0",
 				})
 				if err != nil {
 					log.Fatal(err)

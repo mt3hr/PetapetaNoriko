@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build && move dist src/app/ppmk/",
+    "build": "rimraf src/app/ppmk/dist && vue-cli-service --mode development build && move dist src/app/ppmk/",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -32,6 +32,7 @@
     "@vue/eslint-config-typescript": "^9.1.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
+    "rimraf": "^3.0.2",
     "typescript": "~4.5.5",
     "vue-cli-plugin-vuetify": "~2.5.8",
     "webpack-plugin-vuetify": "^2.0.0-alpha.0"
