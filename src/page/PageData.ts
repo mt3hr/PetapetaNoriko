@@ -7,7 +7,7 @@ export default class PageData {
     pageid = generateUUID()
     pagename = "ページ"
     width = window.innerWidth - 300 - 300 - 20
-    height = 710
+    height = window.innerHeight - 160
     html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
     css: string
     webfonts: Array<string> = new Array<string>()

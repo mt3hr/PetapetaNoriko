@@ -124,10 +124,10 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             <v-container>
                 <v-row>
                     <v-col>
-                        <v-checkbox @change="update_page_html" v-model="export_head" :label="'ヘッダ'"/>
+                        <v-checkbox @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
                     </v-col>
                     <v-col>
-                        <v-checkbox @change="update_page_html" v-model="export_base64_image" :label="'埋め込み画像（激重）'"/>
+                        <v-checkbox @change="update_page_html" v-model="export_base64_image" :label="'埋め込み画像（激重）'" />
                     </v-col>
                 </v-row>
             </v-container>
@@ -404,7 +404,7 @@ export default class PutPullMockRootPage extends Vue {
 
 .dropzone_wrap {
     white-space: pre-line;
-    height: 770px;
+    height: calc(100vh - 105px);
     width: fit-content;
     overflow: scroll;
 }
@@ -426,7 +426,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .html_tag_list_view {
-    height: 620px;
+    height: calc(100vh - 255px);
     overflow-y: scroll;
 }
 
@@ -436,7 +436,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .property_view {
-    height: 300px;
+    height: calc(100vh - 575px);
     overflow: scroll;
 }
 
