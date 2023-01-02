@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/mt3hr/PutPullMock/src/app/ppmk/cmd"
-)
+import "github.com/mt3hr/PutPullMock/src/app/ppmk/ppmk"
 
 func main() {
-	cmd.Execute()
+	ppmk.Execute()
 }

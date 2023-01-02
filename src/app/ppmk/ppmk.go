@@ -1,6 +1,7 @@
 package ppmk
 
 import (
+	"embed"
 	"fmt"
 	"io/fs"
 	"log"
@@ -14,21 +15,25 @@ import (
 
 	"github.com/asticode/go-astikit"
 	"github.com/asticode/go-astilectron"
+	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 )
 
 var (
+	//go:embed dist
+	htmlFS embed.FS // htmlファイル郡
+
 	port = 51520
 	cmd  = &cobra.Command{
 		Use: "rykv",
 		PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		},
 		Run: func(_ *cobra.Command, _ []string) {
+			interceptCh := make(chan os.Signal)
 			func() {
 				signal.Notify(interceptCh, os.Interrupt)
 				go func() {
 					<-interceptCh
-					repositories.Close()
 					os.Exit(0)
 				}()
 				go func() {
@@ -40,7 +45,7 @@ var (
 
 				address := ""
 				address += "http://localhost"
-				address += strconv.Itoa(port)
+				address += ":" + strconv.Itoa(port)
 
 				// Initialize astilectron
 				a, err := astilectron.New(nil, astilectron.Options{
@@ -88,10 +93,12 @@ document.addEventListener('click', (e) => {
   for (let i = 0; i < e.path.length; i++) {
     let element = e.path[i]
 	if (element.tagName === 'A') {
-      e.preventDefault()
-	  let aTag = element
-	  let href = aTag.href
-      astilectron.sendMessage('` + openInDefaultBrowserMessagePrefix + ` ' + href)
+	    let aTag = element
+	    let href = aTag.href
+	    if (!href.startsWith('blob:')) {
+          e.preventDefault()
+          astilectron.sendMessage('` + openInDefaultBrowserMessagePrefix + ` ' + href)
+	    }
 	}
   }
 })
@@ -128,16 +135,16 @@ func openbrowser(url string) error {
 }
 
 func launchServer() error {
-	router := golira.NewRouter()
+	router := mux.NewRouter()
 
-	html, err := fs.Sub(htmlFS, "html")
+	html, err := fs.Sub(htmlFS, "dist")
 	if err != nil {
 		return err
 	}
 	router.PathPrefix("/").Handler(http.FileServer(http.FS(html)))
 
 	var handler http.Handler = router
-	err = http.ListenAndServe(config.ServerConfig.Address, handler)
+	err = http.ListenAndServe(":"+strconv.Itoa(port), handler)
 	if err != nil {
 		err = fmt.Errorf("failed to launch server: %w", err)
 		return err
