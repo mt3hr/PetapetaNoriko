@@ -1,6 +1,6 @@
 <template>
-    <input type="number" :style="position_css" @click="onclick_tag" :name="name" :value="value" :class="tagclass"
-        :autocomplete="autocomplete" :list="list" :max="max" :min="min" :readonly="readonly" :required="required"
+    <input type="number" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :class="tagclass"
+        :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required"
         :step="step">
 </template>
 

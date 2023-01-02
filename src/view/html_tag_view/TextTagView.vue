@@ -1,7 +1,7 @@
 <template>
-    <input type="text" :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
+    <input type="text" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
         :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder" :class="tagclass"
-        :readonly="readonly" :required="required" :list="list">
+        :required="required" :list="list">
 </template>
 
 <script lang="ts">

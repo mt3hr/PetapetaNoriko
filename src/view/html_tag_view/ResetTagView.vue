@@ -1,5 +1,5 @@
 <template>
-    <input type="reset" :class="tagclass" :style="position_css" @click="onclick_tag" :value="value">
+    <input type="reset" readonly :class="tagclass" :style="position_css" @click="onclick_tag" :value="value">
 </template>
 
 <script lang="ts">

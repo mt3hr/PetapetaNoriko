@@ -1,8 +1,8 @@
 
 <template>
-    <input type="email" :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
+    <input type="email" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
         :class="tagclass" :maxlength="maxlength" :autocomplete="autocomplete" :multiple="multiple" :pattern="pattern"
-        :placeholder="placeholder" :readonly="readonly" :required="required">
+        :placeholder="placeholder" :required="required">
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-    <input type="file" :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
+    <input type="file" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
         :class="tagclass" :accept="accept" :multiple="multiple" :required="required">
 </template>
 

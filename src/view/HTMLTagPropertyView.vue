@@ -8,10 +8,10 @@
                     <input v-if="use_checkbox(property)" type="checkbox" v-model="property.value"
                         :disabled="is_editable_property(property)"
                         @change="(e) => updated_property_value(e, property)" />
-                    <textarea v-else-if="use_textarea(property)" :value="property.value"
+                    <textarea v-else-if="use_textarea(property)" v-model="property.value"
                         :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)"></textarea>
-                    <input v-else type="text" :value="property.value" :disabled="is_editable_property(property)"
+                    <input v-else type="text" v-model="property.value" :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)" />
                 </td>
             </tr>

@@ -1,5 +1,5 @@
 <template>
-    <input type="submit" :style="position_css" @click="onclick_tag" :name="name" :value="value" :formaction="formaction"
+    <input type="submit" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :formaction="formaction"
         :class="tagclass" :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
         :formtarget="formtarget">
 </template>

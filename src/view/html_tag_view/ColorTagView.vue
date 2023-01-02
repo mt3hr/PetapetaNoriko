@@ -1,6 +1,5 @@
-
 <template>
-    <input type="color" :style="position_css" @click="onclick_tag" :name="name" :value="value" :class="tagclass"
+    <input type="color" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :class="tagclass"
         :autocomplete="autocomplete">
 </template>
 

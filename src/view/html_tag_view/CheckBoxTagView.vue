@@ -1,5 +1,5 @@
 <template>
-    <input type="checkbox" :style="position_css" @click="onclick_tag" :name="name" :value="value" :checked="checked"
+    <input type="checkbox" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :checked="checked"
         :class="tagclass">
 </template>
 

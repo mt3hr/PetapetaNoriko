@@ -72,7 +72,7 @@
     </v-container>
 
     <v-dialog v-model="is_show_css_dialog">
-        <v-card>
+        <v-card class="pa-5">
             <v-card-title> ページCSS </v-card-title>
             <v-textarea v-model="css" @keyup="updated_css" :rows="20"></v-textarea>
             <v-container>
@@ -86,7 +86,7 @@
         </v-card>
     </v-dialog>
     <v-dialog v-model="is_show_readin_dialog">
-        <v-card>
+        <v-card class="pa-5">
             <input type="file" @change="read_ppmk_project" />
             <v-container>
                 <v-row>
@@ -100,7 +100,7 @@
 
     </v-dialog>
     <v-dialog v-model="is_show_writeout_dialog">
-        <v-card>
+        <v-card class="pa-5">
             <v-card-title>ページHTML</v-card-title>
             <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
             <v-container>

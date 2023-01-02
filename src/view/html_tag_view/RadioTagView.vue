@@ -1,5 +1,5 @@
 <template>
-    <input type="radio" :style="position_css" @click="onclick_tag" :name="name" :value="value" :checked="checked"
+    <input type="radio" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :checked="checked"
         :class="tagclass" :required="required" />
 </template>
 

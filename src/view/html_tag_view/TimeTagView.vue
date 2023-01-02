@@ -1,5 +1,5 @@
 <template>
-    <input type="time" :style="position_css" @click="onclick_tag" :name="name" :value="value"
+    <input type="time" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value"
         :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required" :class="tagclass"
         :step="step">
 </template>

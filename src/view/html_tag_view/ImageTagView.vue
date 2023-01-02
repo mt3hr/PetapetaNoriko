@@ -1,5 +1,5 @@
 <template>
-    <input type="image" :style="position_css" @click="onclick_tag" :name="name" :value="value" :src="src" :alt="alt"
+    <input type="image" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :src="src" :alt="alt"
         :class="tagclass" :height="height" :width="width" :formaciton="formaciton" :formenctype="formenctype"
         :formmethod="formmethod" :formnovalidate="formnovalidate" :formtarget="formtarget">
 </template>

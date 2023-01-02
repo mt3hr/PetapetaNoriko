@@ -1,6 +1,6 @@
 <template>
-    <input type="datetime-local" :style="position_css" @click="onclick_tag" :name="name" :value="value" :class="tagclass"
-        :autocomplete="autocomplete" :list="list" :max="max" :min="min" :readonly="readonly" :required="required"
+    <input type="datetime-local" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :class="tagclass"
+        :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required"
         :step="step">
 </template>
 
