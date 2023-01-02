@@ -258,8 +258,8 @@ export default class DropZone extends Vue {
             for (let i = 0; i < this.html_tagdatas.length; i++) {
                 html_tagdata = this.html_tagdatas[i]
                 if (target_tag_id == html_tagdata.tagid) {
-                    let dropzone_x = document.getElementById("dropzone").offsetLeft
-                    let dropzone_y = document.getElementById("dropzone").offsetTop
+                    let dropzone_x =document.getElementById("dropzone").getBoundingClientRect().left 
+                    let dropzone_y =document.getElementById("dropzone").getBoundingClientRect().top
                     html_tagdata.position_x = e.pageX - dropzone_x
                     html_tagdata.position_y = e.pageY - dropzone_y
                     html_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))

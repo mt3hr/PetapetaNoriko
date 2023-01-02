@@ -9,9 +9,9 @@
                 <v-btn>ログイン</v-btn>
             </v-col>
         </v-row>
-        <v-row class="ppmk_row">
+        <v-row class="ppmk_row ppmk_main_pane">
             <!--サイドバー-->
-            <v-col cols="auto" class="sidebar">
+            <v-col cols="auto" class="sidebar flex-nowrap">
                 <v-container>
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
@@ -26,14 +26,14 @@
             </v-col>
 
             <!--ドロップゾーン-->
-            <v-col cols="auto" class="dropzone_wrap">
+            <v-col cols="auto" class="dropzone_wrap flex-nowrap">
                 <DropZone class="component dropzone" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"
                     @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 <!--TODO-->
             </v-col>
 
             <!--プロパティビュー-->
-            <v-col cols="auto" class="propertyview">
+            <v-col cols="auto" class="propertyview flex-nowrap">
                 <v-container>
                     <v-row>
                         <v-col cols="auto">
@@ -360,13 +360,26 @@ export default class PutPullMockRootPage extends Vue {
     overflow: scroll;
 }
 
+.v-container {
+    width: fit-content;
+}
+
 .ppmk_row {
     width: 100vw;
+    flex-wrap: nowrap;
+}
+
+.ppmk_main_pane {
+    overflow-x: scroll;
 }
 </style>
 <style>
 input,
 textarea {
     border: solid 1px silver !important;
+}
+
+body {
+    overflow: scroll !important;
 }
 </style>
