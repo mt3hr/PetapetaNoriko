@@ -1,5 +1,5 @@
 import { serializable } from "@/serializable/serializable";
-import HTMLTagDataBase from "./HTMLTagDataBase";
+import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
 
 @serializable
 export default class IMGTagData extends HTMLTagDataBase {
@@ -13,13 +13,19 @@ export default class IMGTagData extends HTMLTagDataBase {
         super()
         this.tagname = "img"
     }
-    override generate_html(print_id_for_css: boolean): string {
+    override generate_html(options: GenerateHTMLOptions): string {
         let html = ""
         html += "<img"
-        if (print_id_for_css) html += " id=\"" + this.tagid + "\""
+        if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
-        if (this.src.indexOf("data:image") == 0) html += " src=\"\""
-        else if (this.src != "") html += " src=\"" + this.src + "\""
+        if (this.src != "") {
+            if (this.src.startsWith("data:image")) {
+                if (!options.export_base64_image) html += " src=\"\""
+                else html += " src=\"" + this.src + "\""
+            } else {
+                html += " src=\"" + this.src + "\""
+            }
+        }
         if (this.alt != "") html += " alt=\"" + this.alt + "\""
         if (this.usemap != "") html += " usemap=\"" + this.usemap + "\""
         if (this.ismap != "") html += " ismap=\"" + this.ismap + "\""
@@ -28,6 +34,7 @@ export default class IMGTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
-override to_string(): string {
+    override to_string(): string {
         return this.alt
-    }}
+    }
+}

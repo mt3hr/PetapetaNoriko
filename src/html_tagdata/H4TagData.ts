@@ -1,5 +1,5 @@
 import { serializable } from "@/serializable/serializable";
-import HTMLTagDataBase from "./HTMLTagDataBase";
+import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
 
 @serializable
 export default class H4TagData extends HTMLTagDataBase {
@@ -8,10 +8,10 @@ export default class H4TagData extends HTMLTagDataBase {
         super()
         this.tagname = "h4"
     }
-    override generate_html(print_id_for_css: boolean): string {
+    override generate_html(options: GenerateHTMLOptions): string {
         let html = ""
         html += "<h4"
-        if (print_id_for_css) html += " id=\"" + this.tagid + "\""
+        if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
         html += ">" + this.text + "</h4>"
         return html

@@ -1,5 +1,5 @@
 import { serializable } from "@/serializable/serializable";
-import HTMLTagDataBase from "./HTMLTagDataBase";
+import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
 
 @serializable
 export default class RadioTagData extends HTMLTagDataBase {
@@ -11,10 +11,10 @@ export default class RadioTagData extends HTMLTagDataBase {
         super()
         this.tagname = "radio"
     }
-    override generate_html(print_id_for_css: boolean): string {
+    override generate_html(options: GenerateHTMLOptions): string {
         let html = ""
         html += "<input type=\"radio\""
-        if (print_id_for_css) html += " id=\"" + this.tagid + "\""
+        if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
         if (this.name != "") html += " name=\"" + this.name + "\""
         if (this.value != "") html += " value=\"" + this.value + "\""

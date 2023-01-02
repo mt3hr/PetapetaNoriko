@@ -1,6 +1,13 @@
 <template>
     <div>
         <h2>HTML要素一覧</h2>
+        <h3>基本</h3>
+        <ul>
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'p')">p</li>
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'a')">a</li>
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'img')">img</li>
+        </ul>
+        <h3>見出し</h3>
         <ul>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'h1')">h1</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'h2')">h2</li>
@@ -8,15 +15,18 @@
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'h4')">h4</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'h5')">h5</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'h6')">h6</li>
-            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'p')">p</li>
-            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'a')">a</li>
+        </ul>
+        <h3>構造</h3>
+        <ul>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'ul')">ul</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'ol')">ol</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'li')">li</li>
-            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'img')">img</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'table')">table</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'tr')">tr</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'td')">td</li>
+        </ul>
+        <h3>フォーム/input</h3>
+        <ul>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'form')">form</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'button')">button</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'checkbox')">checkbox</li>
@@ -40,6 +50,9 @@
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'time')">time</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'url')">url</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'week')">week</li>
+        </ul>
+        <h3>その他</h3>
+        <ul>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'textarea')">textarea</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'select')">select</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'option')">option</li>

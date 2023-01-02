@@ -1,6 +1,12 @@
 import { serializable } from "@/serializable/serializable"
 import generateUUID from "@/uuid"
 
+export class GenerateHTMLOptions {
+    export_id: boolean
+    export_base64_image: boolean
+    export_head: boolean
+}
+
 @serializable
 export default class HTMLTagDataBase {
     child_tags: Array<HTMLTagDataBase>
@@ -10,7 +16,7 @@ export default class HTMLTagDataBase {
     position_x: number
     position_y: number
     scale: number
-    generate_html(print_id_for_css: boolean): string {
+    generate_html(options: GenerateHTMLOptions): string {
         return ""
     }
     generate_position_css(): string {

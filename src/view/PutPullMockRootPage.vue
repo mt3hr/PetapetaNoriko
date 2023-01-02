@@ -121,6 +121,16 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
     <v-dialog v-model="is_show_writeout_dialog">
         <v-card class="pa-5">
             <v-card-title>ページHTML</v-card-title>
+            <v-container>
+                <v-row>
+                    <v-col>
+                        <v-checkbox @change="update_page_html" v-model="export_head" :label="'ヘッダ'"/>
+                    </v-col>
+                    <v-col>
+                        <v-checkbox @change="update_page_html" v-model="export_base64_image" :label="'埋め込み画像（激重）'"/>
+                    </v-col>
+                </v-row>
+            </v-container>
             <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
             <v-container>
                 <v-row>
@@ -147,7 +157,7 @@ import TagListView from '@/view/TagListView.vue'
 import DropZone from '@/view/DropZone.vue'
 import HTMLTagPropertyView from '@/view/HTMLTagPropertyView.vue'
 import PagePropertyView from '@/view/PagePropertyView.vue'
-import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase'
+import HTMLTagDataBase, { GenerateHTMLOptions } from '@/html_tagdata/HTMLTagDataBase'
 import PageData from '@/page/PageData'
 import HTMLTagStructView from './HTMLTagStructView.vue'
 import { Watch } from 'vue-property-decorator'
@@ -175,6 +185,9 @@ export default class PutPullMockRootPage extends Vue {
     css = ""
     page_html = ""
     page_webfont = ""
+
+    export_base64_image = false
+    export_head = true
 
     read_ppmk_project(e) {
         let reader = new FileReader()
@@ -206,7 +219,11 @@ export default class PutPullMockRootPage extends Vue {
     save_ppmk_html_css() {
         let page_list_view: any = this.$refs['page_list_view']
         page_list_view.pagedatas.forEach((pagedata: PageData) => {
-            let html = pagedata.generate_html(false, true)
+            let export_options = new GenerateHTMLOptions()
+            export_options.export_base64_image = this.export_base64_image
+            export_options.export_head = this.export_head
+            export_options.export_id = false
+            let html = pagedata.generate_html(export_options)
             let css = pagedata.css
 
             {
@@ -236,6 +253,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     show_writeout_dialog() {
+        this.export_base64_image = false
         this.update_page_html()
         this.is_show_writeout_dialog = true
     }
@@ -248,7 +266,12 @@ export default class PutPullMockRootPage extends Vue {
         let page_list_view: any = this.$refs["page_list_view"]
         let page_index = page_list_view.selected_index
         let pagedata: PageData = page_list_view.pagedatas[page_index]
-        this.page_html = pagedata.generate_html(false, false)
+        let export_options = new GenerateHTMLOptions()
+        export_options.export_base64_image = this.export_base64_image
+        export_options.export_head = this.export_head
+        export_options.export_id = false
+        let html = pagedata.generate_html(export_options)
+        this.page_html = html
     }
 
     updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase) {

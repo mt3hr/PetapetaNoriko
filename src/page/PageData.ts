@@ -1,4 +1,4 @@
-import HTMLTagDataBase from "@/html_tagdata/HTMLTagDataBase"
+import HTMLTagDataBase, { GenerateHTMLOptions } from "@/html_tagdata/HTMLTagDataBase"
 import { serializable } from "@/serializable/serializable"
 import generateUUID from "@/uuid"
 
@@ -12,10 +12,10 @@ export default class PageData {
     css: string
     webfonts: Array<string> = new Array<string>()
 
-    generate_html(print_id_for_css: boolean, print_head: boolean): string {
+    generate_html(options: GenerateHTMLOptions): string {
         let html = ""
         html += "<html>\n"
-        if (print_head) {
+        if (options.export_head) {
             html += "  <head>\n"
             html += "    <title>" + this.pagename + "</title>\n"
             html += "    <link rel=\"stylesheet\" href=\"" + this.pagename + ".css\">\n"
@@ -24,7 +24,7 @@ export default class PageData {
         html += "  <body>\n"
         for (let i = 0; i < this.html_tagdatas.length; i++) {
             const tagdata = this.html_tagdatas[i]
-            html += "    " + tagdata.generate_html(print_id_for_css) + "\n"
+            html += "    " + tagdata.generate_html(options) + "\n"
         }
         html += "  </body>\n"
         html += "</html>\n"

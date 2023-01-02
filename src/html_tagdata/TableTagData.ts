@@ -1,4 +1,4 @@
-import HTMLTagDataBase from "./HTMLTagDataBase";
+import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
 
 export default class TableTagData extends HTMLTagDataBase {
     disabled = false
@@ -9,7 +9,7 @@ export default class TableTagData extends HTMLTagDataBase {
         super()
         this.tagname = "table"
     }
-    override generate_html(print_id_for_css: boolean): string {
+    override generate_html(options: GenerateHTMLOptions): string {
         // TODO 
         return ""
     }

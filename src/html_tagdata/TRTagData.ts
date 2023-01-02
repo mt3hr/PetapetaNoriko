@@ -1,11 +1,11 @@
-import HTMLTagDataBase from "./HTMLTagDataBase";
+import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
 
 export default class TRTagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "tr"
     }
-    override generate_html(print_id_for_css: boolean): string {
+    override generate_html(options: GenerateHTMLOptions): string {
         // TODO 
         return ""
     }
