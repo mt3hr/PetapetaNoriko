@@ -6,12 +6,12 @@
         <h2>ドロップゾーン</h2>
         <div id="dropzone" class="dropzone" @drop.prevent="on_drop" @dragover.prevent="on_dragover"
             :style="dropzone_style">
-            <div class="page" :style="dropzone_style">
+            <body class="page" :style="dropzone_style">
                 <div v-for="tagdata, index in html_tagdatas" :key="index">
                     <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
                         @delete_tagdata="delete_tagdata" />
                 </div>
-            </div>
+            </body>
         </div>
     </div>
 </template>
