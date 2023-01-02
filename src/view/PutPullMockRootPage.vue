@@ -61,7 +61,8 @@
         </v-row>
         <v-row class="ppmk_row">
             <v-col cols="auto">
-                <v-btn @click="is_show_css_dialog = true">CSS編集</v-btn>
+                <v-btn @click="is_show_css_dialog = true">CSS</v-btn>
+                <v-btn @click="is_show_webfont_dialog = true">WebFont</v-btn>
             </v-col>
             <v-spacer />
             <v-col cols="auto">
@@ -74,7 +75,10 @@
     <v-dialog v-model="is_show_css_dialog">
         <v-card class="pa-5">
             <v-card-title> ページCSS </v-card-title>
-            <v-textarea v-model="css" @keyup="updated_css" :rows="20"></v-textarea>
+            <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
+  width: 200px;
+  height: auto;
+}"></v-textarea>
             <v-container>
                 <v-row>
                     <v-spacer />
@@ -94,6 +98,21 @@
                         <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
                     </v-col>
                     <v-spacer />
+                </v-row>
+            </v-container>
+        </v-card>
+    </v-dialog>
+    <v-dialog v-model="is_show_webfont_dialog">
+        <v-card class="pa-5">
+            <v-card-title>ページウェブフォント</v-card-title>
+            <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
+            <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
+https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+            <v-container>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
+                    </v-col>
                 </v-row>
             </v-container>
         </v-card>
@@ -133,6 +152,7 @@ import PageData from '@/page/PageData'
 import HTMLTagStructView from './HTMLTagStructView.vue'
 import { Watch } from 'vue-property-decorator'
 import { deserialize } from '@/serializable/serializable'
+import { head } from '@/main'
 
 @Options({
     components: {
@@ -151,8 +171,10 @@ export default class PutPullMockRootPage extends Vue {
     is_show_css_dialog = false
     is_show_writeout_dialog = false
     is_show_readin_dialog = false
+    is_show_webfont_dialog = false
     css = ""
     page_html = ""
+    page_webfont = ""
 
     read_ppmk_project(e) {
         let reader = new FileReader()
@@ -252,6 +274,8 @@ export default class PutPullMockRootPage extends Vue {
         let page_list_view: any = this.$refs["page_list_view"]
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
         this.css = page_list_view.pagedatas[page_list_view.selected_index].css
+        this.page_webfont = page_list_view.pagedatas[page_list_view.selected_index].webfonts.join("\n")
+        this.update_page_webfont()
     }
 
     onclick_tag(tagdata: HTMLTagDataBase) {
@@ -302,11 +326,49 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     @Watch('css')
-    updated_css() {
+    updated_css(e) {
+        if (e) {
+            if (e.key == "Tab") {
+                e.preventDefault()
+                let css_text_area: any = document.getElementById("css_text_area")
+                let selectionStart = css_text_area.selectionStart
+                css_text_area.value =
+                    css_text_area.value.substr(0, css_text_area.selectionStart) +
+                    "    " +
+                    css_text_area.value.substr(css_text_area.selectionStart)
+                this.$nextTick(() => {
+                    css_text_area.selectionStart = selectionStart + 4
+                    css_text_area.selectionEnd = selectionStart + 4
+                })
+                return
+            }
+        }
+
         let page_list_view: any = this.$refs["page_list_view"]
         page_list_view.pagedatas[page_list_view.selected_index].css = this.css
         let dropzone: any = this.$refs["dropzone"]
         dropzone.style_user_edited = this.css
+    }
+    @Watch('page_webfont')
+    updated_page_webfont() {
+        let page_list_view: any = this.$refs["page_list_view"]
+        page_list_view.pagedatas[page_list_view.selected_index].webfonts = this.page_webfont.split("\n")
+        this.update_page_webfont()
+    }
+
+    update_page_webfont() {
+        let page_list_view: any = this.$refs["page_list_view"]
+        let page_web_font_links = []
+        for (let i = 0; i < page_list_view.pagedatas[page_list_view.selected_index].webfonts.length; i++) {
+            let page_web_font = page_list_view.pagedatas[page_list_view.selected_index].webfonts[i]
+            page_web_font_links.push({
+                href: page_web_font,
+                rel: "stylesheet",
+            })
+        }
+        head.push({
+            link: page_web_font_links
+        })
     }
 }
 </script>

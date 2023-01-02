@@ -39,6 +39,7 @@ export default class PagePropertyView extends Vue {
                 case "pageid":
                 case "html_tagdatas":
                 case "css":
+                case "webfonts":
                     return
             }
             let property: Property = new Property()
