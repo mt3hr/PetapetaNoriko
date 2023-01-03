@@ -80,6 +80,7 @@ export default class HTMLTagPropertyView extends Vue {
         switch (property.name) {
             case "tagid":
             case "child_tagdatas":
+            case "has_child_tag":
                 return {
                     "display": "none"
                 }

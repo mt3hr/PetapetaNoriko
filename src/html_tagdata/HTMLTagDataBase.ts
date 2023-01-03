@@ -16,6 +16,7 @@ export class GenerateHTMLOptions {
 @serializable
 export default class HTMLTagDataBase {
     child_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
+    has_child_tag: boolean
     tagname: string
     tagid = "id_" + generateUUID()
     tagclass = ""

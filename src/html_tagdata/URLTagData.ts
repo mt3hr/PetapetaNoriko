@@ -16,6 +16,7 @@ export default class URLTagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "url"
+        this.has_child_tag = true
     }
     override generate_html(options: GenerateHTMLOptions): string {
         let html = ""

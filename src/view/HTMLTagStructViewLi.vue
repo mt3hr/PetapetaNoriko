@@ -1,11 +1,12 @@
 <template>
     <li v-for="tagdata, index in html_tagdatas" :key="index" draggable="true" dropzone
-        @drop.stop="(e) => drop(e, tagdata, index)" @dragstart.stop="(e) => dragstart(e, tagdata, index)"
-        @dragover.prevent="dragover">
+        @drop.stop="(e) => drop(e, tagdata, true)" @dragstart.stop="(e) => dragstart(e, tagdata, index)"
+        @click.stop="() => onclick_tag(tagdata)" @dragover.prevent="dragover">
         <span>{{ tagdata.tagname }}:</span>
         <span>({{ tagdata.to_string() }})</span>
         <ul v-if="tagdata.child_tagdatas.length != 0">
             <HTMLTagStructViewLi :html_tagdatas_root="html_tagdatas_root" :html_tagdatas="tagdata.child_tagdatas"
+                @onclick_tag="onclick_tag"
                 @updated_html_tagdatas="(tagdatas) => updated_html_tagdatas_child(tagdatas, index)" />
         </ul>
     </li>
@@ -32,12 +33,18 @@ export default class HTMLTagPropertyView extends Vue {
             e.dataTransfer.dropEffect = "move"
         }
     }
-    drop(e: DragEvent, tagdata: HTMLTagDataBase, index: number) {
-        let html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
+    drop(e: DragEvent, tagdata: HTMLTagDataBase, to_child: boolean) {
+        if (e.dataTransfer.getData("ppmk/struct_li_id") == tagdata.tagid) {
+            return
+        }
+        let html_tagdatas: Array<HTMLTagDataBase>
+        let html_tagdatas_root: Array<HTMLTagDataBase>
         let move_tagdata: HTMLTagDataBase
 
         let json = JSON.stringify(this.html_tagdatas)
         html_tagdatas = JSON.parse(json, deserialize)
+        json = JSON.stringify(this.html_tagdatas_root)
+        html_tagdatas_root = JSON.parse(json, deserialize)
 
         let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
         walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -53,27 +60,53 @@ export default class HTMLTagPropertyView extends Vue {
             }
             return false
         }
-        walk_tagdatas(html_tagdatas)
+        walk_tagdatas(html_tagdatas_root)
 
         let is_child = false
-        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
-            for (let i = 0; i < tagdatas.length; i++) {
-                if (tagdata.tagid == tagdatas[i].tagid) {
-                    if (!is_child) {
-                        move_tagdata.position_style = PositionStyle.Absolute
+        let child_appended = false
+
+        if (to_child) {
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    if (tagdata.tagid == tagdatas[i].tagid) {
+                        if (tagdatas[i].has_child_tag) {
+                            move_tagdata.position_style = PositionStyle.None
+                            tagdatas[i].child_tagdatas.push(move_tagdata)
+                            child_appended = true
+                            return true
+                        }
                     }
-                    tagdatas.splice(i, 0, move_tagdata)
-                    return true
+                    is_child = true
+                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                        return true
+                    }
                 }
-                is_child = true
-                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
-                    return true
-                }
+                return false
             }
-            return false
+            walk_tagdatas(html_tagdatas_root)
         }
-        walk_tagdatas(html_tagdatas)
-        this.updated_html_tagdatas(html_tagdatas)
+        if (!child_appended) {
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    if (tagdata.tagid == tagdatas[i].tagid) {
+                        if (!is_child) {
+                            move_tagdata.position_style = PositionStyle.Absolute
+                        } else {
+                            move_tagdata.position_style = PositionStyle.None
+                        }
+                        tagdatas.splice(i, 0, move_tagdata)
+                        return true
+                    }
+                    is_child = true
+                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                        return true
+                    }
+                }
+                return false
+            }
+            walk_tagdatas(html_tagdatas_root)
+        }
+        this.updated_html_tagdatas(html_tagdatas_root)
     }
 
     updated_html_tagdatas(html_tagdatas: Array<HTMLTagDataBase>) {
@@ -81,14 +114,7 @@ export default class HTMLTagPropertyView extends Vue {
     }
 
     updated_html_tagdatas_child(tagdatas: any, index: number) {
-        let json = JSON.stringify(this.html_tagdatas)
-        let html_tagdatas: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
-
-        let child = html_tagdatas[index]
-        child.child_tagdatas = tagdatas
-
-        html_tagdatas.splice(index, 1, child)
-        this.updated_html_tagdatas(html_tagdatas)
+        this.$emit("updated_html_tagdatas", tagdatas)
     }
 
     dragstart(e: DragEvent, tagdata: HTMLTagDataBase, index: number): void {
@@ -97,6 +123,10 @@ export default class HTMLTagPropertyView extends Vue {
 
     beforeCreate(): void {
         (this as any).$options.components.HTMLTagStructViewLi = HTMLTagStructViewLi_ref
+    }
+
+    onclick_tag(tagdata: HTMLTagDataBase) {
+        this.$emit('onclick_tag', tagdata)
     }
 }
 </script>

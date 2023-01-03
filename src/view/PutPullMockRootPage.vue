@@ -6,6 +6,9 @@
             </v-col>
             <v-spacer />
             <v-col cols="auto">
+                <input type="checkbox" v-model="show_border">境界を表示
+            </v-col>
+            <v-col cols="auto">
                 <v-btn>ログイン</v-btn>
             </v-col>
         </v-row>
@@ -27,7 +30,8 @@
 
             <!--ドロップゾーン-->
             <v-col cols="auto" class="dropzone_wrap">
-                <DropZone class="component dropzone" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"
+                <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
+                    @update_tagdatas="updated_htmltagdatas" @updated_htmltagdatas="updated_htmltagdatas"
                     @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 <!--TODO-->
             </v-col>
@@ -52,7 +56,8 @@
                     <v-row>
                         <v-col cols="auto">
                             <!--構造ビュー-->
-                            <HTMLTagStructView class="component struct_view" ref="struct_view"
+                            <HTMLTagStructView @onclick_tag="onclick_tag" class="component struct_view"
+                                ref="struct_view"
                                 @updated_html_tagdatas="(html_tagdatas) => updated_htmltagdatas(html_tagdatas, null)" />
                         </v-col>
                     </v-row>
@@ -79,11 +84,11 @@
   width: 200px;
   height: auto;
 }"></v-textarea>
-                <v-row>
-                    <v-col cols="auto">
-                        <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
-                    </v-col>
-                </v-row>
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
+                </v-col>
+            </v-row>
         </v-card>
     </v-dialog>
     <v-dialog v-model="is_show_readin_dialog">
@@ -91,7 +96,7 @@
             <input type="file" @change="read_ppmk_project" />
             <v-row>
                 <v-col cols="auto">
-                    <v-btn @click="is_show_readin_dialog= false">閉じる</v-btn>
+                    <v-btn @click="is_show_readin_dialog = false">閉じる</v-btn>
                 </v-col>
                 <v-spacer />
             </v-row>
@@ -184,6 +189,8 @@ export default class PutPullMockRootPage extends Vue {
     export_base64_image = false
     export_head = true
     export_position_css = false
+
+    show_border = true
 
     read_ppmk_project(e) {
         let reader = new FileReader()

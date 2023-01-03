@@ -9,7 +9,8 @@
 
             <body class="page" :style="dropzone_style">
                 <div v-for="tagdata, index in html_tagdatas" :key="index">
-                    <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
+                    <HTMLTagView :tagdatas_root="html_tagdatas" :show_border="show_border" :tagdata="tagdata"
+                        @update_tagdatas="update_tagdatas" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
                         @delete_tagdata="delete_tagdata" />
                 </div>
             </body>
@@ -65,6 +66,137 @@ import CheckBoxTagData from '@/html_tagdata/CheckBoxTagData'
 import EmailTagData from '@/html_tagdata/EmailTagData'
 import { Prop } from 'vue-property-decorator'
 
+export function generate_tagdata_by_tagname(tagname: string): HTMLTagDataBase {
+    let tag_data: HTMLTagDataBase
+    // 鬼の条件分岐
+    switch (tagname) {
+        case "h1":
+            tag_data = new H1TagData()
+            break
+        case "h2":
+            tag_data = new H2TagData()
+            break
+        case "h3":
+            tag_data = new H3TagData()
+            break
+        case "h4":
+            tag_data = new H4TagData()
+            break
+        case "h5":
+            tag_data = new H5TagData()
+            break
+        case "h6":
+            tag_data = new H6TagData()
+            break
+        case "p":
+            tag_data = new PTagData()
+            break
+        case "a":
+            tag_data = new ATagData()
+            break
+        case "ul":
+            tag_data = new ULTagData()
+            break
+        case "ol":
+            tag_data = new OLTagData()
+            break
+        case "li":
+            tag_data = new LITagData()
+            break
+        case "img":
+            tag_data = new IMGTagData()
+            break
+        case "table":
+            tag_data = new TableTagData()
+            break
+        case "tr":
+            tag_data = new TRTagData()
+            break
+        case "td":
+            tag_data = new TDTagData()
+            break
+        case "form":
+            tag_data = new FormTagData()
+            break
+        case "button":
+            tag_data = new ButtonTagData()
+            break
+        case "checkbox":
+            tag_data = new CheckBoxTagData()
+            break
+        case "color":
+            tag_data = new ColorTagData()
+            break
+        case "date":
+            tag_data = new DateTagData()
+            break
+        case "datetimelocal":
+            tag_data = new DateTimeLocalTagData()
+            break
+        case "email":
+            tag_data = new EmailTagData()
+            break
+        case "file":
+            tag_data = new FileTagData()
+            break
+        case "image":
+            tag_data = new ImageTagData()
+            break
+        case "month":
+            tag_data = new MonthTagData()
+            break
+        case "number":
+            tag_data = new NumberTagData()
+            break
+        case "password":
+            tag_data = new PasswordTagData()
+            break
+        case "radio":
+            tag_data = new RadioTagData()
+            break
+        case "range":
+            tag_data = new RangeTagData()
+            break
+        case "reset":
+            tag_data = new ResetTagData()
+            break
+        case "search":
+            tag_data = new SearchTagData()
+            break
+        case "submit":
+            tag_data = new SubmitTagData()
+            break
+        case "tel":
+            tag_data = new TelTagData()
+            break
+        case "text":
+            tag_data = new TextTagData()
+            break
+        case "time":
+            tag_data = new TimeTagData()
+            break
+        case "url":
+            tag_data = new URLTagData()
+            break
+        case "week":
+            tag_data = new WeekTagData()
+            break
+        case "textarea":
+            tag_data = new TextAreaTagData()
+            break
+        case "select":
+            tag_data = new SelectTagData()
+            break
+        case "option":
+            tag_data = new OptionTagData()
+            break
+        case "label":
+            tag_data = new LabelTagData()
+            break
+    }
+    return tag_data
+}
+
 @Options({
     components: {
         HTMLTagView,
@@ -74,6 +206,7 @@ import { Prop } from 'vue-property-decorator'
 export default class DropZone extends Vue {
     html_tagdatas: Array<HTMLTagData> = new Array<HTMLTagData>()
     style_user_edited = ""
+    @Prop() show_border: boolean
     @Prop() dropzone_style: any
 
     // https://stackoverflow.com/questions/3326494/parsing-css-in-javascript-jquery
@@ -124,133 +257,7 @@ export default class DropZone extends Vue {
     on_drop(e: DragEvent) {
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             let tagname = e.dataTransfer.getData("ppmk/htmltag")
-            let tag_data: HTMLTagData
-            // 鬼の条件分岐
-            switch (tagname) {
-                case "h1":
-                    tag_data = new H1TagData()
-                    break
-                case "h2":
-                    tag_data = new H2TagData()
-                    break
-                case "h3":
-                    tag_data = new H3TagData()
-                    break
-                case "h4":
-                    tag_data = new H4TagData()
-                    break
-                case "h5":
-                    tag_data = new H5TagData()
-                    break
-                case "h6":
-                    tag_data = new H6TagData()
-                    break
-                case "p":
-                    tag_data = new PTagData()
-                    break
-                case "a":
-                    tag_data = new ATagData()
-                    break
-                case "ul":
-                    tag_data = new ULTagData()
-                    break
-                case "ol":
-                    tag_data = new OLTagData()
-                    break
-                case "li":
-                    tag_data = new LITagData()
-                    break
-                case "img":
-                    tag_data = new IMGTagData()
-                    break
-                case "table":
-                    tag_data = new TableTagData()
-                    break
-                case "tr":
-                    tag_data = new TRTagData()
-                    break
-                case "td":
-                    tag_data = new TDTagData()
-                    break
-                case "form":
-                    tag_data = new FormTagData()
-                    break
-                case "button":
-                    tag_data = new ButtonTagData()
-                    break
-                case "checkbox":
-                    tag_data = new CheckBoxTagData()
-                    break
-                case "color":
-                    tag_data = new ColorTagData()
-                    break
-                case "date":
-                    tag_data = new DateTagData()
-                    break
-                case "datetimelocal":
-                    tag_data = new DateTimeLocalTagData()
-                    break
-                case "email":
-                    tag_data = new EmailTagData()
-                    break
-                case "file":
-                    tag_data = new FileTagData()
-                    break
-                case "image":
-                    tag_data = new ImageTagData()
-                    break
-                case "month":
-                    tag_data = new MonthTagData()
-                    break
-                case "number":
-                    tag_data = new NumberTagData()
-                    break
-                case "password":
-                    tag_data = new PasswordTagData()
-                    break
-                case "radio":
-                    tag_data = new RadioTagData()
-                    break
-                case "range":
-                    tag_data = new RangeTagData()
-                    break
-                case "reset":
-                    tag_data = new ResetTagData()
-                    break
-                case "search":
-                    tag_data = new SearchTagData()
-                    break
-                case "submit":
-                    tag_data = new SubmitTagData()
-                    break
-                case "tel":
-                    tag_data = new TelTagData()
-                    break
-                case "text":
-                    tag_data = new TextTagData()
-                    break
-                case "time":
-                    tag_data = new TimeTagData()
-                    break
-                case "url":
-                    tag_data = new URLTagData()
-                    break
-                case "week":
-                    tag_data = new WeekTagData()
-                    break
-                case "textarea":
-                    tag_data = new TextAreaTagData()
-                    break
-                case "select":
-                    tag_data = new SelectTagData()
-                    break
-                case "option":
-                    tag_data = new OptionTagData()
-                    break
-                case "label":
-                    tag_data = new LabelTagData()
-                    break
-            }
+            let tag_data: HTMLTagData = generate_tagdata_by_tagname(tagname)
             tag_data.position_x = e.offsetX
             tag_data.position_y = e.offsetY
             this.html_tagdatas.push(tag_data)
@@ -287,7 +294,7 @@ export default class DropZone extends Vue {
         e.preventDefault()
     }
 
-    onclick_tag(tagdata: HTMLTagData) {
+    onclick_tag(tagdata: HTMLTagDataBase) {
         this.$emit('onclick_tag', tagdata)
     }
 
@@ -317,6 +324,10 @@ export default class DropZone extends Vue {
         if (index != -1) {
             this.html_tagdatas.splice(index, 1)
         }
+    }
+
+    update_tagdatas(tagdatas: Array<HTMLTagDataBase>) {
+        this.$emit("update_tagdatas", tagdatas)
     }
 }
 </script>

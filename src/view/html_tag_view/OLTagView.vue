@@ -1,20 +1,20 @@
 <template>
-    <ol :style="position_css" @click="onclick_tag" :class="tagclass" @drop.stop="on_drop_li_component"
-        @dragover.prevent="on_dragover_li_component">
+    <ol :style="position_css" @click="onclick_tag" :class="tagclass" @drop.stop="on_drop"
+        @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
-            :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
+            :tagdatas_root="tagdatas_root" :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
             @onclick_tag="onclick_child_tag(child_tagdata)" @delete_tagdata="delete_child_tagdata" />
     </ol>
 </template>
 <script lang="ts">
 import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase';
-import LITagData from '@/html_tagdata/LITagData';
 import OLTagData from '@/html_tagdata/OLTagData';
 import { deserialize } from '@/serializable/serializable';
 import { Options } from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 import HTMLTagView from '@/view/HTMLTagView.vue';
+import { generate_tagdata_by_tagname } from '../DropZone.vue';
 
 @Options({
     components: {
@@ -81,28 +81,62 @@ export default class TextTagView extends HTMLTagViewBase {
         this.$emit('updated_tagdata', tagdata_typed)
     }
 
-    on_dragover_li_component(e: DragEvent) {
+    on_dragover(e: DragEvent) {
         let tagname = e.dataTransfer.getData("ppmk/htmltag")
-        if (tagname != "li") {
-            e.dataTransfer.dropEffect = "none"
-            return
+        if (tagname) {
+            e.dataTransfer.dropEffect = "copy"
         }
-        e.dataTransfer.dropEffect = "copy"
     }
 
-    on_drop_li_component(e: DragEvent) {
-        let json = JSON.stringify(this.tagdata_typed)
-        let tagdata_typed: OLTagData = JSON.parse(json, deserialize)
+    on_drop(e: DragEvent) {
+        if (e.dataTransfer.getData("ppmk/htmltag")) {
+            let json = JSON.stringify(this.tagdata_typed)
+            let tagdata_typed: OLTagData = JSON.parse(json, deserialize)
+            let tagname = e.dataTransfer.getData("ppmk/htmltag")
+            let tagdata: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
+            tagdata.position_style = PositionStyle.None
+            tagdata_typed.child_tagdatas.push(tagdata)
+            this.$emit('updated_tagdata', tagdata_typed)
+        } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
+            let json = JSON.stringify(this.tagdatas_root)
+            let html_tagdatas_root = JSON.parse(json, deserialize)
+            let move_tagdata: HTMLTagDataBase
 
-        let tagname = e.dataTransfer.getData("ppmk/htmltag")
-        if (tagname != "li") {
-            return
+            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    if (e.dataTransfer.getData("ppmk/move_tag_id") == tagdatas[i].tagid) {
+                        move_tagdata = tagdatas[i]
+                        tagdatas.splice(i, 1)
+                        return true
+                    }
+                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                        return true
+                    }
+                }
+                return false
+            }
+            walk_tagdatas(html_tagdatas_root)
+
+            let tagdata_typed = this.tagdata_typed
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    if (tagdata_typed.tagid == tagdatas[i].tagid) {
+                        if (tagdatas[i].has_child_tag) {
+                            move_tagdata.position_style = PositionStyle.None
+                            tagdatas[i].child_tagdatas.push(move_tagdata)
+                            return true
+                        }
+                    }
+                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                        return true
+                    }
+                }
+                return false
+            }
+            walk_tagdatas(html_tagdatas_root)
+            this.$emit("update_tagdatas", html_tagdatas_root)
         }
-        let tag_data: LITagData = new LITagData()
-        tag_data.position_style = PositionStyle.None
-        tagdata_typed.child_tagdatas.push(tag_data)
-
-        this.$emit('updated_tagdata', tagdata_typed)
     }
 
     beforeCreate(): void {
@@ -115,6 +149,5 @@ export default class TextTagView extends HTMLTagViewBase {
 ol {
     min-width: 200px;
     min-height: 50px;
-    background-color: silver;
 }
 </style>

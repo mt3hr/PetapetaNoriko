@@ -6,6 +6,7 @@ export default class ULTagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "ul"
+        this.has_child_tag = true
     }
     override generate_html(options: GenerateHTMLOptions): string {
         let html = ""
