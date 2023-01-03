@@ -11,7 +11,7 @@
         </v-row>
         <v-row class="ppmk_row ppmk_main_pane">
             <!--サイドバー-->
-            <v-col cols="auto" class="sidebar flex-nowrap">
+            <v-col cols="auto" class="sidebar">
                 <v-container>
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
@@ -26,14 +26,14 @@
             </v-col>
 
             <!--ドロップゾーン-->
-            <v-col cols="auto" class="dropzone_wrap flex-nowrap">
+            <v-col cols="auto" class="dropzone_wrap">
                 <DropZone class="component dropzone" ref="dropzone" @updated_htmltagdatas="updated_htmltagdatas"
                     @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 <!--TODO-->
             </v-col>
 
             <!--プロパティビュー-->
-            <v-col cols="auto" class="propertyview flex-nowrap">
+            <v-col cols="auto" class="propertyview">
                 <v-container>
                     <v-row>
                         <v-col cols="auto">
@@ -79,27 +79,22 @@
   width: 200px;
   height: auto;
 }"></v-textarea>
-            <v-container>
                 <v-row>
-                    <v-spacer />
                     <v-col cols="auto">
                         <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
-            </v-container>
         </v-card>
     </v-dialog>
     <v-dialog v-model="is_show_readin_dialog">
         <v-card class="pa-5">
             <input type="file" @change="read_ppmk_project" />
-            <v-container>
-                <v-row>
-                    <v-col cols="auto">
-                        <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
-                    </v-col>
-                    <v-spacer />
-                </v-row>
-            </v-container>
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_readin_dialog= false">閉じる</v-btn>
+                </v-col>
+                <v-spacer />
+            </v-row>
         </v-card>
     </v-dialog>
     <v-dialog v-model="is_show_webfont_dialog">
@@ -108,47 +103,44 @@
             <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
             <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
 https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
-            <v-container>
-                <v-row>
-                    <v-col cols="auto">
-                        <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
-                    </v-col>
-                </v-row>
-            </v-container>
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
+                </v-col>
+            </v-row>
         </v-card>
 
     </v-dialog>
     <v-dialog v-model="is_show_writeout_dialog">
         <v-card class="pa-5">
             <v-card-title>ページHTML</v-card-title>
-            <v-container>
-                <v-row>
-                    <v-col>
-                        <v-checkbox @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
-                    </v-col>
-                    <v-col>
-                        <v-checkbox @change="update_page_html" v-model="export_base64_image" :label="'埋め込み画像（激重）'" />
-                    </v-col>
-                    <v-col>
-                        <v-checkbox @change="update_page_html" v-model="export_position_css" :label="'位置情報（非推奨）'" />
-                    </v-col>
-                </v-row>
-            </v-container>
+            <v-row>
+                <v-col>
+                    <v-checkbox @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
+                </v-col>
+                <v-col>
+                    <v-checkbox @change="update_page_html" v-model="export_base64_image" :label="'埋め込み画像（激重）'" />
+                </v-col>
+                <v-col>
+                    <v-checkbox @change="update_page_html" v-model="export_position_css" :label="'位置情報（非推奨）'" />
+                </v-col>
+            </v-row>
             <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
-            <v-container>
-                <v-row>
-                    <v-col cols="auto">
-                        <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
-                    </v-col>
-                    <v-spacer />
-                    <v-col cols="auto">
-                        <v-btn @click="save_ppmk_html_css">すべてのページをHTMLファイルに保存</v-btn>
-                    </v-col>
-                    <v-col cols="auto">
-                        <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
-                    </v-col>
-                </v-row>
-            </v-container>
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
+                </v-col>
+                <v-spacer />
+                <v-col cols="auto">
+                    <v-btn @click="save_ppmk_html_css_this_page">このページをHTMLファイルに保存</v-btn>
+                </v-col>
+                <v-col cols="auto">
+                    <v-btn @click="save_ppmk_html_css_all_pages">すべてのページをHTMLファイルに保存</v-btn>
+                </v-col>
+                <v-col cols="auto">
+                    <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
+                </v-col>
+            </v-row>
         </v-card>
     </v-dialog>
 </template>
@@ -220,7 +212,46 @@ export default class PutPullMockRootPage extends Vue {
         URL.revokeObjectURL(url);
     }
 
-    save_ppmk_html_css() {
+
+    save_ppmk_html_css_this_page() {
+        let page_list_view: any = this.$refs['page_list_view']
+        let page_index = page_list_view.selected_index
+        let pagedata = page_list_view.pagedatas[page_index]
+        let export_options = new GenerateHTMLOptions()
+        export_options.export_base64_image = this.export_base64_image
+        export_options.export_head = this.export_head
+        export_options.export_id = this.export_position_css
+        export_options.export_position_css = this.export_position_css
+        let html = pagedata.generate_html(export_options)
+        let css = pagedata.css
+
+        {
+            let html_data_blob = new Blob([html])
+            let url = URL.createObjectURL(html_data_blob)
+            let a = document.createElement("a");
+            document.body.appendChild(a);
+            a.download = pagedata.pagename + '.html';
+            a.href = url;
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+        {
+            let css_data_blob = new Blob([css])
+            let url = URL.createObjectURL(css_data_blob)
+            let a = document.createElement("a");
+            document.body.appendChild(a);
+            a.download = pagedata.pagename + '.css';
+            a.href = url;
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+    }
+
+
+
+    save_ppmk_html_css_all_pages() {
         let page_list_view: any = this.$refs['page_list_view']
         page_list_view.pagedatas.forEach((pagedata: PageData) => {
             let export_options = new GenerateHTMLOptions()
@@ -254,7 +285,6 @@ export default class PutPullMockRootPage extends Vue {
                 URL.revokeObjectURL(url);
             }
         });
-
     }
 
     show_writeout_dialog() {
