@@ -129,6 +129,9 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                     <v-col>
                         <v-checkbox @change="update_page_html" v-model="export_base64_image" :label="'埋め込み画像（激重）'" />
                     </v-col>
+                    <v-col>
+                        <v-checkbox @change="update_page_html" v-model="export_position_css" :label="'位置情報（非推奨）'" />
+                    </v-col>
                 </v-row>
             </v-container>
             <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
@@ -188,6 +191,7 @@ export default class PutPullMockRootPage extends Vue {
 
     export_base64_image = false
     export_head = true
+    export_position_css = false
 
     read_ppmk_project(e) {
         let reader = new FileReader()
@@ -222,7 +226,8 @@ export default class PutPullMockRootPage extends Vue {
             let export_options = new GenerateHTMLOptions()
             export_options.export_base64_image = this.export_base64_image
             export_options.export_head = this.export_head
-            export_options.export_id = false
+            export_options.export_id = this.export_position_css
+            export_options.export_position_css = this.export_position_css
             let html = pagedata.generate_html(export_options)
             let css = pagedata.css
 
@@ -269,7 +274,8 @@ export default class PutPullMockRootPage extends Vue {
         let export_options = new GenerateHTMLOptions()
         export_options.export_base64_image = this.export_base64_image
         export_options.export_head = this.export_head
-        export_options.export_id = false
+        export_options.export_id = this.export_position_css
+        export_options.export_position_css = this.export_position_css
         let html = pagedata.generate_html(export_options)
         this.page_html = html
     }

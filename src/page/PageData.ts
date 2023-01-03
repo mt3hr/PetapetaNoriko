@@ -19,6 +19,18 @@ export default class PageData {
             html += "  <head>\n"
             html += "    <title>" + this.pagename + "</title>\n"
             html += "    <link rel=\"stylesheet\" href=\"" + this.pagename + ".css\">\n"
+            if (options.export_position_css) {
+                html += "    <style>\n"
+                for (let i = 0; i < this.html_tagdatas.length; i++) {
+                    const tagdata = this.html_tagdatas[i]
+                    html += tagdata.generate_position_css()
+                }
+                html += "    </style>\n"
+            }
+            for (let i = 0; i < this.webfonts.length; i++) {
+                const webfont = this.webfonts[i]
+                html += "    <link rel=\"stylesheet\" href=\"" + webfont + "\">\n"
+            }
             html += "  </head>\n"
         }
         html += "  <body>\n"

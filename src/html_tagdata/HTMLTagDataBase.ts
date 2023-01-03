@@ -5,13 +5,14 @@ export class GenerateHTMLOptions {
     export_id: boolean
     export_base64_image: boolean
     export_head: boolean
+    export_position_css: boolean
 }
 
 @serializable
 export default class HTMLTagDataBase {
     child_tags: Array<HTMLTagDataBase>
     tagname: string
-    tagid = generateUUID()
+    tagid = "id_" + generateUUID()
     tagclass = ""
     position_x: number
     position_y: number
@@ -20,7 +21,7 @@ export default class HTMLTagDataBase {
         return ""
     }
     generate_position_css(): string {
-        return "#" + this.tagid + " {\n  position: relative;\n  left: " + this.position_x + "px;\n" + "  top: " + this.position_y + "px;\n}\n"
+        return "#" + this.tagid + " {\n  position: absolute;\n  left: " + this.position_x + "px;\n" + "  top: " + this.position_y + "px;\n}\n"
     }
     to_string(): string {
         return "tagbase"
