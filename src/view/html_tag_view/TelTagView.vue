@@ -9,7 +9,7 @@ import TelTagData from '@/html_tagdata/TelTagData';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
-export default class TagView extends HTMLTagViewBase {
+export default class TelTagView extends HTMLTagViewBase {
     name: string
     value: string
     size: string

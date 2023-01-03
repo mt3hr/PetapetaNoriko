@@ -1,56 +1,78 @@
 <template>
     <li v-for="tagdata, index in html_tagdatas" :key="index" draggable="true" dropzone
-        @drop.prevent="(e) => drop(e, tagdata, index)" @dragstart.stop="(e) => dragstart(e, tagdata, index)"
+        @drop.stop="(e) => drop(e, tagdata, index)" @dragstart.stop="(e) => dragstart(e, tagdata, index)"
         @dragover.prevent="dragover">
-        <span>{{ tagdata.tagname }}:</span> <span>({{ tagdata.to_string() }})</span>
-        <div v-if="tagdata.child_tags">
-            <HTMLTagStructViewLi :tagdatas="tagdata.child_tags"
+        <span>{{ tagdata.tagname }}:</span>
+        <span>({{ tagdata.to_string() }})</span>
+        <ul v-if="tagdata.child_tagdatas.length != 0">
+            <HTMLTagStructViewLi :html_tagdatas_root="html_tagdatas_root" :html_tagdatas="tagdata.child_tagdatas"
                 @updated_html_tagdatas="(tagdatas) => updated_html_tagdatas_child(tagdatas, index)" />
-        </div>
+        </ul>
     </li>
 </template>
 <script lang="ts">
-import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
+import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase';
 import { Options, Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import HTMLTagStructViewLi from '@/view/HTMLTagStructViewLi.vue'
+import HTMLTagStructViewLi_ref from '@/view/HTMLTagStructViewLi.vue'
 import { deserialize } from '@/serializable/serializable';
 
 @Options({
     components: {
-        HTMLTagStructViewLi,
+        HTMLTagStructViewLi_ref,
     }
 })
 
 export default class HTMLTagPropertyView extends Vue {
+    @Prop() html_tagdatas_root: Array<HTMLTagDataBase>
     @Prop() html_tagdatas: Array<HTMLTagDataBase>
 
     dragover(e: DragEvent) {
-        e.dataTransfer.dropEffect = "move"
+        if (e.dataTransfer.getData("ppmk/struct_li_id")) {
+            e.dataTransfer.dropEffect = "move"
+        }
     }
     drop(e: DragEvent, tagdata: HTMLTagDataBase, index: number) {
         let html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
         let move_tagdata: HTMLTagDataBase
-        let removeIndex = -1
-        let insertIndex = -1
 
         let json = JSON.stringify(this.html_tagdatas)
         html_tagdatas = JSON.parse(json, deserialize)
 
-        for (let i = 0; i < html_tagdatas.length; i++) {
-            if (e.dataTransfer.getData("ppmk/struct_li_id") == html_tagdatas[i].tagid) {
-                move_tagdata = this.html_tagdatas[i]
-                removeIndex = i
+        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+            for (let i = 0; i < tagdatas.length; i++) {
+                if (e.dataTransfer.getData("ppmk/struct_li_id") == tagdatas[i].tagid) {
+                    move_tagdata = tagdatas[i]
+                    tagdatas.splice(i, 1)
+                    return true
+                }
+                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                    return true
+                }
             }
+            return false
         }
-        html_tagdatas.splice(removeIndex, 1)
+        walk_tagdatas(html_tagdatas)
 
-        for (let i = 0; i < html_tagdatas.length; i++) {
-            if (tagdata.tagid == html_tagdatas[i].tagid) {
-                insertIndex = i
+        let is_child = false
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+            for (let i = 0; i < tagdatas.length; i++) {
+                if (tagdata.tagid == tagdatas[i].tagid) {
+                    if (!is_child) {
+                        move_tagdata.position_style = PositionStyle.Absolute
+                    }
+                    tagdatas.splice(i, 0, move_tagdata)
+                    return true
+                }
+                is_child = true
+                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                    return true
+                }
             }
+            return false
         }
-        html_tagdatas.splice(insertIndex, 0, move_tagdata)
+        walk_tagdatas(html_tagdatas)
         this.updated_html_tagdatas(html_tagdatas)
     }
 
@@ -59,19 +81,22 @@ export default class HTMLTagPropertyView extends Vue {
     }
 
     updated_html_tagdatas_child(tagdatas: any, index: number) {
-        let html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
-        let json = JSON.stringify(html_tagdatas)
-        html_tagdatas = JSON.parse(json, deserialize)
+        let json = JSON.stringify(this.html_tagdatas)
+        let html_tagdatas: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
 
-        let child: HTMLTagDataBase = html_tagdatas[index]
-        child.child_tags = tagdatas
+        let child = html_tagdatas[index]
+        child.child_tagdatas = tagdatas
 
-        html_tagdatas.splice(index, 0, child)
+        html_tagdatas.splice(index, 1, child)
         this.updated_html_tagdatas(html_tagdatas)
     }
 
     dragstart(e: DragEvent, tagdata: HTMLTagDataBase, index: number): void {
         e.dataTransfer.setData("ppmk/struct_li_id", tagdata.tagid)
+    }
+
+    beforeCreate(): void {
+        (this as any).$options.components.HTMLTagStructViewLi = HTMLTagStructViewLi_ref
     }
 }
 </script>

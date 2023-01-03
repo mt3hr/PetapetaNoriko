@@ -6,6 +6,7 @@
         <h2>ドロップゾーン</h2>
         <div id="dropzone" class="dropzone" @drop.prevent="on_drop" @dragover.prevent="on_dragover"
             :style="dropzone_style">
+
             <body class="page" :style="dropzone_style">
                 <div v-for="tagdata, index in html_tagdatas" :key="index">
                     <HTMLTagView :tagdata="tagdata" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
@@ -86,7 +87,6 @@ export default class DropZone extends Vue {
 
     get style_user_edited_fixed(): string {
         try {
-
             let style = ""
             let css_rules: any = this.rulesForCssText(this.style_user_edited)
             for (let i = 0; i < css_rules.length; i++) {
@@ -96,7 +96,11 @@ export default class DropZone extends Vue {
                 let target = css_text_spl[0]
                 let rules = "{" + css_text_spl[1]
 
-                target = "#dropzone " + target
+                let targets = target.split(",")
+                for (let j = 0; j < targets.length; j++) {
+                    targets[j] = "#dropzone " + targets[j]
+                }
+                target = targets.join(",")
 
                 style += target + rules + "\n"
             }
@@ -258,8 +262,8 @@ export default class DropZone extends Vue {
             for (let i = 0; i < this.html_tagdatas.length; i++) {
                 html_tagdata = this.html_tagdatas[i]
                 if (target_tag_id == html_tagdata.tagid) {
-                    let dropzone_x =document.getElementById("dropzone").getBoundingClientRect().left 
-                    let dropzone_y =document.getElementById("dropzone").getBoundingClientRect().top
+                    let dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
+                    let dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
                     html_tagdata.position_x = e.pageX - dropzone_x
                     html_tagdata.position_y = e.pageY - dropzone_y
                     html_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
@@ -321,6 +325,7 @@ export default class DropZone extends Vue {
     overflow: hidden;
     position: relative;
 }
+
 body {
     overflow-y: hidden !important;
 }

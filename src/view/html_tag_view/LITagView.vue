@@ -1,5 +1,5 @@
 <template>
-    <li :class="tagclass" :style="position_css" @click="onclick_tag" :value="value">{{ text }}</li>
+    <li :class="tagclass" :style="position_css" @click.stop="onclick_tag" :value="value">{{ text }}</li>
 </template>
 
 <script lang="ts">
@@ -7,12 +7,13 @@ import LITagData from '@/html_tagdata/LITagData';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
-export default class TagView extends HTMLTagViewBase {
+export default class LITagView extends HTMLTagViewBase {
     text: string
     value: string
     tagclass: string
 
     @Watch('text')
+    @Watch('value')
     @Watch('tagclass')
     update_tagdata() {
         let tagdata: LITagData = new LITagData()

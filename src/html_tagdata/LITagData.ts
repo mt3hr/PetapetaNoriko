@@ -15,7 +15,7 @@ export default class LITagData extends HTMLTagDataBase {
         if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
         if (this.value != "") html += " value=\"" + this.value + "\""
-        html += ">" + this.text + "</label>"
+        html += ">" + this.text + "</li>"
         return html
     }
     override to_string(): string {

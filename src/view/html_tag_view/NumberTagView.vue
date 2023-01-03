@@ -9,7 +9,7 @@ import NumberTagData from '@/html_tagdata/NumberTagData';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
-export default class TagView extends HTMLTagViewBase {
+export default class NumberTagView extends HTMLTagViewBase {
     name: string
     value: string
     autocomplete: string

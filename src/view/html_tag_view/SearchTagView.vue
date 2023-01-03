@@ -9,7 +9,7 @@ import SearchTagData from '@/html_tagdata/SearchTagData';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
-export default class TagView extends HTMLTagViewBase {
+export default class SearchTagView extends HTMLTagViewBase {
     name: string
     value: string
     size: string

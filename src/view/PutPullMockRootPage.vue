@@ -282,10 +282,11 @@ export default class PutPullMockRootPage extends Vue {
 
     updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase) {
         let page_list_view: any = this.$refs["page_list_view"]
-        let page_index = page_list_view.selected_index
-        let pagedata = page_list_view.pagedatas[page_index]
-        pagedata.html_tagdatas = html_tagdatas
-        if (tagdata) this.onclick_tag(tagdata)
+        page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = html_tagdatas
+        if (tagdata) {
+            this.onclick_tag(tagdata)
+        }
+        page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
     }
 
@@ -317,17 +318,22 @@ export default class PutPullMockRootPage extends Vue {
 
     updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
         let page_list_view: any = this.$refs["page_list_view"]
-        let tagdatas = page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas
-        let index = -1
-        for (let i = 0; i < tagdatas.length; i++) {
-            if (html_tagdata.tagid == tagdatas[i].tagid) {
-                index = i
-                break
+        let tagdatas: Array<HTMLTagDataBase> = page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas
+
+        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+            for (let i = 0; i < tagdatas.length; i++) {
+                if (html_tagdata.tagid == tagdatas[i].tagid) {
+                    tagdatas.splice(i, 1, html_tagdata)
+                    return true
+                }
+                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                    return true
+                }
             }
+            return false
         }
-        if (index != -1) {
-            tagdatas.splice(index, 1, html_tagdata)
-        }
+        walk_tagdatas(tagdatas)
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
     }
     updated_page_property(page_data: PageData) {
@@ -345,6 +351,7 @@ export default class PutPullMockRootPage extends Vue {
     update_struct_view(tagdatas: Array<HTMLTagDataBase>) {
         let struct_view: any = this.$refs["struct_view"]
         struct_view.html_tagdatas = tagdatas
+        struct_view.html_tagdatas_root = tagdatas
     }
 
     get dropzone_style(): any {

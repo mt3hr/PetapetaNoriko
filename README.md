@@ -1,24 +1,21 @@
-# nima
+# PutPullMock
+PutPullMockはワイヤーフレーム作成支援アプリケーションです。
 
-## Project setup
-```
-npm install
-```
+## ビルド、インストールなど
 
-### Compiles and hot-reloads for development
+### セットアップ
 ```
-npm run serve
+npm i
 ```
 
-### Compiles and minifies for production
+### インストール
+Go言語開発環境が必要
 ```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
+npm run build; cd src/app/; go install -ldflags="-H windowsgui";
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### 起動
+初回実行時は起動までに時間がかかります
+```
+ppmk
+```
