@@ -16,9 +16,12 @@ export default class FormTagData extends HTMLTagDataBase {
         this.tagname = "form"
         this.has_child_tag = true
     }
-    override generate_html(options: GenerateHTMLOptions): string {
+    override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
+        html += indent
         html += "<tr"
+        if (options.export_id) html += " id=\"" + this.tagid + "\""
+        if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
         if (this.acceptcharset != "") html += " acceptcharset=\"" + this.acceptcharset + "\""
         if (this.action != "") html += " action=\"" + this.action + "\""
         if (this.autocomplete != "") html += " autocomplete=\"" + this.autocomplete + "\""
@@ -29,9 +32,11 @@ export default class FormTagData extends HTMLTagDataBase {
         if (this.target != "") html += " =\"" + this.target + "\""
         html += ">\n"
         for (let i = 0; i < this.child_tagdatas.length; i++) {
-            html += this.child_tagdatas[i].generate_html(options) + "\n"
+            html += this.child_tagdatas[i].generate_html(options, indent + "    ")
+            html += "\n"
         }
-        html += "</tr>\n"
+        html += indent
+        html += "</tr>"
         return html
     }
     override to_string(): string {

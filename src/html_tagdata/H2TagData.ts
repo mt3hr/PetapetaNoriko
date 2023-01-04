@@ -8,8 +8,9 @@ export default class H2TagData extends HTMLTagDataBase {
         super()
         this.tagname = "h2"
     }
-    override generate_html(options: GenerateHTMLOptions): string {
+    override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
+        html += indent
         html += "<h2"
         if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""

@@ -25,7 +25,7 @@ export default class HTMLTagDataBase {
     scale: number
     position_style: PositionStyle = PositionStyle.Absolute
 
-    generate_html(options: GenerateHTMLOptions): string {
+    generate_html(options: GenerateHTMLOptions, indent: string): string {
         return ""
     }
     generate_position_css(): string {

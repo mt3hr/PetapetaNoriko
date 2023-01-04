@@ -8,15 +8,22 @@ export default class TRTagData extends HTMLTagDataBase {
         this.tagname = "tr"
         this.has_child_tag = true
     }
-    override generate_html(options: GenerateHTMLOptions): string {
+    override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
-        html += "<tr>\n"
-        for (let i = 0; i < this.child_tagdatas.length; i ++) {
-            html += this.child_tagdatas[i].generate_html(options) + "\n"
+        html += indent
+        html += "<tr"
+        if (options.export_id) html += " id=\"" + this.tagid + "\""
+        if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
+        html += ">\n"
+        for (let i = 0; i < this.child_tagdatas.length; i++) {
+            html += this.child_tagdatas[i].generate_html(options, indent + "    ")
+            html += "\n"
         }
-        html += "</tr>\n"
+        html += indent
+        html += "</tr>"
         return html
     }
-override to_string(): string {
+    override to_string(): string {
         return "tr"
-    }}
+    }
+}

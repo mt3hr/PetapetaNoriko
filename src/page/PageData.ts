@@ -1,4 +1,4 @@
-import HTMLTagDataBase, { GenerateHTMLOptions } from "@/html_tagdata/HTMLTagDataBase"
+import HTMLTagDataBase, { GenerateHTMLOptions, PositionStyle } from "@/html_tagdata/HTMLTagDataBase"
 import { serializable } from "@/serializable/serializable"
 import generateUUID from "@/uuid"
 
@@ -23,7 +23,9 @@ export default class PageData {
                 html += "    <style>\n"
                 for (let i = 0; i < this.html_tagdatas.length; i++) {
                     const tagdata = this.html_tagdatas[i]
-                    html += tagdata.generate_position_css()
+                    if (tagdata.position_style != PositionStyle.None) {
+                        html += tagdata.generate_position_css()
+                    }
                 }
                 html += "    </style>\n"
             }
@@ -36,7 +38,7 @@ export default class PageData {
         html += "  <body>\n"
         for (let i = 0; i < this.html_tagdatas.length; i++) {
             const tagdata = this.html_tagdatas[i]
-            html += "    " + tagdata.generate_html(options) + "\n"
+            html += tagdata.generate_html(options, "    ") + "\n"
         }
         html += "  </body>\n"
         html += "</html>\n"

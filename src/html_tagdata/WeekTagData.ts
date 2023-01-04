@@ -16,8 +16,9 @@ export default class WeekTagData extends HTMLTagDataBase {
         super()
         this.tagname = "week"
     }
-    override generate_html(options: GenerateHTMLOptions): string {
+    override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
+        html += indent
         html += "<input type=\"date-time-local\""
         if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""

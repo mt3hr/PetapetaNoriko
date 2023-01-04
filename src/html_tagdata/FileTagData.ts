@@ -13,8 +13,9 @@ export default class FileTagData extends HTMLTagDataBase {
         super()
         this.tagname = "file"
     }
-    override generate_html(options: GenerateHTMLOptions): string {
+    override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
+        html += indent
         html += "<input type=\"file\""
         if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""

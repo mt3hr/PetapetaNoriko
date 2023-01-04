@@ -31,7 +31,7 @@
             <!--ドロップゾーン-->
             <v-col cols="auto" class="dropzone_wrap">
                 <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
-                    @update_tagdatas="updated_htmltagdatas" @updated_htmltagdatas="updated_htmltagdatas"
+                    @updated_tagdatas_root="updated_htmltagdatas" @updated_htmltagdatas="updated_htmltagdatas"
                     @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 <!--TODO-->
             </v-col>
@@ -331,6 +331,7 @@ export default class PutPullMockRootPage extends Vue {
         let dropzone: any = this.$refs["dropzone"]
         let html_tagdatas = pagedata.html_tagdatas
         dropzone.html_tagdatas = html_tagdatas
+        dropzone.html_tagdatas_root = html_tagdatas
 
         let page_property_view: any = this.$refs["page_property_view"]
         page_property_view.page_data = pagedata

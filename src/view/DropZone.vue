@@ -4,15 +4,13 @@
             {{ style_user_edited_fixed }}
         </component>
         <h2>ドロップゾーン</h2>
-        <div id="dropzone" class="dropzone" @drop.prevent="on_drop" @dragover.prevent="on_dragover"
+        <div id="dropzone" class="dropzone" @drop.stop="on_drop" @dragover.prevent="on_dragover"
             :style="dropzone_style">
 
             <body class="page" :style="dropzone_style">
-                <div v-for="tagdata, index in html_tagdatas" :key="index">
-                    <HTMLTagView :tagdatas_root="html_tagdatas" :show_border="show_border" :tagdata="tagdata"
-                        @update_tagdatas="update_tagdatas" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
-                        @delete_tagdata="delete_tagdata" />
-                </div>
+                <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas_root"
+                    :show_border="show_border" :tagdata="tagdata" @updated_tagdatas_root="updated_tagdatas_root"
+                    @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag" @delete_tagdata="delete_tagdata" />
             </body>
         </div>
     </div>
@@ -20,7 +18,7 @@
 
 <script lang="ts">
 import { Vue, Options } from 'vue-class-component'
-import HTMLTagData from '@/html_tagdata/HTMLTagDataBase'
+import HTMLTagData, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase'
 import HTMLTagView from '@/view/HTMLTagView.vue'
 import H1TagData from '@/html_tagdata/H1TagData'
 import H2TagData from '@/html_tagdata/H2TagData'
@@ -67,6 +65,7 @@ import EmailTagData from '@/html_tagdata/EmailTagData'
 import { Prop } from 'vue-property-decorator'
 import DivTagData from '@/html_tagdata/DivTagData'
 import SpanTagData from '@/html_tagdata/SpanTagData'
+import { deserialize } from '@/serializable/serializable'
 
 export function generate_tagdata_by_tagname(tagname: string): HTMLTagDataBase {
     let tag_data: HTMLTagDataBase
@@ -213,6 +212,7 @@ export function generate_tagdata_by_tagname(tagname: string): HTMLTagDataBase {
 
 export default class DropZone extends Vue {
     html_tagdatas: Array<HTMLTagData> = new Array<HTMLTagData>()
+    html_tagdatas_root: Array<HTMLTagData> = new Array<HTMLTagData>()
     style_user_edited = ""
     @Prop() show_border: boolean
     @Prop() dropzone_style: any
@@ -272,21 +272,37 @@ export default class DropZone extends Vue {
             this.updated_tagdata(tag_data)
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
             // すでに配置されたコンポーネントの移動
-            let target_tag_id = e.dataTransfer.getData("ppmk/move_tag_id")
-            let html_tagdata: HTMLTagData
-            for (let i = 0; i < this.html_tagdatas.length; i++) {
-                html_tagdata = this.html_tagdatas[i]
-                if (target_tag_id == html_tagdata.tagid) {
-                    let dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
-                    let dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
-                    html_tagdata.position_x = e.pageX - dropzone_x
-                    html_tagdata.position_y = e.pageY - dropzone_y
-                    html_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
-                    html_tagdata.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
-                    break
+            let json = JSON.stringify(this.html_tagdatas)
+            let html_tagdatas_root = JSON.parse(json, deserialize)
+            let move_tagdata: HTMLTagDataBase
+
+            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    let html_tagdata = tagdatas[i]
+                    if (e.dataTransfer.getData("ppmk/move_tag_id") == tagdatas[i].tagid) {
+                        move_tagdata = tagdatas[i]
+                        move_tagdata.position_style = PositionStyle.Absolute
+                        tagdatas.splice(i, 1)
+                        let dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
+                        let dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
+                        html_tagdata.position_x = e.pageX - dropzone_x
+                        html_tagdata.position_y = e.pageY - dropzone_y
+                        html_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
+                        html_tagdata.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
+                        return true
+                    }
+                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                        return true
+                    }
                 }
+                return false
             }
-            this.updated_tagdata(html_tagdata)
+            walk_tagdatas(html_tagdatas_root)
+            html_tagdatas_root.push(move_tagdata)
+
+            this.$emit('updated_htmltagdatas', html_tagdatas_root, null)
+            e.stopPropagation()
         } else if (e.dataTransfer.items.length != 0) {
             const reader = new FileReader()
             reader.onload = (event: any) => {
@@ -299,7 +315,7 @@ export default class DropZone extends Vue {
             }
             reader.readAsDataURL(e.dataTransfer.files[0])
         }
-        e.preventDefault()
+        e.stopPropagation()
     }
 
     onclick_tag(tagdata: HTMLTagDataBase) {
@@ -334,8 +350,8 @@ export default class DropZone extends Vue {
         }
     }
 
-    update_tagdatas(tagdatas: Array<HTMLTagDataBase>) {
-        this.$emit("update_tagdatas", tagdatas)
+    updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
+        this.$emit('updated_tagdatas_root', tagdatas, null)
     }
 }
 </script>

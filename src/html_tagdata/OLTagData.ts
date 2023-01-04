@@ -10,13 +10,19 @@ export default class OLTagData extends HTMLTagDataBase {
         this.tagname = "ol"
         this.has_child_tag = true
     }
-    override generate_html(options: GenerateHTMLOptions): string {
+    override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
-        html += "<ol>\n"
-        for (let i = 0; i < this.child_tagdatas.length; i ++) {
-            html += this.child_tagdatas[i].generate_html(options) + "\n"
+        html += indent
+        html += "<ol"
+        if (options.export_id) html += " id=\"" + this.tagid + "\""
+        if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
+        html += ">\n"
+        for (let i = 0; i < this.child_tagdatas.length; i++) {
+            html += this.child_tagdatas[i].generate_html(options, indent + "    ")
+            html += "\n"
         }
-        html += "</ol>\n"
+        html += indent
+        html += "</ol>"
         return html
     }
     override to_string(): string {

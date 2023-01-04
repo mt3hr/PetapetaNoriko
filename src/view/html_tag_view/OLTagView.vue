@@ -1,10 +1,10 @@
 <template>
-    <ol :style="position_css" @click.stop="onclick_tag" :class="tagclass" @drop.stop="on_drop"
+    <ol :style="position_css" @click.stop="onclick_tag" :class="tagclass" @drop="on_drop"
         @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
-            :show_border="show_border" :tagdatas_root="tagdatas_root" :tagdata="child_tagdata"
-            @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_child_tag(child_tagdata)"
-            @delete_tagdata="delete_child_tagdata" />
+            @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
+            :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
+            @onclick_tag="onclick_child_tag(child_tagdata)" @delete_tagdata="delete_child_tagdata" />
     </ol>
 </template>
 <script lang="ts">
@@ -99,6 +99,9 @@ export default class TextTagView extends HTMLTagViewBase {
             tagdata_typed.child_tagdatas.push(tagdata)
             this.$emit('updated_tagdata', tagdata_typed)
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
+            if (e.dataTransfer.getData("ppmk/move_tag_id") == this.tagdata_typed.tagid) {
+                return
+            }
             let json = JSON.stringify(this.tagdatas_root)
             let html_tagdatas_root = JSON.parse(json, deserialize)
             let move_tagdata: HTMLTagDataBase
@@ -136,12 +139,17 @@ export default class TextTagView extends HTMLTagViewBase {
                 return false
             }
             walk_tagdatas(html_tagdatas_root)
-            this.$emit("update_tagdatas", html_tagdatas_root)
+            this.$emit("updated_tagdatas_root", html_tagdatas_root)
         }
+        e.stopPropagation()
     }
 
     beforeCreate(): void {
         (this as any).$options.components.HTMLTagView = HTMLTagView
+    }
+
+    updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
+        this.$emit("updated_tagdatas_root", tagdatas)
     }
 }
 

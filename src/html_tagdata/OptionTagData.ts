@@ -11,14 +11,18 @@ export default class OptionTagData extends HTMLTagDataBase {
         super()
         this.tagname = "option"
     }
-    override generate_html(options: GenerateHTMLOptions): string {
+    override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
+        html += indent
         html += "<option"
+        if (options.export_id) html += " id=\"" + this.tagid + "\""
+        if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
         if (this.disabled) html += " disabled"
         if (this.label != "") html += " label=\"" + this.label + "\""
         if (this.selected) html += " selected"
         if (this.value != "") html += " value=\"" + this.value + "\""
         html += ">\n"
+        html += indent
         html += "</option>\n"
         return html
     }

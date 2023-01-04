@@ -8,13 +8,19 @@ export default class ULTagData extends HTMLTagDataBase {
         this.tagname = "ul"
         this.has_child_tag = true
     }
-    override generate_html(options: GenerateHTMLOptions): string {
+    override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
-        html += "<ul>\n"
-        for (let i = 0; i < this.child_tagdatas.length; i ++) {
-            html += this.child_tagdatas[i].generate_html(options) + "\n"
+        html += indent
+        html += "<ul"
+        if (options.export_id) html += " id=\"" + this.tagid + "\""
+        if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
+        html += ">\n"
+        for (let i = 0; i < this.child_tagdatas.length; i++) {
+            html += this.child_tagdatas[i].generate_html(options, indent + "    ")
+            html += "\n"
         }
-        html += "</ul>\n"
+        html += indent
+        html += "</ul>"
         return html
     }
     override to_string(): string {

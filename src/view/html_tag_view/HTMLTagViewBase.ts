@@ -23,7 +23,7 @@ export default class HTMLTagViewBase extends Vue {
             style.scale = this.tagdata.scale
         }
         if (this.show_border) {
-            style.border = "solid 1px black"
+            style.border = "solid 2px black"
             style["background-color"] = "snow"
         }
         this.position_css = style
