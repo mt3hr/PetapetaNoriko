@@ -116,7 +116,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
         </v-card>
 
     </v-dialog>
-    <v-dialog v-model="is_show_writeout_dialog">
+    <v-dialog id="writeout_dialog" v-model="is_show_writeout_dialog">
         <v-card class="pa-5">
             <v-card-title>ページHTML</v-card-title>
             <v-row>
@@ -136,6 +136,9 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                     <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
                 </v-col>
                 <v-spacer />
+                <v-col cols="auto">
+                    <v-btn @click="print_this_page">このページを印刷する</v-btn>
+                </v-col>
                 <v-col cols="auto">
                     <v-btn @click="save_ppmk_html_css_this_page">このページをHTMLファイルに保存</v-btn>
                 </v-col>
@@ -443,6 +446,24 @@ export default class PutPullMockRootPage extends Vue {
         head.push({
             link: page_web_font_links
         })
+    }
+
+    print_this_page() {
+        // https://beelabo.com/web/1423
+        let area = document.getElementById("dropzone_body").outerHTML
+        let head = ""
+        let cmd = '<' + 'script' + '>' + 'window.print(); window.close()' + '<' + '/script' + '>'
+        let links = document.getElementsByTagName("link")
+        for (let i = 0; i < links.length; i++) {
+            head = head + links[i].outerHTML
+        }
+        let styles = document.getElementsByTagName("style")
+        for (let i = 0; i < styles.length; i++) {
+            head = head + styles[i].outerHTML
+        }
+        head += "<style>" + this.css + "</style>"
+        let sub = window.open()
+        sub.document.write("<html><head>" + head + "</head>" + area + cmd + "</html>")
     }
 }
 </script>

@@ -7,7 +7,7 @@
         <div id="dropzone" class="dropzone" @drop.stop="on_drop" @dragover.prevent="on_dragover"
             :style="dropzone_style">
 
-            <body class="page" :style="dropzone_style">
+            <body id="dropzone_body" class="page" :style="dropzone_style">
                 <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas_root"
                     :show_border="show_border" :tagdata="tagdata" @updated_tagdatas_root="updated_tagdatas_root"
                     @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag" @delete_tagdata="delete_tagdata" />
