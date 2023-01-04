@@ -1,9 +1,10 @@
 <template>
-    <ol :style="position_css" @click="onclick_tag" :class="tagclass" @drop.stop="on_drop"
+    <ol :style="position_css" @click.stop="onclick_tag" :class="tagclass" @drop.stop="on_drop"
         @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
-            :tagdatas_root="tagdatas_root" :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
-            @onclick_tag="onclick_child_tag(child_tagdata)" @delete_tagdata="delete_child_tagdata" />
+            :show_border="show_border" :tagdatas_root="tagdatas_root" :tagdata="child_tagdata"
+            @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_child_tag(child_tagdata)"
+            @delete_tagdata="delete_child_tagdata" />
     </ol>
 </template>
 <script lang="ts">

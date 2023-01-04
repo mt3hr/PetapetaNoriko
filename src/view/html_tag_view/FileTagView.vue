@@ -1,5 +1,5 @@
 <template>
-    <input type="file" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
+    <input type="file" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :size="size"
         :class="tagclass" :accept="accept" :multiple="multiple" :required="required">
 </template>
 
@@ -18,12 +18,12 @@ export default class FileTagView extends HTMLTagViewBase {
     tagclass: string
 
     @Watch('name')
-    @Watch('tagclass')
     @Watch('value')
     @Watch('size')
     @Watch('accept')
     @Watch('multiple')
     @Watch('required')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: FileTagData = new FileTagData()
         tagdata.tagid = this.tagdata.tagid

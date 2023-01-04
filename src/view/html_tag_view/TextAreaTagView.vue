@@ -1,5 +1,5 @@
 <template>
-    <textarea :style="position_css" readonly @click="onclick_tag" :autofocus="autofocus" :cols="cols" :disabled="disabled"
+    <textarea :style="position_css" readonly @click.stop="onclick_tag" :autofocus="autofocus" :cols="cols" :disabled="disabled"
         :form="form" :maxlength="maxlength" :name="name" :placeholder="placeholder" :class="tagclass"
         :required="required" :rows="rows" :wrap="wrap"></textarea>
 </template>
@@ -24,7 +24,6 @@ export default class TextAreaTagView extends HTMLTagViewBase {
     tagclass: string
 
     @Watch('autofoucs')
-    @Watch('tagclass')
     @Watch('cols')
     @Watch('disabled')
     @Watch('form')
@@ -35,6 +34,7 @@ export default class TextAreaTagView extends HTMLTagViewBase {
     @Watch('required')
     @Watch('rows')
     @Watch('wrap')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: TextAreaTagData = new TextAreaTagData()
         tagdata.tagid = this.tagdata.tagid

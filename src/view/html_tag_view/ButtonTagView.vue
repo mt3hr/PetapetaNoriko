@@ -1,5 +1,5 @@
 <template>
-    <input type="button" readonly :style="position_css" @click="onclick_tag" :class="tagclass" :name="name" :value="value">
+    <input type="button" readonly :style="position_css" @click.stop="onclick_tag" :class="tagclass" :name="name" :value="value">
 </template>
 
 <script lang="ts">
@@ -13,7 +13,6 @@ export default class ButtonTagView extends HTMLTagViewBase {
     tagclass: string
 
     @Watch('name')
-    @Watch('tagclass')
     @Watch('value')
     @Watch('tagclass')
     update_tagdata() {

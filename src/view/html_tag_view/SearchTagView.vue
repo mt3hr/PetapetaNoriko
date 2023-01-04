@@ -1,5 +1,5 @@
 <template>
-    <input type="search" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :size="size"
+    <input type="search" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :size="size"
         :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder" :class="tagclass"
         :required="required" :list="list">
 </template>
@@ -23,7 +23,6 @@ export default class SearchTagView extends HTMLTagViewBase {
     tagclass: string
 
     @Watch('name')
-    @Watch('tagclass')
     @Watch('value')
     @Watch('size')
     @Watch('maxlength')
@@ -33,6 +32,7 @@ export default class SearchTagView extends HTMLTagViewBase {
     @Watch('readonly')
     @Watch('required')
     @Watch('list')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: SearchTagData = new SearchTagData()
         tagdata.tagid = this.tagdata.tagid

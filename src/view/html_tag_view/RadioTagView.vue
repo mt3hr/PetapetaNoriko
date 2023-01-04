@@ -1,5 +1,5 @@
 <template>
-    <input type="radio" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :checked="checked"
+    <input type="radio" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :checked="checked"
         :class="tagclass" :required="required" />
 </template>
 
@@ -19,6 +19,7 @@ export default class RadioTagView extends HTMLTagViewBase {
     @Watch('value')
     @Watch('checked')
     @Watch('required')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: RadioTagData = new RadioTagData()
         tagdata.tagid = this.tagdata.tagid

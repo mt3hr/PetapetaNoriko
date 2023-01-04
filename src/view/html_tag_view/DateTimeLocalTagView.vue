@@ -1,5 +1,5 @@
 <template>
-    <input type="datetime-local" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :class="tagclass"
+    <input type="datetime-local" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
         :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required"
         :step="step">
 </template>
@@ -22,7 +22,6 @@ export default class DateTimeLocalTagView extends HTMLTagViewBase {
     tagclass: string
 
     @Watch('name')
-    @Watch('tagclass')
     @Watch('value')
     @Watch('autocomplete')
     @Watch('list')
@@ -31,6 +30,7 @@ export default class DateTimeLocalTagView extends HTMLTagViewBase {
     @Watch('readonly')
     @Watch('required')
     @Watch('step')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: DateTimeLocalTagData = new DateTimeLocalTagData()
         tagdata.tagid = this.tagdata.tagid

@@ -1,9 +1,10 @@
 <template>
-    <ul :style="position_css" @click="onclick_tag" :class="tagclass" @drop.stop="on_drop"
+    <ul :style="position_css" @click.stop="onclick_tag" :class="tagclass" @drop.stop="on_drop"
         @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
-            :tagdatas_root="tagdatas_root" :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
-            @onclick_tag="onclick_child_tag(child_tagdata)" @delete_tagdata="delete_child_tagdata" />
+            :show_border="show_border" :tagdatas_root="tagdatas_root" :tagdata="child_tagdata"
+            @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_child_tag(child_tagdata)"
+            @delete_tagdata="delete_child_tagdata" />
     </ul>
 </template>
 <script lang="ts">
@@ -22,7 +23,7 @@ import { generate_tagdata_by_tagname } from '../DropZone.vue';
         HTMLTagView,
     }
 })
-export default class TextTagView extends HTMLTagViewBase {
+export default class ULTagView extends HTMLTagViewBase {
     tagclass = ""
 
     @Watch('tagclass')
@@ -37,7 +38,6 @@ export default class TextTagView extends HTMLTagViewBase {
 
     @Watch('tagdata')
     update_view() {
-        //TODO
         this.tagclass = this.tagdata_typed.tagclass
     }
 

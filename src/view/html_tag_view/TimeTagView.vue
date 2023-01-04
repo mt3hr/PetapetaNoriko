@@ -1,5 +1,5 @@
 <template>
-    <input type="time" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value"
+    <input type="time" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value"
         :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required" :class="tagclass"
         :step="step">
 </template>
@@ -21,7 +21,6 @@ export default class TimeTagView extends HTMLTagViewBase {
     tagclass: string
 
     @Watch('name')
-    @Watch('tagclass')
     @Watch('value')
     @Watch('autocomplete')
     @Watch('list')
@@ -29,6 +28,7 @@ export default class TimeTagView extends HTMLTagViewBase {
     @Watch('min')
     @Watch('required')
     @Watch('step')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: TimeTagData = new TimeTagData()
         tagdata.tagid = this.tagdata.tagid

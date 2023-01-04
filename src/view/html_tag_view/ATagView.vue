@@ -1,5 +1,5 @@
 <template>
-    <a :style="position_css" @click="onclick_tag" :href="href" :name="name" :charset="charset" :hreflang="hreflang"
+    <a :style="position_css" @click.stop="onclick_tag" :href="href" :name="name" :charset="charset" :hreflang="hreflang"
         :class="tagclass" :type="type" :rel="rel" :rev="rev" :tabindex="tabindex" :accesskey="accesskey" :shape="shape"
         :coords="coords">{{ text }}</a>
 </template>

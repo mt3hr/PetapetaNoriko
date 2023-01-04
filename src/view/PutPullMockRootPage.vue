@@ -6,7 +6,7 @@
             </v-col>
             <v-spacer />
             <v-col cols="auto">
-                <input type="checkbox" v-model="show_border">境界を表示
+                <v-checkbox class="checkbox" v-model="show_border" :label="'境界を表示'" />
             </v-col>
             <v-col cols="auto">
                 <v-btn>ログイン</v-btn>
@@ -470,6 +470,8 @@ export default class PutPullMockRootPage extends Vue {
     margin: 0px;
 }
 
+
+
 .page_list_view {
     height: 150px;
     overflow-y: scroll;
@@ -506,6 +508,16 @@ export default class PutPullMockRootPage extends Vue {
 
 .ppmk_main_pane {
     overflow-x: scroll;
+}
+
+.v-input__details {
+    display: none;
+}
+
+.checkbox {
+    position: relative;
+    height: 50px;
+    top: -7px;
 }
 </style>
 <style>

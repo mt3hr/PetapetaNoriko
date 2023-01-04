@@ -1,5 +1,5 @@
 <template>
-    <input type="month" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :class="tagclass"
+    <input type="month" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
         :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required"
         :step="step">
 </template>
@@ -22,7 +22,15 @@ export default class MonthTagView extends HTMLTagViewBase {
     step: string
     tagclass: string
 
-    @Watch('text')
+    @Watch('name')
+    @Watch('value')
+    @Watch('autocomplete')
+    @Watch('list')
+    @Watch('max')
+    @Watch('min')
+    @Watch('readonly')
+    @Watch('required')
+    @Watch('step')
     @Watch('tagclass')
     update_tagdata() {
         let tagdata: MonthTagData = new MonthTagData()

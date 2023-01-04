@@ -21,13 +21,13 @@
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'ul')">ul</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'ol')">ol</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'li')">li</li>
-            <!-- <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'table')">table</li> -->
-            <!-- <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'tr')">tr</li> -->
-            <!-- <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'td')">td</li> -->
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'table')">table</li>
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'tr')">tr</li>
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'td')">td</li>
         </ul>
         <h3>フォーム/input</h3>
         <ul>
-            <!-- <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'form')">form</li> -->
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'form')">form</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'button')">button</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'checkbox')">checkbox</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'color')">color</li>
@@ -54,8 +54,8 @@
         <h3>その他</h3>
         <ul>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'textarea')">textarea</li>
-            <!-- <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'select')">select</li> -->
-            <!-- <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'option')">option</li> -->
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'select')">select</li>
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'option')">option</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'label')">label</li>
         </ul>
     </div>

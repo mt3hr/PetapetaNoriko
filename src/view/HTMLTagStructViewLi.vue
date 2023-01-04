@@ -91,8 +91,6 @@ export default class HTMLTagPropertyView extends Vue {
                     if (tagdata.tagid == tagdatas[i].tagid) {
                         if (!is_child) {
                             move_tagdata.position_style = PositionStyle.Absolute
-                        } else {
-                            move_tagdata.position_style = PositionStyle.None
                         }
                         tagdatas.splice(i, 0, move_tagdata)
                         return true

@@ -1,5 +1,5 @@
 <template>
-    <img :class="tagclass" :style="position_css" @click="onclick_tag" :src="src" :alt="alt" :usemap="usemap" :ismap="ismap"
+    <img :class="tagclass" :style="position_css" @click.stop="onclick_tag" :src="src" :alt="alt" :usemap="usemap" :ismap="ismap"
         :width="width" :height="height" />
 </template>
 
@@ -18,12 +18,12 @@ export default class IMGTagView extends HTMLTagViewBase {
     tagclass: string
 
     @Watch('src')
-    @Watch('tagclass')
     @Watch('alt')
     @Watch('usemap')
     @Watch('ismap')
     @Watch('width')
     @Watch('height')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: IMGTagData = new IMGTagData()
         tagdata.tagid = this.tagdata.tagid

@@ -1,5 +1,5 @@
 <template>
-    <input type="checkbox" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :checked="checked"
+    <input type="checkbox" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :checked="checked"
         :class="tagclass">
 </template>
 
@@ -16,8 +16,8 @@ export default class CHeckBoxTagView extends HTMLTagViewBase {
 
     @Watch('name')
     @Watch('value')
-    @Watch('tagclass')
     @Watch('checked')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: CheckBoxTagData = new CheckBoxTagData()
         tagdata.tagid = this.tagdata.tagid

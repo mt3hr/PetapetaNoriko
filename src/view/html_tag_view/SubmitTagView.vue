@@ -1,5 +1,5 @@
 <template>
-    <input type="submit" readonly :style="position_css" @click="onclick_tag" :name="name" :value="value" :formaction="formaction"
+    <input type="submit" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :formaction="formaction"
         :class="tagclass" :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
         :formtarget="formtarget">
 </template>
@@ -20,13 +20,13 @@ export default class SubmitTagView extends HTMLTagViewBase {
     tagclass: string
 
     @Watch('name')
-    @Watch('tagclass')
     @Watch('value')
     @Watch('formaction')
     @Watch('formenctype')
     @Watch('formmethod')
     @Watch('formnovalidate')
     @Watch('formtarget')
+    @Watch('tagclass')
     update_tagdata() {
         let tagdata: SubmitTagData = new SubmitTagData()
         tagdata.tagid = this.tagdata.tagid
