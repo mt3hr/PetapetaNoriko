@@ -314,6 +314,7 @@ export default class DropZone extends Vue {
                 this.updated_tagdata(tag_data)
             }
             reader.readAsDataURL(e.dataTransfer.files[0])
+            e.preventDefault()
         }
         e.stopPropagation()
     }

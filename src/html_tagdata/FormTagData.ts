@@ -9,7 +9,7 @@ export default class FormTagData extends HTMLTagDataBase {
     enctype = ""
     method = ""
     name = ""
-    novalidate = true
+    novalidate = false
     target = ""
     constructor() {
         super()
@@ -19,7 +19,7 @@ export default class FormTagData extends HTMLTagDataBase {
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
         html += indent
-        html += "<tr"
+        html += "<form"
         if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
         if (this.acceptcharset != "") html += " acceptcharset=\"" + this.acceptcharset + "\""
@@ -36,7 +36,7 @@ export default class FormTagData extends HTMLTagDataBase {
             html += "\n"
         }
         html += indent
-        html += "</tr>"
+        html += "</form>"
         return html
     }
     override to_string(): string {
