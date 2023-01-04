@@ -24,6 +24,8 @@
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'table')">table</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'tr')">tr</li>
             <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'td')">td</li>
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'div')">div</li>
+            <li draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, 'span')">span</li>
         </ul>
         <h3>フォーム/input</h3>
         <ul>

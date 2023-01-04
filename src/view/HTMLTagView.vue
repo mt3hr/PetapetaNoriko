@@ -123,6 +123,12 @@
     <LabelTagView v-if="tagdata.tagname == 'label'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
         :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
         @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <DivTagView v-if="tagdata.tagname == 'div'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        @update_tagdatas="update_tagdatas" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <SpanTagView v-if="tagdata.tagname == 'span'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        @update_tagdatas="update_tagdatas" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
 
     <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
         <v-list>
@@ -139,7 +145,6 @@ import H3TagView from '@/view/html_tag_view/H3TagView.vue'
 import H4TagView from '@/view/html_tag_view/H4TagView.vue'
 import H5TagView from '@/view/html_tag_view/H5TagView.vue'
 import H6TagView from '@/view/html_tag_view/H6TagView.vue'
-
 import PTagView from '@/view/html_tag_view/PTagView.vue'
 import ATagView from '@/view/html_tag_view/ATagView.vue'
 import ULTagView from '@/view/html_tag_view/ULTagView.vue'
@@ -175,6 +180,8 @@ import TextAreaTagView from '@/view/html_tag_view/TextTagView.vue'
 import SelectTagView from '@/view/html_tag_view/SelectTagView.vue'
 import OptionTagView from '@/view/html_tag_view/OptionTagView.vue'
 import LabelTagView from '@/view/html_tag_view/LabelTagView.vue'
+import DivTagView from '@/view/html_tag_view/DivTagView.vue'
+import SpanTagView from '@/view/html_tag_view/SpanTagView.vue'
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
 
 @Options({
@@ -220,6 +227,8 @@ import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
         SelectTagView,
         OptionTagView,
         LabelTagView,
+        DivTagView,
+        SpanTagView,
     }
 })
 export default class HTMLTagView extends Vue {
@@ -232,6 +241,7 @@ export default class HTMLTagView extends Vue {
 
     get contextmenu_style(): any {
         return {
+            display: "inline",
             position: "absolute",
             left: this.x_contextmenu + "px",
             top: this.y_contextmenu + "px",
@@ -240,9 +250,9 @@ export default class HTMLTagView extends Vue {
 
     show_contextmenu(e: MouseEvent) {
         e.preventDefault()
-        this.x_contextmenu= e.clientX
-        this.y_contextmenu= e.clientY
-        this.is_show_contextmenu= true
+        this.x_contextmenu = e.clientX
+        this.y_contextmenu = e.clientY
+        this.is_show_contextmenu = true
     }
 
     on_drag_start(e: DragEvent) {

@@ -65,6 +65,8 @@ import ULTagData from '@/html_tagdata/ULTagData'
 import CheckBoxTagData from '@/html_tagdata/CheckBoxTagData'
 import EmailTagData from '@/html_tagdata/EmailTagData'
 import { Prop } from 'vue-property-decorator'
+import DivTagData from '@/html_tagdata/DivTagData'
+import SpanTagData from '@/html_tagdata/SpanTagData'
 
 export function generate_tagdata_by_tagname(tagname: string): HTMLTagDataBase {
     let tag_data: HTMLTagDataBase
@@ -192,6 +194,12 @@ export function generate_tagdata_by_tagname(tagname: string): HTMLTagDataBase {
             break
         case "label":
             tag_data = new LabelTagData()
+            break
+        case "div":
+            tag_data = new DivTagData()
+            break
+        case "span":
+            tag_data = new SpanTagData()
             break
     }
     return tag_data
