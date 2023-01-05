@@ -1,7 +1,7 @@
 <template>
     <div dropzone="true" @drop.stop="drop" @dragover.prevent="dragover">
         <h2>構造</h2>
-        <ul>
+        <ul class="dropzone_wrap">
             <HTMLTagStructViewLi v-for="tagdata, index in html_tagdatas" :key="index" @onclick_tag="onclick_tag"
                 @delete_tagdata="delete_tag" :tagdata="tagdata" :html_tagdatas_root="html_tagdatas"
                 @updated_html_tagdatas="updated_html_tagdatas" />
@@ -72,5 +72,9 @@ export default class HTMLTagPropertyView extends Vue {
 <style scoped>
 li {
     margin-left: 20px;
+}
+
+.dropzone_wrap {
+    margin-bottom: 20px;
 }
 </style>

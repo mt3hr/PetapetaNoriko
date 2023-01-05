@@ -73,7 +73,7 @@ export default class HTMLTagPropertyView extends Vue {
             return false
         }
         let exists_in_children = walk_tagdatas(target_tagdata.child_tagdatas)
-        return exists_in_children
+        return !exists_in_children
     }
 
     drop(e: DragEvent, tagdata: HTMLTagDataBase, to_child: boolean) {
@@ -161,7 +161,7 @@ export default class HTMLTagPropertyView extends Vue {
                         if (tagdata.tagid == tagdatas[i].tagid) {
                             if (tagdatas[i].has_child_tag) {
                                 move_tagdata.position_style = PositionStyle.None
-                                tagdatas[i].child_tagdatas.push(move_tagdata)
+                                tagdatas[i].child_tagdatas.splice(i, 0, move_tagdata)
                                 child_appended = true
                                 return true
                             }
