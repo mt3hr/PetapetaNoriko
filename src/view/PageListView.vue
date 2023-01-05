@@ -6,13 +6,16 @@
         </h2>
         <ul>
             <PageListItem v-for="(pagedata, index) in pagedatas" :pagedata="pagedata" :key="index"
-                :style="generate_style(index)" @clicked_page="clicked_page" @delete_page="delete_page" />
+                @copy_page="(pagedata) => copy_page(pagedata, index)" :style="generate_style(index)"
+                @move_pagedata="(e, pagedata) => move_pagedata(e, pagedata, index)" @clicked_page="clicked_page"
+                @delete_page="delete_page" />
         </ul>
     </div>
 </template>
 <script lang="ts">
 import PageData from '@/page/PageData';
 import PageListItem from '@/page/PageListItem.vue';
+import { deserialize } from '@/serializable/serializable';
 import { Options, Vue } from 'vue-class-component';
 
 
@@ -22,6 +25,7 @@ import { Options, Vue } from 'vue-class-component';
     }
 })
 export default class Page extends Vue {
+
     selected_index = 0
     pagedatas: Array<PageData> = new Array<PageData>()
 
@@ -68,6 +72,32 @@ export default class Page extends Vue {
         this.$nextTick(() => {
             this.clicked_page(pagedata)
         })
+    }
+
+    copy_page(pagedata: any, index: number) {
+        this.pagedatas.splice(index + 1, 0, pagedata)
+    }
+
+    move_pagedata(e: DragEvent, pagedata: PageData, index: number) {
+        let json = JSON.stringify(this.pagedatas)
+        let pagedatas: Array<PageData> = JSON.parse(json, deserialize)
+
+        let move_pagedata: PageData
+        for (let i = 0; i < pagedatas.length; i++) {
+            if (e.dataTransfer.getData("ppmk/move_page_id") == pagedatas[i].pageid) {
+                move_pagedata = pagedatas[i]
+                pagedatas.splice(i, 1)
+                break
+            }
+        }
+
+        for (let i = 0; i < pagedatas.length; i++) {
+            if (pagedata.pageid == pagedatas[i].pageid) {
+                pagedatas.splice(index, 0, move_pagedata)
+                break
+            }
+        }
+        this.pagedatas = pagedatas
     }
 }
 </script>

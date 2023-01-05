@@ -1,15 +1,19 @@
 <template>
-    <div>
-        <li @contextmenu.prevent="show_contextmenu" @click="clicked_page">
-            {{ pagedata.pagename }}</li>
-        <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
-            <v-list>
-                <v-list-item @click="delete_page()">削除</v-list-item>
-            </v-list>
-        </v-menu>
-    </div>
+    <li @contextmenu.prevent="show_contextmenu" @click="clicked_page" @drop.stop="drop" @dragover.prevent="dragover"
+        draggable="true" @dragstart.stop="on_drag_start">
+        {{ pagedata.pagename }}</li>
+    <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
+        <v-list>
+            <v-list-item @click="copy_page()">コピーを作成</v-list-item>
+        </v-list>
+        <v-list>
+            <v-list-item @click="delete_page()">削除</v-list-item>
+        </v-list>
+    </v-menu>
 </template>
 <script lang="ts">
+import { deserialize } from '@/serializable/serializable';
+import generateUUID from '@/uuid';
 import { Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import PageData from './PageData';
@@ -41,5 +45,28 @@ export default class PageListItem extends Vue {
         }
     }
 
+    copy_page(): void {
+        let json = JSON.stringify(this.pagedata)
+        let page_copy: PageData = JSON.parse(json, deserialize)
+        page_copy.pageid = generateUUID()
+        page_copy.pagename += "_copy"
+        this.$emit("copy_page", page_copy)
+    }
+
+    drop(e: DragEvent) {
+        let json = JSON.stringify(this.pagedata)
+        let pagedata: Array<PageData> = JSON.parse(json, deserialize)
+        this.$emit("move_pagedata", e, pagedata)
+    }
+
+    dragover(e: DragEvent) {
+        if (e.dataTransfer.getData("ppmk/move_page_id")) {
+            e.dataTransfer.dropEffect = "move"
+        }
+    }
+
+    on_drag_start(e: DragEvent) {
+        e.dataTransfer.setData("ppmk/move_page_id", this.pagedata.pageid)
+    }
 }
 </script>
