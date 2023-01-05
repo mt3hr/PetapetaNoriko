@@ -98,7 +98,7 @@ export default class SpanTagView extends HTMLTagViewBase {
             tagdata_typed.child_tagdatas.push(tagdata)
             this.$emit('updated_tagdata', tagdata_typed)
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
-            if (e.dataTransfer.getData("ppmk/move_tag_id") == this.tagdata_typed.tagid) {
+            if (!this.can_drop(e.dataTransfer.getData("ppmk/move_tag_id"), this.tagdata_typed)) {
                 return
             }
             let json = JSON.stringify(this.tagdatas_root)

@@ -28,4 +28,25 @@ export default class HTMLTagViewBase extends Vue {
         }
         this.position_css = style
     }
+
+    can_drop(move_tagid: string, target_tagdata: HTMLTagDataBase): boolean {
+        if (move_tagid == target_tagdata.tagid) {
+            return false
+        }
+
+        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+            for (let i = 0; i < tagdatas.length; i++) {
+                if (move_tagid == tagdatas[i].tagid) {
+                    return true
+                }
+                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                    return true
+                }
+            }
+            return false
+        }
+        const exists_in_children = walk_tagdatas(target_tagdata.child_tagdatas)
+        return exists_in_children
+    }
 }

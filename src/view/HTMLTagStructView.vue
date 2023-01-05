@@ -2,7 +2,8 @@
     <div dropzone="true" @drop.stop="drop" @dragover.prevent="dragover">
         <h2>構造</h2>
         <ul>
-            <HTMLTagStructViewLi @onclick_tag="onclick_tag" :html_tagdatas="html_tagdatas" :html_tagdatas_root="html_tagdatas"
+            <HTMLTagStructViewLi v-for="tagdata, index in html_tagdatas" :key="index" @onclick_tag="onclick_tag"
+                @delete_tagdata="delete_tag" :tagdata="tagdata" :html_tagdatas_root="html_tagdatas"
                 @updated_html_tagdatas="updated_html_tagdatas" />
         </ul>
     </div>
@@ -12,7 +13,6 @@ import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase';
 import { Options, Vue } from 'vue-class-component';
 import HTMLTagStructViewLi from '@/view/HTMLTagStructViewLi.vue'
 import { deserialize } from '@/serializable/serializable';
-import { Prop } from 'vue-property-decorator';
 
 @Options({
     components: {
@@ -62,6 +62,10 @@ export default class HTMLTagPropertyView extends Vue {
 
     onclick_tag(tagdata: HTMLTagDataBase) {
         this.$emit('onclick_tag', tagdata)
+    }
+
+    delete_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("delete_tagdata", tagdata)
     }
 }
 </script>

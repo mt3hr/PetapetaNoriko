@@ -265,7 +265,7 @@ export default class DropZone extends Vue {
     on_drop(e: DragEvent) {
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             let tagname = e.dataTransfer.getData("ppmk/htmltag")
-            let tag_data: HTMLTagData = generate_tagdata_by_tagname(tagname)
+            let tag_data: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
             tag_data.position_x = e.offsetX
             tag_data.position_y = e.offsetY
             this.html_tagdatas.push(tag_data)
@@ -338,17 +338,25 @@ export default class DropZone extends Vue {
         })
     }
 
-    delete_tagdata(html_tagdata: HTMLTagDataBase) {
-        let index = -1
-        for (let i = 0; i < this.html_tagdatas.length; i++) {
-            if (html_tagdata.tagid == this.html_tagdatas[i].tagid) {
-                index = i
-                break
+    delete_tagdata(tagdata: HTMLTagDataBase) {
+        let json = JSON.stringify(this.html_tagdatas)
+        let html_tagdatas_root = JSON.parse(json, deserialize)
+
+        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+            for (let i = 0; i < tagdatas.length; i++) {
+                let html_tagdata = tagdatas[i]
+                if (tagdata.tagid == tagdatas[i].tagid) {
+                    tagdatas.splice(i, 1)
+                    return true
+                }
+                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                    return true
+                }
             }
         }
-        if (index != -1) {
-            this.html_tagdatas.splice(index, 1)
-        }
+        walk_tagdatas(html_tagdatas_root)
+        this.$emit('updated_htmltagdatas', html_tagdatas_root, null)
     }
 
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {

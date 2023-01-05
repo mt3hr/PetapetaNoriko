@@ -9,7 +9,7 @@
                 <v-checkbox class="checkbox" v-model="show_border" :label="'境界を表示'" />
             </v-col>
             <v-col cols="auto">
-                <v-btn>ログイン</v-btn>
+                <v-btn :style="{ display: 'none' }">ログイン</v-btn>
             </v-col>
         </v-row>
         <v-row class="ppmk_row ppmk_main_pane">
@@ -57,7 +57,7 @@
                         <v-col cols="auto">
                             <!--構造ビュー-->
                             <HTMLTagStructView @onclick_tag="onclick_tag" class="component struct_view"
-                                ref="struct_view"
+                                ref="struct_view" @delete_tagdata="delete_tagdata"
                                 @updated_html_tagdatas="(html_tagdatas) => updated_htmltagdatas(html_tagdatas, null)" />
                         </v-col>
                     </v-row>
@@ -464,6 +464,28 @@ export default class PutPullMockRootPage extends Vue {
         head += "<style>" + this.css + "</style>"
         let sub = window.open()
         sub.document.write("<html><head>" + head + "</head>" + area + cmd + "</html>")
+    }
+
+    delete_tagdata(tagdata: HTMLTagDataBase) {
+        let page_list_view: any = this.$refs['page_list_view']
+        let tagdatas: Array<HTMLTagDataBase> = page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas
+
+        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+            for (let i = 0; i < tagdatas.length; i++) {
+                let html_tagdata = tagdatas[i]
+                if (tagdata.tagid == tagdatas[i].tagid) {
+                    tagdatas.splice(i, 1)
+                    return true
+                }
+                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                    return true
+                }
+            }
+        }
+        walk_tagdatas(tagdatas)
+        page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = tagdatas
+        this.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
     }
 }
 </script>
