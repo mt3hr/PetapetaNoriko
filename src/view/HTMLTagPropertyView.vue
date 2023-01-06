@@ -81,6 +81,9 @@ export default class HTMLTagPropertyView extends Vue {
             case "tagid":
             case "child_tagdatas":
             case "has_child_tag":
+            case "selected_this_tag":
+            case "position_style":
+            case "scale":
                 return {
                     "display": "none"
                 }

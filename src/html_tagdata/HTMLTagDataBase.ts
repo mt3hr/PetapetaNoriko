@@ -24,16 +24,20 @@ export default class HTMLTagDataBase {
     position_y: number
     scale: number
     position_style: PositionStyle = PositionStyle.Absolute
+    selected_this_tag = false
 
     generate_html(options: GenerateHTMLOptions, indent: string): string {
         return ""
     }
     generate_position_css(): string {
+        let style = "#" + this.tagid + " {\n"
         if (this.position_style == PositionStyle.Absolute) {
-            return "#" + this.tagid + " {\n  position: absolute;\n  left: " + this.position_x + "px;\n" + "  top: " + this.position_y + "px;\n}\n"
+            style += "position: absolute;\n  left: " + this.position_x + "px;\n" + "  top: " + this.position_y + "px;\n"
         } else {
-            return "#" + this.tagid + " {\n  position: initial;\n}\n"
+            style += "position: initial;\n"
         }
+        style += "}\n"
+        return style
     }
     to_string(): string {
         return "tagbase"

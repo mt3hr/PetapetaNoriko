@@ -7,6 +7,7 @@ export default class HTMLTagViewBase extends Vue {
     @Prop({ require: true }) tagdatas_root: Array<HTMLTagDataBase>
     @Prop() show_border: boolean
     position_css: string
+    selected_this_tag = false
 
     created() {
         this.update_position()
@@ -25,6 +26,9 @@ export default class HTMLTagViewBase extends Vue {
         if (this.show_border) {
             style.border = "solid 2px black"
             style["background-color"] = "snow"
+        }
+        if (this.tagdata.selected_this_tag) {
+            style.border = "solid 2px yellow"
         }
         this.position_css = style
     }
