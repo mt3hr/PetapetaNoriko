@@ -3,7 +3,7 @@
         <h2>ページプロパティ</h2>
         <table>
             <tr v-for="property, index in properties" :key="index">
-                <td>{{ property.name }}:</td>
+                <td>{{ get_property_name_jp(property.name) }}:</td>
                 <td><input type="text" :value="property.value"
                         @keyup="(e) => updated_property_value(e, property.name)" /> </td>
             </tr>
@@ -58,6 +58,18 @@ export default class PagePropertyView extends Vue {
         page_data[property_name] = value
 
         this.$emit('updated_page_property', page_data)
+    }
+
+    get_property_name_jp(name: string) {
+        switch (name) {
+            case "pagename":
+                return "ページ名"
+            case "width":
+                return "幅"
+            case "height":
+                return "高さ"
+        }
+        return name
     }
 }
 </script>

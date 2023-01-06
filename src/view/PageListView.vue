@@ -98,10 +98,9 @@ export default class Page extends Vue {
         }
 
         pagedatas.splice(index, 0, move_pagedata)
-        this.$nextTick(() => {
-            this.pagedatas = pagedatas
-        })
-        this.clicked_page(pagedata)
+        this.pagedatas = pagedatas
+        this.selected_index = index
+        this.clicked_page(this.pagedatas[index])
     }
 }
 </script>
