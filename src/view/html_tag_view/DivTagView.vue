@@ -4,7 +4,7 @@
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
             @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
             :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
-            @onclick_tag="onclick_child_tag(child_tagdata)" @delete_tagdata="delete_child_tagdata" />
+            @onclick_tag="onclick_child_tag" @delete_tagdata="delete_child_tagdata" />
     </div>
 </template>
 <script lang="ts">
