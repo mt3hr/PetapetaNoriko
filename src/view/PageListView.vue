@@ -8,7 +8,7 @@
             <PageListItem v-for="(pagedata, index) in pagedatas" :pagedata="pagedata" :key="index"
                 @copy_page="(pagedata) => copy_page(pagedata, index)" :style="generate_style(index)"
                 @move_pagedata="(e, pagedata) => move_pagedata(e, pagedata, index)" @clicked_page="clicked_page"
-                @delete_page="delete_page" />
+                :selected="selected_index == index" @delete_page="delete_page" />
         </ul>
     </div>
 </template>
@@ -25,7 +25,6 @@ import { Options, Vue } from 'vue-class-component';
     }
 })
 export default class Page extends Vue {
-
     selected_index = 0
     pagedatas: Array<PageData> = new Array<PageData>()
 
@@ -36,7 +35,9 @@ export default class Page extends Vue {
                 break
             }
         }
-        this.$emit('clicked_page', pagedata)
+        this.$nextTick(() => {
+            this.$emit('clicked_page', pagedata)
+        })
     }
 
     delete_page(pagedata: PageData) {
@@ -76,9 +77,14 @@ export default class Page extends Vue {
 
     copy_page(pagedata: any, index: number) {
         this.pagedatas.splice(index + 1, 0, pagedata)
+        this.clicked_page(pagedata)
     }
 
     move_pagedata(e: DragEvent, pagedata: PageData, index: number) {
+        if (e.dataTransfer.getData("ppmk/move_page_id") == pagedata.pageid) {
+            return
+        }
+
         let json = JSON.stringify(this.pagedatas)
         let pagedatas: Array<PageData> = JSON.parse(json, deserialize)
 
@@ -91,13 +97,11 @@ export default class Page extends Vue {
             }
         }
 
-        for (let i = 0; i < pagedatas.length; i++) {
-            if (pagedata.pageid == pagedatas[i].pageid) {
-                pagedatas.splice(index, 0, move_pagedata)
-                break
-            }
-        }
-        this.pagedatas = pagedatas
+        pagedatas.splice(index, 0, move_pagedata)
+        this.$nextTick(() => {
+            this.pagedatas = pagedatas
+        })
+        this.clicked_page(pagedata)
     }
 }
 </script>

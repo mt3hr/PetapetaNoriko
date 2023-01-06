@@ -1,6 +1,6 @@
 <template>
     <li @contextmenu.prevent="show_contextmenu" @click="clicked_page" @drop.stop="drop" @dragover.prevent="dragover"
-        draggable="true" @dragstart.stop="on_drag_start">
+        :style="style" draggable="true" @dragstart.stop="on_drag_start">
         {{ pagedata.pagename }}</li>
     <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
         <v-list>
@@ -15,14 +15,23 @@
 import { deserialize } from '@/serializable/serializable';
 import generateUUID from '@/uuid';
 import { Vue } from 'vue-class-component';
-import { Prop } from 'vue-property-decorator';
+import { Prop, Watch } from 'vue-property-decorator';
 import PageData from './PageData';
 
 export default class PageListItem extends Vue {
     @Prop() pagedata: PageData
+    @Prop() selected: boolean
     is_show_contextmenu = false
     x_contextmenu = 0
     y_contextmenu = 0
+
+    get style(): any {
+        if (this.selected) {
+            return { "font-weight": "bold" }
+        } else {
+            return {}
+        }
+    }
 
     clicked_page() {
         this.$emit('clicked_page', this.pagedata)
