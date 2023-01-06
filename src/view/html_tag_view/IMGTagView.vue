@@ -1,5 +1,5 @@
 <template>
-    <img :class="tagclass" :style="position_css" @click.stop="onclick_tag" :src="src" :alt="alt" :usemap="usemap" :ismap="ismap"
+    <img :class="tagclass" :id="tagdata.tagid" :style="position_css" @click.prevent.stop="onclick_tag" :src="src" :alt="alt" :usemap="usemap" :ismap="ismap"
         :width="width" :height="height" />
 </template>
 

@@ -1,6 +1,6 @@
 <template>
-    <input type="radio" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :checked="checked"
-        :class="tagclass" :required="required" />
+    <input type="radio" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :checked="checked"
+        :class="tagclass" :id="tagdata.tagid" :required="required" />
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-    <h5 :style="position_css" @click.stop="onclick_tag" :class="tagclass">{{ text }}</h5>
+:   <h5 :style="position_css" @click.prevent.stop="onclick_tag" :class="tagclass" :id="tagdata.tagid">{{ text }}</h5>
 </template>
 
 <script lang="ts">

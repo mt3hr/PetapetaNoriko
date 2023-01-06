@@ -1,6 +1,6 @@
 <template>
-    <input type="submit" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :formaction="formaction"
-        :class="tagclass" :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
+    <input type="submit" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :formaction="formaction"
+        :class="tagclass" :id="tagdata.tagid" :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
         :formtarget="formtarget">
 </template>
 

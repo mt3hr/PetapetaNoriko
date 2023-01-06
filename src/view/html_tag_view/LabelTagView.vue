@@ -1,5 +1,5 @@
 <template>
-    <label :class="tagclass" :style="position_css" @click.stop="onclick_tag" :form="form" :for="this.for" :text="text">{{ text
+    <label :class="tagclass" :id="tagdata.tagid" :style="position_css" @click.prevent.stop="onclick_tag" :form="form" :for="this.for" :text="text">{{ text
         }}</label>
 </template>
 

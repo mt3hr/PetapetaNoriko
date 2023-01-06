@@ -1,6 +1,6 @@
 <template>
-    <input type="tel" :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :size="size"
-        :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder" :class="tagclass"
+    <input type="tel" :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
+        :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder" :class="tagclass" :id="tagdata.tagid"
         :readonly="readonly" :required="required" :list="list">
 </template>
 

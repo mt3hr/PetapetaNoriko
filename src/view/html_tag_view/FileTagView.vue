@@ -1,6 +1,6 @@
 <template>
-    <input type="file" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :size="size"
-        :class="tagclass" :accept="accept" :multiple="multiple" :required="required">
+    <input type="file" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
+        :class="tagclass" :id="tagdata.tagid" :accept="accept" :multiple="multiple" :required="required">
 </template>
 
 <script lang="ts">

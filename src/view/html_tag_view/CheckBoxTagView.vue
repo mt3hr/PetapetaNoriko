@@ -1,6 +1,6 @@
 <template>
-    <input type="checkbox" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :checked="checked"
-        :class="tagclass">
+    <input type="checkbox" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :checked="checked"
+        :class="tagclass" :id="tagdata.tagid">
 </template>
 
 <script lang="ts">

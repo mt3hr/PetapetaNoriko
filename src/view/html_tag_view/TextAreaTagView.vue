@@ -1,6 +1,6 @@
 <template>
-    <textarea :style="position_css" readonly @click.stop="onclick_tag" :autofocus="autofocus" :cols="cols" :disabled="disabled"
-        :form="form" :maxlength="maxlength" :name="name" :placeholder="placeholder" :class="tagclass"
+    <textarea :style="position_css" readonly @click.prevent.stop="onclick_tag" :autofocus="autofocus" :cols="cols" :disabled="disabled"
+        :form="form" :maxlength="maxlength" :name="name" :placeholder="placeholder" :class="tagclass" :id="tagdata.tagid"
         :required="required" :rows="rows" :wrap="wrap"></textarea>
 </template>
 

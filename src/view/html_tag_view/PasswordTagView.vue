@@ -1,7 +1,7 @@
 <template>
-    <input type="password" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :size="size"
+    <input type="password" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
         :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder"
-        :class="tagclass" :required="required">
+        :class="tagclass" :id="tagdata.tagid" :required="required">
 </template>
 
 <script lang="ts">

@@ -1,6 +1,6 @@
 <template>
-    <input type="image" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :src="src" :alt="alt"
-        :class="tagclass" :height="height" :width="width" :formaciton="formaciton" :formenctype="formenctype"
+    <input type="image" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :src="src" :alt="alt"
+        :class="tagclass" :id="tagdata.tagid" :height="height" :width="width" :formaciton="formaciton" :formenctype="formenctype"
         :formmethod="formmethod" :formnovalidate="formnovalidate" :formtarget="formtarget">
 </template>
 

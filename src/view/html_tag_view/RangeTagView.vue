@@ -1,5 +1,5 @@
 <template>
-    <input type="range" readonly :style="position_css" @click.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
+    <input type="range" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass" :id="tagdata.tagid"
         :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
 </template>
 

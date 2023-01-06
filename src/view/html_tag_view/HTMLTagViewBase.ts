@@ -47,6 +47,6 @@ export default class HTMLTagViewBase extends Vue {
             return false
         }
         const exists_in_children = walk_tagdatas(target_tagdata.child_tagdatas)
-        return exists_in_children
+        return !exists_in_children
     }
 }

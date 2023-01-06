@@ -1,5 +1,5 @@
 <template>
-    <form :style="position_css" @click.stop="onclick_tag" :class="tagclass" @drop="on_drop"
+    <form :style="position_css" @click.prevent.stop="onclick_tag" :class="tagclass" :id="tagdata.tagid" @drop="on_drop"
         :acceptcharset="acceptcharset" :action="action" :autocomplete="autocomplete" :enctype="enctype" :method="method"
         :name="name" :novalidate="novalidate" :target="target" @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"

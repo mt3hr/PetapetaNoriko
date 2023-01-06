@@ -1,6 +1,6 @@
 <template>
-    <a :style="position_css" @click.stop="onclick_tag" :href="href" :name="name" :charset="charset" :hreflang="hreflang"
-        :class="tagclass" :type="type" :rel="rel" :rev="rev" :tabindex="tabindex" :accesskey="accesskey" :shape="shape"
+    <a :style="position_css" @click.prevent.stop="onclick_tag" :href="href" :name="name" :charset="charset" :hreflang="hreflang"
+        :class="tagclass" :id="tagdata.tagid" :type="type" :rel="rel" :rev="rev" :tabindex="tabindex" :accesskey="accesskey" :shape="shape"
         :coords="coords">{{ text }}</a>
 </template>
 
