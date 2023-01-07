@@ -23,6 +23,7 @@
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
                         <PageListView class="component page_list_view" ref="page_list_view"
                             :auto_save_pagedatas_to_localstorage="auto_save_pagedatas_to_localstorage"
+                            @update_auto_save_pagedatas_to_localstorage="update_auto_save_pagedatas_to_localstorage"
                             @clicked_page="clicked_page" />
                     </v-row>
                     <v-row>
@@ -337,15 +338,16 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     read_ppmk_project(e) {
+        let page_list_view: any = this.$refs['page_list_view']
         let reader = new FileReader()
         reader.addEventListener('load', (e) => {
             let pagedatas = JSON.parse(e.target.result.toString(), deserialize)
-            let page_list_view: any = this.$refs['page_list_view']
             page_list_view.pagedatas = pagedatas
             page_list_view.clicked_page(page_list_view.pagedatas[0])
             this.is_show_readin_dialog = false
         })
         reader.readAsText(e.target.files[0])
+        page_list_view.save_pagedatas_to_localstorage()
     }
 
     save_ppmk_project() {
@@ -644,6 +646,10 @@ export default class PutPullMockRootPage extends Vue {
 
     copy_tag(tagdata: HTMLTagDataBase) {
         this.copied_tagdata = tagdata
+    }
+
+    update_auto_save_pagedatas_to_localstorage(auto_save_pagedatas_to_localstorage) {
+        this.auto_save_pagedatas_to_localstorage = auto_save_pagedatas_to_localstorage
     }
 }
 </script>

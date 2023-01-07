@@ -10,6 +10,24 @@
                 @move_pagedata="(e, pagedata) => move_pagedata(e, pagedata, index)" @clicked_page="clicked_page"
                 :selected="selected_index == index" @delete_page="delete_page" />
         </ul>
+        <v-dialog v-model="is_show_oversize_localstorage_dialog">
+            <v-card class="pa-5">
+                <v-card-title>
+                    自動保存容量超過
+                </v-card-title>
+                <v-card-text>
+                    データが大きすぎるため自動保存できません。
+                    自動保存機能を無効化します。
+                    （書き出しはできます）
+                </v-card-text>
+
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_oversize_localstorage_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script lang="ts">
@@ -30,10 +48,18 @@ export default class Page extends Vue {
     pagedatas: Array<PageData> = new Array<PageData>()
     @Prop() auto_save_pagedatas_to_localstorage: boolean
 
+    is_show_oversize_localstorage_dialog = false
+
     @Watch('pagedatas')
     save_pagedatas_to_localstorage() {
         if (this.auto_save_pagedatas_to_localstorage) {
-            window.localStorage.setItem("ppmk_pagedatas", JSON.stringify(this.pagedatas))
+            try {
+                window.localStorage.setItem("ppmk_pagedatas", JSON.stringify(this.pagedatas))
+            } catch (e) {
+                this.is_show_oversize_localstorage_dialog = true
+                this.$emit("update_auto_save_pagedatas_to_localstorage", false)
+                this.clear_pagedatas_at_localstorage()
+            }
         }
     }
 
