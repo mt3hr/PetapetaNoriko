@@ -21,14 +21,25 @@ import (
 
 func init() {
 	cobra.MousetrapHelpText = "" // Windowsでマウスから起動しても怒られないようにする
+	cmd.AddCommand(serverCmd)
 }
 
 var (
 	//go:embed dist
 	htmlFS embed.FS // htmlファイル郡
 
-	port = 51520
-	cmd  = &cobra.Command{
+	port      = 51520
+	serverCmd = &cobra.Command{
+		Use: "server",
+		PersistentPreRun: func(_ *cobra.Command, _ []string) {
+		},
+		Run: func(_ *cobra.Command, _ []string) {
+			if err := launchServer(); err != nil {
+				log.Fatal(err)
+			}
+		},
+	}
+	cmd = &cobra.Command{
 		Use: "rykv",
 		PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		},
