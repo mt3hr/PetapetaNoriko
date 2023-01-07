@@ -30,6 +30,7 @@ import IMGTagData from '@/html_tagdata/IMGTagData'
 import { Prop } from 'vue-property-decorator'
 import { deserialize } from '@/serializable/serializable'
 import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by_tagname'
+import generateUUID from '@/uuid'
 
 @Options({
     components: {
@@ -51,6 +52,15 @@ export default class DropZone extends Vue {
 
     paste_tag() {
         if (this.copied_tagdata.tagname != 'tagbase') {
+            this.copied_tagdata.tagid = "id_" + generateUUID()
+            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) { console.log("スパークリングワイン") }
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    tagdatas[i].tagid = "id_" + generateUUID()
+                    walk_tagdatas(tagdatas[i].child_tagdatas)
+                }
+            }
+            walk_tagdatas(this.copied_tagdata.child_tagdatas)
             this.html_tagdatas.push(this.copied_tagdata)
         }
         this.updated_tagdatas_root(this.html_tagdatas)
