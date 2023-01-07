@@ -26,7 +26,14 @@ export default class ImageTagData extends HTMLTagDataBase {
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
         if (this.name != "") html += " name=\"" + this.name + "\""
         if (this.value != "") html += " value=\"" + this.value + "\""
-        if (this.src != "") html += " src=\"" + this.src + "\""
+        if (this.src != "") {
+            if (this.src.startsWith("data:image")) {
+                if (!options.export_base64_image) html += " src=\"\""
+                else html += " src=\"" + this.src + "\""
+            } else {
+                html += " src=\"" + this.src + "\""
+            }
+        }
         if (this.alt != "") html += " alt=\"" + this.alt + "\""
         if (this.height != "") html += " height=\"" + this.height + "\""
         if (this.width != "") html += " width=\"" + this.width + "\""
@@ -38,6 +45,7 @@ export default class ImageTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
-override to_string(): string {
+    override to_string(): string {
         return this.name
-    }}
+    }
+}

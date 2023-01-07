@@ -17,6 +17,7 @@ import PageData from '@/page/PageData';
 import PageListItem from '@/page/PageListItem.vue';
 import { deserialize } from '@/serializable/serializable';
 import { Options, Vue } from 'vue-class-component';
+import { Prop, Watch } from 'vue-property-decorator';
 
 
 @Options({
@@ -27,6 +28,21 @@ import { Options, Vue } from 'vue-class-component';
 export default class Page extends Vue {
     selected_index = 0
     pagedatas: Array<PageData> = new Array<PageData>()
+    @Prop() auto_save_pagedatas_to_localstorage: boolean
+
+    @Watch('pagedatas')
+    save_pagedatas_to_localstorage() {
+        if (this.auto_save_pagedatas_to_localstorage) {
+            window.localStorage.setItem("ppmk_pagedatas", JSON.stringify(this.pagedatas))
+        }
+    }
+
+    @Watch('auto_save_pagedatas_to_localstorage')
+    clear_pagedatas_at_localstorage() {
+        if (!this.auto_save_pagedatas_to_localstorage) {
+            window.localStorage.setItem("ppmk_pagedatas", "")
+        }
+    }
 
     clicked_page(pagedata: PageData) {
         for (let i = 0; i < this.pagedatas.length; i++) {
@@ -55,7 +71,16 @@ export default class Page extends Vue {
     }
 
     created(): void {
-        this.add_page()
+        if (this.auto_save_pagedatas_to_localstorage) {
+            try {
+                this.pagedatas = JSON.parse(window.localStorage.getItem("ppmk_pagedatas"), deserialize)
+                this.clicked_page(this.pagedatas[0])
+            } catch (e) {
+                this.add_page()
+            }
+        } else {
+            this.add_page()
+        }
     }
 
     generate_style(index: number): any {

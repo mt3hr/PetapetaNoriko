@@ -6,8 +6,11 @@
             </v-col>
             <v-spacer />
             <v-col cols="auto">
-                <v-checkbox class="checkbox" v-model="show_border" :label="'境界を表示'" />
+                <v-checkbox class="checkbox mx-3" v-model="show_border" :label="'境界を表示'" />
             </v-col>
+            <v-btn icon @click="show_options_dialog">
+                <v-icon>mdi-cog</v-icon>
+            </v-btn>
             <v-col cols="auto">
                 <v-btn :style="{ display: 'none' }">ログイン</v-btn>
             </v-col>
@@ -19,6 +22,7 @@
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
                         <PageListView class="component page_list_view" ref="page_list_view"
+                            :auto_save_pagedatas_to_localstorage="auto_save_pagedatas_to_localstorage"
                             @clicked_page="clicked_page" />
                     </v-row>
                     <v-row>
@@ -79,8 +83,18 @@
     </v-container>
 
     <v-dialog v-model="is_show_css_dialog">
-        <v-card class="pa-5">
-            <v-card-title> ページCSS </v-card-title>
+        <v-card class="pa-5" :style="page_css_view_style">
+            <v-card-title>
+                <v-row>
+                    <v-col cols="auto">
+                        ページCSS
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-checkbox class="checkbox" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
+                    </v-col>
+                </v-row>
+            </v-card-title>
             <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
   width: 200px;
   height: auto;
@@ -115,20 +129,21 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 </v-col>
             </v-row>
         </v-card>
-
     </v-dialog>
     <v-dialog id="writeout_dialog" v-model="is_show_writeout_dialog">
         <v-card class="pa-5">
             <v-card-title>ページHTML</v-card-title>
             <v-row>
                 <v-col>
-                    <v-checkbox @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
                 </v-col>
                 <v-col>
-                    <v-checkbox @change="update_page_html" v-model="export_base64_image" :label="'埋め込み画像（激重）'" />
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
+                        :label="'埋め込み画像'" />
                 </v-col>
                 <v-col>
-                    <v-checkbox @change="update_page_html" v-model="export_position_css" :label="'位置情報（非推奨）'" />
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
+                        :label="'位置情報'" />
                 </v-col>
             </v-row>
             <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
@@ -152,6 +167,63 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
         </v-card>
     </v-dialog>
+    <v-dialog v-model="is_show_options_dialog">
+        <v-card class="pa-5">
+            <v-card-title>設定</v-card-title>
+            <v-row>
+                <v-col cols="auto">
+                    <h3>全般</h3>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
+                    <v-checkbox class="checkbox" v-model="show_border" :label="'境界を表示'" />
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
+                    <v-checkbox class="checkbox" v-model="auto_save_pagedatas_to_localstorage" :label="'自動保存'" />
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
+                    <h3>CSS編集画面</h3>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
+                    <v-checkbox class="checkbox" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
+                    <h3>出力画面</h3>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
+                        :label="'埋め込み画像'" />
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
+                        :label="'位置情報'" />
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_options_dialog = false">閉じる</v-btn>
+                </v-col>
+            </v-row>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script lang="ts">
@@ -165,8 +237,18 @@ import HTMLTagDataBase, { GenerateHTMLOptions } from '@/html_tagdata/HTMLTagData
 import PageData from '@/page/PageData'
 import HTMLTagStructView from './HTMLTagStructView.vue'
 import { Watch } from 'vue-property-decorator'
-import { deserialize } from '@/serializable/serializable'
+import { deserialize, serializable } from '@/serializable/serializable'
 import { head } from '@/main'
+
+@serializable
+class Settings {
+    export_base64_image: boolean
+    export_head: boolean
+    export_position_css: boolean
+    show_border: boolean
+    transparent_page_css_view: boolean
+    auto_save_pagedatas_to_localstorage: boolean
+}
 
 @Options({
     components: {
@@ -186,6 +268,7 @@ export default class PutPullMockRootPage extends Vue {
     is_show_writeout_dialog = false
     is_show_readin_dialog = false
     is_show_webfont_dialog = false
+    is_show_options_dialog = false
     css = ""
     page_html = ""
     page_webfont = ""
@@ -195,8 +278,57 @@ export default class PutPullMockRootPage extends Vue {
     export_position_css = false
 
     show_border = true
+    transparent_page_css_view = false
+
+    auto_save_pagedatas_to_localstorage = true
 
     copied_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
+
+    @Watch('export_base64_image')
+    @Watch('export_head')
+    @Watch('export_position_css')
+    @Watch('show_border')
+    @Watch('transparent_page_css_view')
+    @Watch('auto_save_pagedatas_to_localstorage')
+    save_settings_to_cookie() {
+        let settings = new Settings()
+        settings.export_base64_image = this.export_base64_image
+        settings.export_head = this.export_head
+        settings.export_position_css = this.export_position_css
+        settings.show_border = this.show_border
+        settings.transparent_page_css_view = this.transparent_page_css_view
+        settings.auto_save_pagedatas_to_localstorage = this.auto_save_pagedatas_to_localstorage
+        document.cookie = JSON.stringify(settings)
+    }
+
+    load_settings_from_cookie() {
+        let settings: Settings
+        try {
+            settings = JSON.parse(document.cookie, deserialize)
+        } catch (e) {
+            settings = new Settings()
+        }
+        this.export_base64_image = settings.export_base64_image
+        this.export_head = settings.export_head
+        this.export_position_css = settings.export_position_css
+        this.show_border = settings.show_border
+        this.transparent_page_css_view = settings.transparent_page_css_view
+        this.auto_save_pagedatas_to_localstorage = settings.auto_save_pagedatas_to_localstorage
+    }
+
+    created(): void {
+        this.load_settings_from_cookie()
+    }
+
+    get page_css_view_style(): any {
+        if (this.transparent_page_css_view) {
+            return {
+                opacity: 0.85,
+            }
+        } else {
+            return {}
+        }
+    }
 
     read_ppmk_project(e) {
         let reader = new FileReader()
@@ -301,13 +433,16 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     show_writeout_dialog() {
-        this.export_base64_image = false
         this.update_page_html()
         this.is_show_writeout_dialog = true
     }
 
     show_readin_dialog() {
         this.is_show_readin_dialog = true
+    }
+
+    show_options_dialog() {
+        this.is_show_options_dialog = true
     }
 
     update_page_html() {
@@ -331,6 +466,7 @@ export default class PutPullMockRootPage extends Vue {
         }
         page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
+        page_list_view.save_pagedatas_to_localstorage()
     }
 
     clicked_page(pagedata: PageData) {
@@ -384,6 +520,7 @@ export default class PutPullMockRootPage extends Vue {
         walk_tagdatas(tagdatas)
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
         property_view.html_tagdata = updated_tagdata
+        page_list_view.save_pagedatas_to_localstorage()
     }
     updated_page_property(page_data: PageData) {
         let page_list_view: any = this.$refs["page_list_view"]
@@ -395,6 +532,7 @@ export default class PutPullMockRootPage extends Vue {
         }
         page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
+        page_list_view.save_pagedatas_to_localstorage()
     }
 
     update_struct_view(tagdatas: Array<HTMLTagDataBase>) {
@@ -439,6 +577,7 @@ export default class PutPullMockRootPage extends Vue {
         let page_list_view: any = this.$refs["page_list_view"]
         page_list_view.pagedatas[page_list_view.selected_index].webfonts = this.page_webfont.split("\n")
         this.update_page_webfont()
+        page_list_view.save_pagedatas_to_localstorage()
     }
 
     update_page_webfont() {
@@ -494,6 +633,7 @@ export default class PutPullMockRootPage extends Vue {
         walk_tagdatas(tagdatas)
         page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = tagdatas
         this.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
+        page_list_view.save_pagedatas_to_localstorage()
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {
