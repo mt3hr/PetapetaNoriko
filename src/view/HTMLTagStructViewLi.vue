@@ -23,7 +23,7 @@ import { Options, Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import HTMLTagStructViewLi_ref from '@/view/HTMLTagStructViewLi.vue'
 import { deserialize } from '@/serializable/serializable';
-import { generate_tagdata_by_tagname } from './DropZone.vue';
+import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by_tagname';
 
 @Options({
     components: {

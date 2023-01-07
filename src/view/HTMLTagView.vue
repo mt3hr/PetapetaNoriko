@@ -173,6 +173,7 @@
 
     <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
         <v-list>
+            <v-list-item @click="copy_tag(tagdata)">コピー</v-list-item>
             <v-list-item @click="delete_tag(tagdata)">削除</v-list-item>
         </v-list>
     </v-menu>
@@ -321,6 +322,10 @@ export default class HTMLTagView extends Vue {
 
     onclick(e: MouseEvent) {
         //TODO
+    }
+
+    copy_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("copy_tag", tagdata)
     }
 }
 </script>

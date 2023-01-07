@@ -4,21 +4,27 @@
             {{ style_user_edited_fixed }}
         </component>
         <h2>ドロップゾーン</h2>
-        <div id="dropzone" class="dropzone" @drop.stop="on_drop" @dragover.prevent="on_dragover"
-            :style="dropzone_style">
+        <div id="dropzone" class="dropzone" @drop.stop="on_drop" @dragover.prevent="on_dragover" :style="dropzone_style"
+            @contextmenu="show_contextmenu">
 
             <body id="dropzone_body" class="page" :style="dropzone_style">
                 <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas_root"
                     :show_border="show_border" :tagdata="tagdata" @updated_tagdatas_root="updated_tagdatas_root"
-                    @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag" @delete_tagdata="delete_tagdata" />
+                    @copy_tag="copy_tag" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
+                    @delete_tagdata="delete_tagdata" />
             </body>
         </div>
+        <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
+            <v-list v-if="copied_tagdata.tagname">
+                <v-list-item @click="paste_tag">貼り付け</v-list-item>
+            </v-list>
+        </v-menu>
     </div>
 </template>
 
 <script lang="ts">
 import { Vue, Options } from 'vue-class-component'
-import HTMLTagData, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase'
+import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase'
 import HTMLTagView from '@/view/HTMLTagView.vue'
 import H1TagData from '@/html_tagdata/H1TagData'
 import H2TagData from '@/html_tagdata/H2TagData'
@@ -26,7 +32,6 @@ import H3TagData from '@/html_tagdata/H3TagData'
 import H4TagData from '@/html_tagdata/H4TagData'
 import H5TagData from '@/html_tagdata/H5TagData'
 import H6TagData from '@/html_tagdata/H6TagData'
-import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase'
 import LabelTagData from '@/html_tagdata/LabelTagData'
 import OptionTagData from '@/html_tagdata/OptionTagData'
 import SelectTagData from '@/html_tagdata/SelectTagData'
@@ -66,143 +71,7 @@ import { Prop } from 'vue-property-decorator'
 import DivTagData from '@/html_tagdata/DivTagData'
 import SpanTagData from '@/html_tagdata/SpanTagData'
 import { deserialize } from '@/serializable/serializable'
-
-export function generate_tagdata_by_tagname(tagname: string): HTMLTagDataBase {
-    let tag_data: HTMLTagDataBase
-    // 鬼の条件分岐
-    switch (tagname) {
-        case "h1":
-            tag_data = new H1TagData()
-            break
-        case "h2":
-            tag_data = new H2TagData()
-            break
-        case "h3":
-            tag_data = new H3TagData()
-            break
-        case "h4":
-            tag_data = new H4TagData()
-            break
-        case "h5":
-            tag_data = new H5TagData()
-            break
-        case "h6":
-            tag_data = new H6TagData()
-            break
-        case "p":
-            tag_data = new PTagData()
-            break
-        case "a":
-            tag_data = new ATagData()
-            break
-        case "ul":
-            tag_data = new ULTagData()
-            break
-        case "ol":
-            tag_data = new OLTagData()
-            break
-        case "li":
-            tag_data = new LITagData()
-            break
-        case "img":
-            tag_data = new IMGTagData()
-            break
-        case "table":
-            tag_data = new TableTagData()
-            break
-        case "tr":
-            tag_data = new TRTagData()
-            break
-        case "td":
-            tag_data = new TDTagData()
-            break
-        case "form":
-            tag_data = new FormTagData()
-            break
-        case "button":
-            tag_data = new ButtonTagData()
-            break
-        case "checkbox":
-            tag_data = new CheckBoxTagData()
-            break
-        case "color":
-            tag_data = new ColorTagData()
-            break
-        case "date":
-            tag_data = new DateTagData()
-            break
-        case "datetimelocal":
-            tag_data = new DateTimeLocalTagData()
-            break
-        case "email":
-            tag_data = new EmailTagData()
-            break
-        case "file":
-            tag_data = new FileTagData()
-            break
-        case "image":
-            tag_data = new ImageTagData()
-            break
-        case "month":
-            tag_data = new MonthTagData()
-            break
-        case "number":
-            tag_data = new NumberTagData()
-            break
-        case "password":
-            tag_data = new PasswordTagData()
-            break
-        case "radio":
-            tag_data = new RadioTagData()
-            break
-        case "range":
-            tag_data = new RangeTagData()
-            break
-        case "reset":
-            tag_data = new ResetTagData()
-            break
-        case "search":
-            tag_data = new SearchTagData()
-            break
-        case "submit":
-            tag_data = new SubmitTagData()
-            break
-        case "tel":
-            tag_data = new TelTagData()
-            break
-        case "text":
-            tag_data = new TextTagData()
-            break
-        case "time":
-            tag_data = new TimeTagData()
-            break
-        case "url":
-            tag_data = new URLTagData()
-            break
-        case "week":
-            tag_data = new WeekTagData()
-            break
-        case "textarea":
-            tag_data = new TextAreaTagData()
-            break
-        case "select":
-            tag_data = new SelectTagData()
-            break
-        case "option":
-            tag_data = new OptionTagData()
-            break
-        case "label":
-            tag_data = new LabelTagData()
-            break
-        case "div":
-            tag_data = new DivTagData()
-            break
-        case "span":
-            tag_data = new SpanTagData()
-            break
-    }
-    return tag_data
-}
+import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by_tagname'
 
 @Options({
     components: {
@@ -211,11 +80,34 @@ export function generate_tagdata_by_tagname(tagname: string): HTMLTagDataBase {
 })
 
 export default class DropZone extends Vue {
-    html_tagdatas: Array<HTMLTagData> = new Array<HTMLTagData>()
-    html_tagdatas_root: Array<HTMLTagData> = new Array<HTMLTagData>()
+    html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
+    html_tagdatas_root: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
     style_user_edited = ""
     @Prop() show_border: boolean
     @Prop() dropzone_style: any
+    @Prop() copied_tagdata: HTMLTagDataBase
+
+    is_show_contextmenu = false
+    x_contextmenu = 0
+    y_contextmenu = 0
+
+    paste_tag() {
+        if (this.copied_tagdata.tagname) {
+            this.html_tagdatas.push(this.copied_tagdata)
+        }
+        this.updated_tagdatas_root(this.html_tagdatas)
+    }
+
+    get contextmenu_style(): any {
+        return {
+            display: "inline",
+            position: "absolute",
+            left: this.x_contextmenu + "px",
+            top: this.y_contextmenu + "px",
+        }
+    }
+
+
 
     // https://stackoverflow.com/questions/3326494/parsing-css-in-javascript-jquery
     rulesForCssText(styleContent) {
@@ -361,6 +253,17 @@ export default class DropZone extends Vue {
 
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
         this.$emit('updated_tagdatas_root', tagdatas, null)
+    }
+
+    copy_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("copy_tag", tagdata)
+    }
+
+    show_contextmenu(e: MouseEvent) {
+        e.preventDefault()
+        this.x_contextmenu = e.clientX
+        this.y_contextmenu = e.clientY
+        this.is_show_contextmenu = true
     }
 }
 </script>

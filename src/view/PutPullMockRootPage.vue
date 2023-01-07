@@ -32,7 +32,8 @@
             <v-col cols="auto" class="dropzone_wrap">
                 <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
                     @updated_tagdatas_root="updated_htmltagdatas" @updated_htmltagdatas="updated_htmltagdatas"
-                    @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
+                    :copied_tagdata="copied_tagdata" @copy_tag="copy_tag" @onclick_tag="onclick_tag"
+                    :dropzone_style="dropzone_style" />
                 <!--TODO-->
             </v-col>
 
@@ -194,6 +195,8 @@ export default class PutPullMockRootPage extends Vue {
     export_position_css = false
 
     show_border = true
+
+    copied_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
 
     read_ppmk_project(e) {
         let reader = new FileReader()
@@ -491,6 +494,10 @@ export default class PutPullMockRootPage extends Vue {
         walk_tagdatas(tagdatas)
         page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = tagdatas
         this.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
+    }
+
+    copy_tag(tagdata: HTMLTagDataBase) {
+        this.copied_tagdata = tagdata
     }
 }
 </script>
