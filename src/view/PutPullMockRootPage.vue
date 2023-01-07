@@ -278,7 +278,7 @@ export default class PutPullMockRootPage extends Vue {
     export_head = true
     export_position_css = false
 
-    show_border = true
+    show_border = false
     transparent_page_css_view = false
 
     auto_save_pagedatas_to_localstorage = true
