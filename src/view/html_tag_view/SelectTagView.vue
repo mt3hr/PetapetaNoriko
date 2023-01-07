@@ -16,7 +16,8 @@ import { Options } from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 import HTMLTagView from '@/view/HTMLTagView.vue';
-import { generate_tagdata_by_tagname } from '../DropZone.vue';
+import { generate_tagdata_by_tagname } from './generate_tagdata_by_tagname';
+import IMGTagData from '@/html_tagdata/IMGTagData';
 
 @Options({
     components: {
@@ -164,6 +165,18 @@ export default class SelectTagView extends HTMLTagViewBase {
             }
             walk_tagdatas(html_tagdatas_root)
             this.$emit("updated_tagdatas_root", html_tagdatas_root)
+        } else if (e.dataTransfer.items.length != 0) {
+            const reader = new FileReader()
+            reader.onload = (event: any) => {
+                let tagdata_typed = this.tagdata_typed
+                let tag_data = new IMGTagData()
+                tag_data.position_style = PositionStyle.None
+                tag_data.src = event.currentTarget.result
+                tagdata_typed.child_tagdatas.push(tag_data)
+                this.$emit('updated_tagdata', tagdata_typed)
+            }
+            reader.readAsDataURL(e.dataTransfer.files[0])
+            e.preventDefault()
         }
         e.stopPropagation()
     }

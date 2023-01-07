@@ -58,7 +58,7 @@
                         <v-col cols="auto">
                             <!--構造ビュー-->
                             <HTMLTagStructView @onclick_tag="onclick_tag" class="component struct_view"
-                                ref="struct_view" @delete_tagdata="delete_tagdata"
+                                @copy_tag="copy_tag" ref="struct_view" @delete_tagdata="delete_tagdata"
                                 @updated_html_tagdatas="(html_tagdatas) => updated_htmltagdatas(html_tagdatas, null)" />
                         </v-col>
                     </v-row>

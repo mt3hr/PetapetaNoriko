@@ -13,6 +13,7 @@
     </li>
     <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
         <v-list>
+            <v-list-item @click="copy_tag(tagdata)">コピー</v-list-item>
             <v-list-item @click="delete_tag(tagdata)">削除</v-list-item>
         </v-list>
     </v-menu>
@@ -227,6 +228,10 @@ export default class HTMLTagPropertyView extends Vue {
         this.x_contextmenu = e.clientX
         this.y_contextmenu = e.clientY
         this.is_show_contextmenu = true
+    }
+
+    copy_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("copy_tag", tagdata)
     }
 }
 </script>

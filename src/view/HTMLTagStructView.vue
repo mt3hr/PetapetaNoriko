@@ -3,7 +3,7 @@
         <h2>構造</h2>
         <ul class="dropzone_wrap">
             <HTMLTagStructViewLi v-for="tagdata, index in html_tagdatas" :key="index" @onclick_tag="onclick_tag"
-                @delete_tagdata="delete_tag" :tagdata="tagdata" :html_tagdatas_root="html_tagdatas"
+                @copy_tag="copy_tag" @delete_tagdata="delete_tag" :tagdata="tagdata" :html_tagdatas_root="html_tagdatas"
                 @updated_html_tagdatas="updated_html_tagdatas" />
         </ul>
     </div>
@@ -66,6 +66,10 @@ export default class HTMLTagPropertyView extends Vue {
 
     delete_tag(tagdata: HTMLTagDataBase) {
         this.$emit("delete_tagdata", tagdata)
+    }
+
+    copy_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("copy_tag", tagdata)
     }
 }
 </script>
