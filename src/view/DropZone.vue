@@ -15,7 +15,7 @@
             </body>
         </div>
         <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
-            <v-list v-if="copied_tagdata.tagname">
+            <v-list v-if="copied_tagdata.tagname != 'tagbase'">
                 <v-list-item @click="paste_tag">貼り付け</v-list-item>
             </v-list>
         </v-menu>
@@ -26,50 +26,8 @@
 import { Vue, Options } from 'vue-class-component'
 import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase'
 import HTMLTagView from '@/view/HTMLTagView.vue'
-import H1TagData from '@/html_tagdata/H1TagData'
-import H2TagData from '@/html_tagdata/H2TagData'
-import H3TagData from '@/html_tagdata/H3TagData'
-import H4TagData from '@/html_tagdata/H4TagData'
-import H5TagData from '@/html_tagdata/H5TagData'
-import H6TagData from '@/html_tagdata/H6TagData'
-import LabelTagData from '@/html_tagdata/LabelTagData'
-import OptionTagData from '@/html_tagdata/OptionTagData'
-import SelectTagData from '@/html_tagdata/SelectTagData'
-import TextAreaTagData from '@/html_tagdata/TextAreaTagData'
-import WeekTagData from '@/html_tagdata/WeekTagData'
-import URLTagData from '@/html_tagdata/URLTagData'
-import TimeTagData from '@/html_tagdata/TimeTagData'
-import TextTagData from '@/html_tagdata/TextTagData'
-import TelTagData from '@/html_tagdata/TelTagData'
-import SubmitTagData from '@/html_tagdata/SubmitTagData'
-import SearchTagData from '@/html_tagdata/SearchTagData'
-import ResetTagData from '@/html_tagdata/ResetTagData'
-import RangeTagData from '@/html_tagdata/RangeTagData'
-import RadioTagData from '@/html_tagdata/RadioTagData'
-import ATagData from '@/html_tagdata/ATagData'
-import ButtonTagData from '@/html_tagdata/ButtonTagData'
-import ColorTagData from '@/html_tagdata/ColorTagData'
-import DateTagData from '@/html_tagdata/DateTagData'
-import DateTimeLocalTagData from '@/html_tagdata/DateTimeLocalTagData'
-import FileTagData from '@/html_tagdata/FileTagData'
-import FormTagData from '@/html_tagdata/FormTagData'
-import ImageTagData from '@/html_tagdata/ImageTagData'
 import IMGTagData from '@/html_tagdata/IMGTagData'
-import LITagData from '@/html_tagdata/LITagData'
-import MonthTagData from '@/html_tagdata/MonthTagData'
-import NumberTagData from '@/html_tagdata/NumberTagData'
-import OLTagData from '@/html_tagdata/OLTagData'
-import PasswordTagData from '@/html_tagdata/PasswordTagData'
-import PTagData from '@/html_tagdata/PTagData'
-import TableTagData from '@/html_tagdata/TableTagData'
-import TDTagData from '@/html_tagdata/TDTagData'
-import TRTagData from '@/html_tagdata/TRTagData'
-import ULTagData from '@/html_tagdata/ULTagData'
-import CheckBoxTagData from '@/html_tagdata/CheckBoxTagData'
-import EmailTagData from '@/html_tagdata/EmailTagData'
 import { Prop } from 'vue-property-decorator'
-import DivTagData from '@/html_tagdata/DivTagData'
-import SpanTagData from '@/html_tagdata/SpanTagData'
 import { deserialize } from '@/serializable/serializable'
 import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by_tagname'
 
@@ -92,7 +50,7 @@ export default class DropZone extends Vue {
     y_contextmenu = 0
 
     paste_tag() {
-        if (this.copied_tagdata.tagname) {
+        if (this.copied_tagdata.tagname != 'tagbase') {
             this.html_tagdatas.push(this.copied_tagdata)
         }
         this.updated_tagdatas_root(this.html_tagdatas)

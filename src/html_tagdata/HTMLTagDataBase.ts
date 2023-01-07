@@ -17,7 +17,7 @@ export class GenerateHTMLOptions {
 export default class HTMLTagDataBase {
     child_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
     has_child_tag: boolean
-    tagname: string
+    tagname = "tagbase"
     tagid = "id_" + generateUUID()
     tagclass = ""
     position_x: number
