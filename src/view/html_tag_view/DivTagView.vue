@@ -165,7 +165,6 @@ export default class DivTagView extends HTMLTagViewBase {
     }
 
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
-        console.log(tagdatas)
         this.$emit("updated_tagdatas_root", tagdatas)
     }
 }

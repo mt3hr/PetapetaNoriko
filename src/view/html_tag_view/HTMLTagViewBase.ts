@@ -79,7 +79,6 @@ export default class HTMLTagViewBase extends Vue {
             }
         }
         walk_tagdatas(this.tagdatas_root)
-        console.log(exist_in_target)
         return !exist_in_target
     }
 }

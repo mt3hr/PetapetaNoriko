@@ -61,20 +61,48 @@ export default class HTMLTagPropertyView extends Vue {
             return false
         }
 
-        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
-        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+        let is_in_drag_tag = false
+        let is_in_target_tag = false
+        let j = 0
+        let exist_in_target = false
+        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) { return }
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
             for (let i = 0; i < tagdatas.length; i++) {
                 if (move_tagid == tagdatas[i].tagid) {
-                    return true
+                    is_in_drag_tag = true
                 }
-                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
-                    return true
+                if (is_in_drag_tag) j++
+                if (is_in_drag_tag && tagdatas[i].tagid == target_tagdata.tagid) {
+                    exist_in_target = true
+                }
+
+                walk_tagdatas(tagdatas[i].child_tagdatas)
+                if (is_in_drag_tag) j--
+                if (is_in_drag_tag && j == 0) {
+                    is_in_drag_tag = false
                 }
             }
-            return false
         }
-        let exists_in_children = walk_tagdatas(target_tagdata.child_tagdatas)
-        return !exists_in_children
+        walk_tagdatas(this.html_tagdatas_root)
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+            for (let i = 0; i < tagdatas.length; i++) {
+                if (target_tagdata.tagid == tagdatas[i].tagid) {
+                    is_in_target_tag = true
+                }
+                if (is_in_target_tag) j++
+                if (is_in_target_tag && tagdatas[i].tagid == move_tagid) {
+                    exist_in_target = true
+                }
+
+                walk_tagdatas(tagdatas[i].child_tagdatas)
+                if (is_in_target_tag) j--
+                if (is_in_target_tag && j == 0) {
+                    is_in_target_tag = false
+                }
+            }
+        }
+        walk_tagdatas(this.html_tagdatas_root)
+        return !exist_in_target
     }
 
     drop(e: DragEvent, tagdata: HTMLTagDataBase, to_child: boolean) {

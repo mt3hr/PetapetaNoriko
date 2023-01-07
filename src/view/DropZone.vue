@@ -53,7 +53,9 @@ export default class DropZone extends Vue {
     paste_tag() {
         if (this.copied_tagdata.tagname != 'tagbase') {
             this.copied_tagdata.tagid = "id_" + generateUUID()
-            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) { console.log("スパークリングワイン") }
+            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                // 後で代入する
+            }
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
                 for (let i = 0; i < tagdatas.length; i++) {
                     tagdatas[i].tagid = "id_" + generateUUID()
