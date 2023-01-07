@@ -3,8 +3,8 @@
         @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
             @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
-            :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
-            @onclick_tag="onclick_child_tag" @delete_tagdata="delete_child_tagdata" />
+            :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_child_tag"
+            @delete_tagdata="delete_child_tagdata" />
     </div>
 </template>
 <script lang="ts">
@@ -95,6 +95,8 @@ export default class DivTagView extends HTMLTagViewBase {
             let tagname = e.dataTransfer.getData("ppmk/htmltag")
             let tagdata: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
             tagdata.position_style = PositionStyle.None
+            tagdata.position_x = undefined
+            tagdata.position_y = undefined
             tagdata_typed.child_tagdatas.push(tagdata)
             this.$emit('updated_tagdata', tagdata_typed)
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
@@ -127,6 +129,8 @@ export default class DivTagView extends HTMLTagViewBase {
                     if (tagdata_typed.tagid == tagdatas[i].tagid) {
                         if (tagdatas[i].has_child_tag) {
                             move_tagdata.position_style = PositionStyle.None
+                            move_tagdata.position_x = undefined
+                            move_tagdata.position_y = undefined
                             tagdatas[i].child_tagdatas.push(move_tagdata)
                             return true
                         }

@@ -359,13 +359,17 @@ export default class PutPullMockRootPage extends Vue {
 
     updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
         let page_list_view: any = this.$refs["page_list_view"]
+        let property_view: any = this.$refs["property_view"]
         let tagdatas: Array<HTMLTagDataBase> = page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas
+
+        let updated_tagdata: HTMLTagDataBase
 
         let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
         walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
             for (let i = 0; i < tagdatas.length; i++) {
                 if (html_tagdata.tagid == tagdatas[i].tagid) {
                     tagdatas.splice(i, 1, html_tagdata)
+                    updated_tagdata = html_tagdata
                     return true
                 }
                 if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
@@ -376,6 +380,7 @@ export default class PutPullMockRootPage extends Vue {
         }
         walk_tagdatas(tagdatas)
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
+        property_view.html_tagdata = updated_tagdata
     }
     updated_page_property(page_data: PageData) {
         let page_list_view: any = this.$refs["page_list_view"]

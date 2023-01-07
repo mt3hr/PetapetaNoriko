@@ -95,6 +95,8 @@ export default class SpanTagView extends HTMLTagViewBase {
             let tagname = e.dataTransfer.getData("ppmk/htmltag")
             let tagdata: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
             tagdata.position_style = PositionStyle.None
+            tagdata.position_x = undefined
+            tagdata.position_y = undefined
             tagdata_typed.child_tagdatas.push(tagdata)
             this.$emit('updated_tagdata', tagdata_typed)
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
@@ -127,6 +129,8 @@ export default class SpanTagView extends HTMLTagViewBase {
                     if (tagdata_typed.tagid == tagdatas[i].tagid) {
                         if (tagdatas[i].has_child_tag) {
                             move_tagdata.position_style = PositionStyle.None
+                            move_tagdata.position_x = undefined
+                            move_tagdata.position_y = undefined
                             tagdatas[i].child_tagdatas.push(move_tagdata)
                             return true
                         }
