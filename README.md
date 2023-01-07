@@ -1,5 +1,6 @@
 # PutPullMock
 PutPullMockはワイヤーフレーム作成支援アプリケーションです。  
+![ppmk](https://raw.githubusercontent.com/mt3hr/PutPullMock/main/devdocs/resources/screenshot.1672967496.png)
 
 ## ビルド、インストールなど
 
