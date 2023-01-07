@@ -307,6 +307,12 @@ export default class PutPullMockRootPage extends Vue {
             settings = JSON.parse(document.cookie, deserialize)
         } catch (e) {
             settings = new Settings()
+            settings.export_base64_image = this.export_base64_image
+            settings.export_head = this.export_head
+            settings.export_position_css = this.export_position_css
+            settings.show_border = this.show_border
+            settings.transparent_page_css_view = this.transparent_page_css_view
+            settings.auto_save_pagedatas_to_localstorage = this.auto_save_pagedatas_to_localstorage
         }
         this.export_base64_image = settings.export_base64_image
         this.export_head = settings.export_head
