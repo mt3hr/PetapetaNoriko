@@ -383,6 +383,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     save_ppmk_project() {
+        this.clicked_tagdata = new HTMLTagDataBase()
         let page_list_view: any = this.$refs['page_list_view']
         let ppmk_data = JSON.stringify(page_list_view.pagedatas)
         let ppmk_data_blob = new Blob([ppmk_data])
@@ -399,6 +400,7 @@ export default class PutPullMockRootPage extends Vue {
 
 
     save_ppmk_html_css_this_page() {
+        this.clicked_tagdata = new HTMLTagDataBase()
         let page_list_view: any = this.$refs['page_list_view']
         let page_index = page_list_view.selected_index
         let pagedata = page_list_view.pagedatas[page_index]
@@ -435,6 +437,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     save_ppmk_html_css_all_pages() {
+        this.clicked_tagdata = new HTMLTagDataBase()
         let page_list_view: any = this.$refs['page_list_view']
         page_list_view.pagedatas.forEach((pagedata: PageData) => {
             let export_options = new GenerateHTMLOptions()
