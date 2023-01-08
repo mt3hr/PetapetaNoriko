@@ -77,8 +77,6 @@ export default class DropZone extends Vue {
         }
     }
 
-
-
     // https://stackoverflow.com/questions/3326494/parsing-css-in-javascript-jquery
     rulesForCssText(styleContent) {
         let doc = document.implementation.createHTMLDocument(""),

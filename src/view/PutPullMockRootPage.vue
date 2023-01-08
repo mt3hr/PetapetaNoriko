@@ -23,6 +23,7 @@
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
                         <PageListView class="component page_list_view" ref="page_list_view"
                             :auto_save_pagedatas_to_localstorage="auto_save_pagedatas_to_localstorage"
+                            @delete_page="delete_page"
                             @update_auto_save_pagedatas_to_localstorage="update_auto_save_pagedatas_to_localstorage"
                             @clicked_page="clicked_page" />
                     </v-row>
@@ -240,6 +241,7 @@ import HTMLTagStructView from './HTMLTagStructView.vue'
 import { Watch } from 'vue-property-decorator'
 import { deserialize, serializable } from '@/serializable/serializable'
 import { head } from '@/main'
+import sample_project_json from '@/sample/ppmk_sample_project.json'
 
 @serializable
 class Settings {
@@ -307,13 +309,29 @@ export default class PutPullMockRootPage extends Vue {
         try {
             settings = JSON.parse(document.cookie, deserialize)
         } catch (e) {
-            settings = new Settings()
-            settings.export_base64_image = this.export_base64_image
-            settings.export_head = this.export_head
-            settings.export_position_css = this.export_position_css
-            settings.show_border = this.show_border
-            settings.transparent_page_css_view = this.transparent_page_css_view
-            settings.auto_save_pagedatas_to_localstorage = this.auto_save_pagedatas_to_localstorage
+            this.save_settings_to_cookie()
+            settings = JSON.parse(document.cookie, deserialize)
+
+            let sample_project: Array<PageData> = JSON.parse(JSON.stringify(sample_project_json), deserialize)
+            let about_ppmk_pagedata: PageData
+            for (let i = 0; i < sample_project.length; i++) {
+                if (sample_project[i].pageid == "d4c84155-99d0-4a95-bfea-66d3e2b173ca") {
+                    about_ppmk_pagedata = sample_project[i]
+                    break
+                }
+            }
+            let pagedatas: Array<PageData> = new Array<PageData>()
+            pagedatas.push(about_ppmk_pagedata)
+
+            this.$nextTick(() => {
+                let page_list_view: any = this.$refs['page_list_view']
+
+                page_list_view.pagedatas = pagedatas
+                this.updated_htmltagdatas(about_ppmk_pagedata.html_tagdatas, null)
+                this.$nextTick(() => {
+                    page_list_view.clicked_page(about_ppmk_pagedata)
+                })
+            })
         }
         this.export_base64_image = settings.export_base64_image
         this.export_head = settings.export_head
@@ -401,8 +419,6 @@ export default class PutPullMockRootPage extends Vue {
             URL.revokeObjectURL(url);
         }
     }
-
-
 
     save_ppmk_html_css_all_pages() {
         let page_list_view: any = this.$refs['page_list_view']
@@ -494,6 +510,7 @@ export default class PutPullMockRootPage extends Vue {
         this.css = page_list_view.pagedatas[page_list_view.selected_index].css
         this.page_webfont = page_list_view.pagedatas[page_list_view.selected_index].webfonts.join("\n")
         this.update_page_webfont()
+        page_list_view.save_pagedatas_to_localstorage()
     }
 
     onclick_tag(tagdata: HTMLTagDataBase) {
@@ -650,6 +667,11 @@ export default class PutPullMockRootPage extends Vue {
 
     update_auto_save_pagedatas_to_localstorage(auto_save_pagedatas_to_localstorage) {
         this.auto_save_pagedatas_to_localstorage = auto_save_pagedatas_to_localstorage
+    }
+
+    delete_page() {
+        let page_list_view: any = this.$refs['page_list_view']
+        page_list_view.save_pagedatas_to_localstorage()
     }
 }
 </script>
