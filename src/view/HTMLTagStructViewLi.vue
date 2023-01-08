@@ -36,6 +36,7 @@ export default class HTMLTagPropertyView extends Vue {
     @Prop() html_tagdatas_root: Array<HTMLTagDataBase>
     @Prop() tagdata: HTMLTagDataBase
     @Prop() clicked_tagdata: HTMLTagDataBase
+    @Prop() auto_scroll_tag_struct_view: boolean
 
     is_show_contextmenu = false
     x_contextmenu = 0
@@ -46,8 +47,10 @@ export default class HTMLTagPropertyView extends Vue {
     @Watch('clicked_tagdata')
     update_style() {
         if (this.tagdata.tagid == this.clicked_tagdata.tagid) {
-            const el = this.$refs['li'] as HTMLElement;
-            el?.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
+            if (this.auto_scroll_tag_struct_view) {
+                const el = this.$refs['li'] as HTMLElement;
+                el?.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
+            }
             this.style = {
                 "background-color": "lightsteelblue",
             }

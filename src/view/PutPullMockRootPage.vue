@@ -65,6 +65,7 @@
                             <!--構造ビュー-->
                             <HTMLTagStructView @onclick_tag="onclick_tag" class="component struct_view"
                                 :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" ref="struct_view"
+                                :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view"
                                 @delete_tagdata="delete_tagdata"
                                 @updated_html_tagdatas="(html_tagdatas) => updated_htmltagdatas(html_tagdatas, null)" />
                         </v-col>
@@ -190,6 +191,12 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
             <v-row>
                 <v-col cols="auto">
+                    <v-checkbox class="checkbox" v-model="auto_scroll_tag_struct_view" :label="'構造ビュー自動スクロール'" />
+                </v-col>
+            </v-row>
+
+            <v-row>
+                <v-col cols="auto">
                     <h3>CSS編集画面</h3>
                 </v-col>
             </v-row>
@@ -252,6 +259,7 @@ class Settings {
     show_border: boolean
     transparent_page_css_view: boolean
     auto_save_pagedatas_to_localstorage: boolean
+    auto_scroll_tag_struct_view: boolean
 }
 
 @Options({
@@ -285,6 +293,7 @@ export default class PutPullMockRootPage extends Vue {
     transparent_page_css_view = false
 
     auto_save_pagedatas_to_localstorage = true
+    auto_scroll_tag_struct_view = true
 
     clicked_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
     copied_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
@@ -295,6 +304,7 @@ export default class PutPullMockRootPage extends Vue {
     @Watch('show_border')
     @Watch('transparent_page_css_view')
     @Watch('auto_save_pagedatas_to_localstorage')
+    @Watch('auto_scroll_tag_struct_view')
     save_settings_to_cookie() {
         let settings = new Settings()
         settings.export_base64_image = this.export_base64_image
@@ -303,6 +313,7 @@ export default class PutPullMockRootPage extends Vue {
         settings.show_border = this.show_border
         settings.transparent_page_css_view = this.transparent_page_css_view
         settings.auto_save_pagedatas_to_localstorage = this.auto_save_pagedatas_to_localstorage
+        settings.auto_scroll_tag_struct_view = this.auto_scroll_tag_struct_view
         document.cookie = JSON.stringify(settings)
     }
 
@@ -341,6 +352,7 @@ export default class PutPullMockRootPage extends Vue {
         this.show_border = settings.show_border
         this.transparent_page_css_view = settings.transparent_page_css_view
         this.auto_save_pagedatas_to_localstorage = settings.auto_save_pagedatas_to_localstorage
+        this.auto_scroll_tag_struct_view = settings.auto_scroll_tag_struct_view
     }
 
     created(): void {
@@ -624,6 +636,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     print_this_page() {
+        this.clicked_tagdata = new HTMLTagDataBase()
         // https://beelabo.com/web/1423
         let area = document.getElementById("dropzone_body").outerHTML
         let head = ""
