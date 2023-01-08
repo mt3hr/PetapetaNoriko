@@ -1,13 +1,13 @@
 <template>
-    <li class="tag_struct_li" draggable="true" dropzone @drop.stop="(e) => drop(e, tagdata, true)"
+    <li ref="li" class="tag_struct_li" draggable="true" dropzone @drop.stop="(e) => drop(e, tagdata, true)"
         @contextmenu.stop="show_contextmenu" @dragstart.stop="(e) => dragstart(e, tagdata)"
-        @click.stop="() => onclick_tag(tagdata)" @dragover.prevent="dragover">
+        @click.stop="() => onclick_tag(tagdata)" @dragover.prevent="dragover" :style="style">
         <span>{{ tagdata.tagname }}:</span>
         <span>({{ tagdata.to_string() }})</span>
         <ul v-if="tagdata.child_tagdatas.length != 0">
             <HTMLTagStructViewLi v-for="child_tagdata, index in tagdata.child_tagdatas" :key="index"
-                @copy_tag="copy_tag" :html_tagdatas_root="html_tagdatas_root" :tagdata="child_tagdata"
-                @onclick_tag="onclick_tag" @delete_tagdata="delete_tag"
+                :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" :html_tagdatas_root="html_tagdatas_root"
+                :tagdata="child_tagdata" @onclick_tag="onclick_tag" @delete_tagdata="delete_tag"
                 @updated_html_tagdatas="(tagdatas) => updated_html_tagdatas_child(tagdatas)" />
         </ul>
     </li>
@@ -21,7 +21,7 @@
 <script lang="ts">
 import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase';
 import { Options, Vue } from 'vue-class-component';
-import { Prop } from 'vue-property-decorator';
+import { Prop, Watch } from 'vue-property-decorator';
 import HTMLTagStructViewLi_ref from '@/view/HTMLTagStructViewLi.vue'
 import { deserialize } from '@/serializable/serializable';
 import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by_tagname';
@@ -35,10 +35,26 @@ import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by
 export default class HTMLTagPropertyView extends Vue {
     @Prop() html_tagdatas_root: Array<HTMLTagDataBase>
     @Prop() tagdata: HTMLTagDataBase
+    @Prop() clicked_tagdata: HTMLTagDataBase
 
     is_show_contextmenu = false
     x_contextmenu = 0
     y_contextmenu = 0
+
+    style: any = {}
+
+    @Watch('clicked_tagdata')
+    update_style() {
+        if (this.tagdata.tagid == this.clicked_tagdata.tagid) {
+            const el = this.$refs['li'] as HTMLElement;
+            el?.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
+            this.style = {
+                "background-color": "lightsteelblue",
+            }
+            return
+        }
+        this.style = {}
+    }
 
     get contextmenu_style(): any {
         return {

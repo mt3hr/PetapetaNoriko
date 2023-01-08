@@ -1,175 +1,176 @@
 <template>
     <H1TagView v-if="tagdata.tagname == 'h1'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border"
-        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" :tagdatas_root="tagdatas_root"
-        @updated_tagdata="updated_tagdata" />
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
+        @onclick_tag="onclick_tag" :tagdatas_root="tagdatas_root" @updated_tagdata="updated_tagdata" />
     <H2TagView v-if="tagdata.tagname == 'h2'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <H3TagView v-if="tagdata.tagname == 'h3'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <H4TagView v-if="tagdata.tagname == 'h4'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <H5TagView v-if="tagdata.tagname == 'h5'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <H6TagView v-if="tagdata.tagname == 'h6'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <PTagView v-if="tagdata.tagname == 'p'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <ATagView v-if="tagdata.tagname == 'a'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <ULTagView v-if="tagdata.tagname == 'ul'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <OLTagView v-if="tagdata.tagname == 'ol'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <LITagView v-if="tagdata.tagname == 'li'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <IMGTagView v-if="tagdata.tagname == 'img'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <TableTagView v-if="tagdata.tagname == 'table'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <TRTagView v-if="tagdata.tagname == 'tr'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <TDTagView v-if="tagdata.tagname == 'td'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <FormTagView v-if="tagdata.tagname == 'form'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <ButtonTagView v-if="tagdata.tagname == 'button'" :tagdata="tagdata" draggable="true" :show_border="show_border"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <CheckBoxTagView v-if="tagdata.tagname == 'checkbox'" :tagdata="tagdata" draggable="true" :show_border="show_border"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <ColorTagView v-if="tagdata.tagname == 'color'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <DateTagView v-if="tagdata.tagname == 'date'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <DateTimeLocalTagView v-if="tagdata.tagname == 'datetimelocal'" :tagdata="tagdata" draggable="true" @click="onclick"
-        @copy_tag="copy_tag" @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root"
-        :show_border="show_border" @dragstart.stop="on_drag_start" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <EMailTagView v-if="tagdata.tagname == 'email'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <FileTagView v-if="tagdata.tagname == 'file'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <ImageTagView v-if="tagdata.tagname == 'image'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <MonthTagView v-if="tagdata.tagname == 'month'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <NumberTagView v-if="tagdata.tagname == 'number'" :tagdata="tagdata" draggable="true" :show_border="show_border"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <PasswordTagView v-if="tagdata.tagname == 'password'" :tagdata="tagdata" draggable="true" :show_border="show_border"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <RadioTagView v-if="tagdata.tagname == 'radio'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <RangeTagView v-if="tagdata.tagname == 'range'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <ResetTagView v-if="tagdata.tagname == 'reset'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <SearchTagView v-if="tagdata.tagname == 'search'" :tagdata="tagdata" draggable="true" :show_border="show_border"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <SubmitTagView v-if="tagdata.tagname == 'submit'" :tagdata="tagdata" draggable="true" :show_border="show_border"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <TelTagView v-if="tagdata.tagname == 'tel'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <TextTagView v-if="tagdata.tagname == 'text'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <TimeTagView v-if="tagdata.tagname == 'time'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <URLTagView v-if="tagdata.tagname == 'url'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <WeekTagView v-if="tagdata.tagname == 'week'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <TextAreaTagView v-if="tagdata.tagname == 'textarea'" :tagdata="tagdata" draggable="true" :show_border="show_border"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <SelectTagView v-if="tagdata.tagname == 'select'" :tagdata="tagdata" draggable="true" :show_border="show_border"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <OptionTagView v-if="tagdata.tagname == 'option'" :tagdata="tagdata" draggable="true" :show_border="show_border"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
-    <LabelTagView v-if="tagdata.tagname == 'label'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
         @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <H3TagView v-if="tagdata.tagname == 'h3'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <H4TagView v-if="tagdata.tagname == 'h4'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <H5TagView v-if="tagdata.tagname == 'h5'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <H6TagView v-if="tagdata.tagname == 'h6'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <PTagView v-if="tagdata.tagname == 'p'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <ATagView v-if="tagdata.tagname == 'a'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <ULTagView v-if="tagdata.tagname == 'ul'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <OLTagView v-if="tagdata.tagname == 'ol'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <LITagView v-if="tagdata.tagname == 'li'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <IMGTagView v-if="tagdata.tagname == 'img'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <TableTagView v-if="tagdata.tagname == 'table'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <TRTagView v-if="tagdata.tagname == 'tr'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <TDTagView v-if="tagdata.tagname == 'td'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <FormTagView v-if="tagdata.tagname == 'form'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <ButtonTagView v-if="tagdata.tagname == 'button'" :tagdata="tagdata" draggable="true" :show_border="show_border"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <CheckBoxTagView v-if="tagdata.tagname == 'checkbox'" :tagdata="tagdata" draggable="true" :show_border="show_border"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <ColorTagView v-if="tagdata.tagname == 'color'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <DateTagView v-if="tagdata.tagname == 'date'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <DateTimeLocalTagView v-if="tagdata.tagname == 'datetimelocal'" :tagdata="tagdata" draggable="true" @click="onclick"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @updated_tagdatas_root="updated_tagdatas_root"
+        :tagdatas_root="tagdatas_root" :show_border="show_border" @dragstart.stop="on_drag_start"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <EMailTagView v-if="tagdata.tagname == 'email'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <FileTagView v-if="tagdata.tagname == 'file'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <ImageTagView v-if="tagdata.tagname == 'image'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <MonthTagView v-if="tagdata.tagname == 'month'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <NumberTagView v-if="tagdata.tagname == 'number'" :tagdata="tagdata" draggable="true" :show_border="show_border"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <PasswordTagView v-if="tagdata.tagname == 'password'" :tagdata="tagdata" draggable="true" :show_border="show_border"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <RadioTagView v-if="tagdata.tagname == 'radio'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <RangeTagView v-if="tagdata.tagname == 'range'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <ResetTagView v-if="tagdata.tagname == 'reset'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <SearchTagView v-if="tagdata.tagname == 'search'" :tagdata="tagdata" draggable="true" :show_border="show_border"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <SubmitTagView v-if="tagdata.tagname == 'submit'" :tagdata="tagdata" draggable="true" :show_border="show_border"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <TelTagView v-if="tagdata.tagname == 'tel'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <TextTagView v-if="tagdata.tagname == 'text'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <TimeTagView v-if="tagdata.tagname == 'time'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <URLTagView v-if="tagdata.tagname == 'url'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <WeekTagView v-if="tagdata.tagname == 'week'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <TextAreaTagView v-if="tagdata.tagname == 'textarea'" :tagdata="tagdata" draggable="true" :show_border="show_border"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <SelectTagView v-if="tagdata.tagname == 'select'" :tagdata="tagdata" draggable="true" :show_border="show_border"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <OptionTagView v-if="tagdata.tagname == 'option'" :tagdata="tagdata" draggable="true" :show_border="show_border"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" @dragstart.stop="on_drag_start"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <LabelTagView v-if="tagdata.tagname == 'label'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick" :tagdatas_root="tagdatas_root"
+        :show_border="show_border" @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag"
+        @updated_tagdata="updated_tagdata" />
     <DivTagView v-if="tagdata.tagname == 'div'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
     <SpanTagView v-if="tagdata.tagname == 'span'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
-        @copy_tag="copy_tag" @click="onclick" @updated_tagdatas_root="updated_tagdatas_root"
-        :tagdatas_root="tagdatas_root" :show_border="show_border" @contextmenu.stop="show_contextmenu"
-        @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
 
     <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
         <v-list>
@@ -180,7 +181,7 @@
 </template>
 <script lang="ts">
 import { Vue, Options } from 'vue-class-component';
-import { Prop } from "vue-property-decorator"
+import { Prop, Watch } from "vue-property-decorator"
 import H1TagView from '@/view/html_tag_view/H1TagView.vue'
 import H2TagView from '@/view/html_tag_view/H2TagView.vue'
 import H3TagView from '@/view/html_tag_view/H3TagView.vue'
@@ -277,6 +278,7 @@ import LITagData from '@/html_tagdata/LITagData';
 export default class HTMLTagView extends Vue {
     @Prop({ require: true }) tagdata: HTMLTagDataBase
     @Prop({ require: true }) tagdatas_root: Array<HTMLTagDataBase>
+    @Prop() clicked_tagdata: HTMLTagDataBase
     @Prop() show_border: boolean
     is_show_contextmenu = false
     x_contextmenu = 0

@@ -2,9 +2,10 @@
     <td :style="position_css" @click.prevent.stop="onclick_tag" :class="tagclass" :id="tagdata.tagid" @drop="on_drop"
         :colspan="colspan" :rowspan="rowspan" :headers="headers" @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
-            @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
-            @copy_tag="copy_tag" :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
-            @onclick_tag="onclick_child_tag" @delete_tagdata="delete_child_tagdata" />
+            :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border"
+            :tagdatas_root="tagdatas_root" @copy_tag="copy_tag" :tagdata="child_tagdata"
+            @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_child_tag"
+            @delete_tagdata="delete_child_tagdata" />
     </td>
 </template>
 <script lang="ts">
@@ -12,7 +13,7 @@ import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase';
 import TDTagData from '@/html_tagdata/TDTagData';
 import { deserialize } from '@/serializable/serializable';
 import { Options } from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
+import { Prop, Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 import HTMLTagView from '@/view/HTMLTagView.vue';
 import { generate_tagdata_by_tagname } from './generate_tagdata_by_tagname';

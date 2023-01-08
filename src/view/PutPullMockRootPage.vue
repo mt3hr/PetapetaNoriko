@@ -37,9 +37,9 @@
             <!--ドロップゾーン-->
             <v-col cols="auto" class="dropzone_wrap">
                 <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
-                    @updated_tagdatas_root="updated_htmltagdatas" @updated_htmltagdatas="updated_htmltagdatas"
-                    :copied_tagdata="copied_tagdata" @copy_tag="copy_tag" @onclick_tag="onclick_tag"
-                    :dropzone_style="dropzone_style" />
+                    :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_htmltagdatas"
+                    @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata" @copy_tag="copy_tag"
+                    @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 <!--TODO-->
             </v-col>
 
@@ -64,7 +64,8 @@
                         <v-col cols="auto">
                             <!--構造ビュー-->
                             <HTMLTagStructView @onclick_tag="onclick_tag" class="component struct_view"
-                                @copy_tag="copy_tag" ref="struct_view" @delete_tagdata="delete_tagdata"
+                                :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" ref="struct_view"
+                                @delete_tagdata="delete_tagdata"
                                 @updated_html_tagdatas="(html_tagdatas) => updated_htmltagdatas(html_tagdatas, null)" />
                         </v-col>
                     </v-row>
@@ -285,6 +286,7 @@ export default class PutPullMockRootPage extends Vue {
 
     auto_save_pagedatas_to_localstorage = true
 
+    clicked_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
     copied_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
 
     @Watch('export_base64_image')
@@ -518,6 +520,7 @@ export default class PutPullMockRootPage extends Vue {
         property_view.html_tagdata = new HTMLTagDataBase()
         this.$nextTick(() => {
             property_view.html_tagdata = tagdata
+            this.clicked_tagdata = tagdata
         })
     }
 

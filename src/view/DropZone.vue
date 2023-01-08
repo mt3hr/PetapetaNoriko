@@ -9,9 +9,9 @@
 
             <body id="dropzone_body" class="page" :style="dropzone_style">
                 <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas_root"
-                    :show_border="show_border" :tagdata="tagdata" @updated_tagdatas_root="updated_tagdatas_root"
-                    @copy_tag="copy_tag" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
-                    @delete_tagdata="delete_tagdata" />
+                    :clicked_tagdata="clicked_tagdata" :show_border="show_border" :tagdata="tagdata"
+                    @updated_tagdatas_root="updated_tagdatas_root" @copy_tag="copy_tag"
+                    @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag" @delete_tagdata="delete_tagdata" />
             </body>
         </div>
         <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
@@ -44,6 +44,7 @@ export default class DropZone extends Vue {
     style_user_edited = ""
     @Prop() show_border: boolean
     @Prop() dropzone_style: any
+    @Prop() clicked_tagdata: HTMLTagDataBase
     @Prop() copied_tagdata: HTMLTagDataBase
 
     is_show_contextmenu = false

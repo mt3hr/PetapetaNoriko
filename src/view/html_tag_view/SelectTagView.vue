@@ -3,7 +3,7 @@
         @drop="on_drop" :autofocus="autofocus" :disabled="disabled" :multiple="multiple" :name="name" :size="size"
         @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
-            @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
+            :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
             :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
             @onclick_tag="onclick_child_tag(child_tagdata)" @delete_tagdata="delete_child_tagdata" />
     </select>
@@ -13,7 +13,7 @@ import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase';
 import SelectTagData from '@/html_tagdata/SelectTagData';
 import { deserialize } from '@/serializable/serializable';
 import { Options } from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
+import { Prop, Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 import HTMLTagView from '@/view/HTMLTagView.vue';
 import { generate_tagdata_by_tagname } from './generate_tagdata_by_tagname';

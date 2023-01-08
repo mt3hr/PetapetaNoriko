@@ -8,6 +8,7 @@ import { generate_tagdata_by_tagname } from "./generate_tagdata_by_tagname";
 export default class HTMLTagViewBase extends Vue {
     @Prop({ require: true }) tagdata: HTMLTagDataBase
     @Prop({ require: true }) tagdatas_root: Array<HTMLTagDataBase>
+    @Prop({ require: true }) clicked_tagdata: HTMLTagDataBase
     @Prop() show_border: boolean
     position_css: string
     selected_this_tag = false
@@ -20,6 +21,7 @@ export default class HTMLTagViewBase extends Vue {
 
     @Watch('show_border')
     @Watch('tagdata')
+    @Watch('clicked_tagdata')
     update_position() {
         const style: any = {}
         if (this.tagdata.position_style == PositionStyle.Absolute) {
@@ -34,6 +36,9 @@ export default class HTMLTagViewBase extends Vue {
         }
         if (this.tagdata.selected_this_tag) {
             style.border = "solid 2px yellow"
+        }
+        if (this.clicked_tagdata.tagid == this.tagdata.tagid) {
+            style["background-color"] = "lightsteelblue";
         }
         this.position_css = style
     }

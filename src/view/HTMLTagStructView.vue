@@ -4,8 +4,9 @@
         <div class="struct_view">
             <ul class="dropzone_wrap">
                 <HTMLTagStructViewLi v-for="tagdata, index in html_tagdatas" :key="index" @onclick_tag="onclick_tag"
-                    @copy_tag="copy_tag" @delete_tagdata="delete_tag" :tagdata="tagdata"
-                    :html_tagdatas_root="html_tagdatas" @updated_html_tagdatas="updated_html_tagdatas" />
+                    :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @delete_tagdata="delete_tag"
+                    :tagdata="tagdata" :html_tagdatas_root="html_tagdatas"
+                    @updated_html_tagdatas="updated_html_tagdatas" />
             </ul>
         </div>
     </div>
@@ -15,6 +16,7 @@ import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase';
 import { Options, Vue } from 'vue-class-component';
 import HTMLTagStructViewLi from '@/view/HTMLTagStructViewLi.vue'
 import { deserialize } from '@/serializable/serializable';
+import { Prop } from 'vue-property-decorator';
 
 @Options({
     components: {
@@ -23,6 +25,7 @@ import { deserialize } from '@/serializable/serializable';
 })
 export default class HTMLTagPropertyView extends Vue {
     html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
+    @Prop() clicked_tagdata: HTMLTagDataBase
 
     updated_html_tagdatas(html_tagdatas: Array<HTMLTagDataBase>) {
         this.$emit("updated_html_tagdatas", html_tagdatas)
