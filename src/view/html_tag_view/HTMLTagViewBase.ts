@@ -19,9 +19,17 @@ export default class HTMLTagViewBase extends Vue {
         this.update_position()
     }
 
+    @Watch('clicked_tagdata')
+    update_clicked_style() {
+        if (this.clicked_tagdata.tagid == this.tagdata.tagid) {
+            this.position_css["background-color"] = "lightsteelblue"
+        } else {
+            this.position_css["background-color"] = undefined
+        }
+    }
+
     @Watch('show_border')
     @Watch('tagdata')
-    @Watch('clicked_tagdata')
     update_position() {
         const style: any = {}
         if (this.tagdata.position_style == PositionStyle.Absolute) {
@@ -36,9 +44,6 @@ export default class HTMLTagViewBase extends Vue {
         }
         if (this.tagdata.selected_this_tag) {
             style.border = "solid 2px yellow"
-        }
-        if (this.clicked_tagdata.tagid == this.tagdata.tagid) {
-            style["background-color"] = "lightsteelblue";
         }
         this.position_css = style
     }

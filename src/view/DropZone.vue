@@ -4,7 +4,7 @@
             {{ style_user_edited_fixed }}
         </component>
         <h2>ドロップゾーン</h2>
-        <div id="dropzone" class="dropzone" @drop.stop="on_drop" @dragover.prevent="on_dragover" :style="dropzone_style"
+        <div id="dropzone" class="dropzone" @click="onclick" @drop.stop="on_drop" @dragover.prevent="on_dragover" :style="dropzone_style"
             @contextmenu="show_contextmenu">
 
             <body id="dropzone_body" class="page" :style="dropzone_style">
@@ -240,6 +240,9 @@ export default class DropZone extends Vue {
         this.x_contextmenu = e.clientX
         this.y_contextmenu = e.clientY
         this.is_show_contextmenu = true
+    }
+    onclick() {
+        this.$emit('onclick_tag', new HTMLTagDataBase())
     }
 }
 </script>
