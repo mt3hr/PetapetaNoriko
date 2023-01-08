@@ -6,8 +6,8 @@
         <span>({{ tagdata.to_string() }})</span>
         <ul v-if="tagdata.child_tagdatas.length != 0">
             <HTMLTagStructViewLi v-for="child_tagdata, index in tagdata.child_tagdatas" :key="index"
-                :html_tagdatas_root="html_tagdatas_root" :tagdata="child_tagdata" @onclick_tag="onclick_tag"
-                @delete_tagdata="delete_tag"
+                @copy_tag="copy_tag" :html_tagdatas_root="html_tagdatas_root" :tagdata="child_tagdata"
+                @onclick_tag="onclick_tag" @delete_tagdata="delete_tag"
                 @updated_html_tagdatas="(tagdatas) => updated_html_tagdatas_child(tagdatas)" />
         </ul>
     </li>
@@ -101,7 +101,7 @@ export default class HTMLTagPropertyView extends Vue {
                 }
             }
         }
-        walk_tagdatas(this.html_tagdatas_root)
+        // walk_tagdatas(this.html_tagdatas_root)
         return !exist_in_target
     }
 
@@ -121,6 +121,8 @@ export default class HTMLTagPropertyView extends Vue {
                     if (tagdata.tagid == tagdatas[i].tagid) {
                         if (tagdatas[i].has_child_tag) {
                             tag_data.position_style = PositionStyle.None
+                            tagdata.position_x = undefined
+                            tagdata.position_y = undefined
                             tagdatas[i].child_tagdatas.push(tag_data)
                             child_appended = true
                             return true
@@ -190,6 +192,8 @@ export default class HTMLTagPropertyView extends Vue {
                         if (tagdata.tagid == tagdatas[i].tagid) {
                             if (tagdatas[i].has_child_tag) {
                                 move_tagdata.position_style = PositionStyle.None
+                                move_tagdata.position_x = undefined
+                                move_tagdata.position_y = undefined
                                 tagdatas[i].child_tagdatas.splice(i, 0, move_tagdata)
                                 child_appended = true
                                 return true

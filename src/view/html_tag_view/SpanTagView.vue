@@ -3,7 +3,7 @@
         @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
             @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
-            :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
+            @copy_tag="copy_tag" :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
             @onclick_tag="onclick_child_tag(child_tagdata)" @delete_tagdata="delete_child_tagdata" />
     </span>
 </template>
@@ -25,7 +25,7 @@ import IMGTagData from '@/html_tagdata/IMGTagData';
     }
 })
 export default class SpanTagView extends HTMLTagViewBase {
-    tagclass = ""
+    tagclass: string
 
     @Watch('tagclass')
     update_tagdata() {
@@ -166,6 +166,9 @@ export default class SpanTagView extends HTMLTagViewBase {
 
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
         this.$emit("updated_tagdatas_root", tagdatas)
+    }
+    copy_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("copy_tag", tagdata)
     }
 }
 

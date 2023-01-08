@@ -4,8 +4,8 @@
         :name="name" :novalidate="novalidate" :target="target" @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
             @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
-            :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_child_tag"
-            @delete_tagdata="delete_child_tagdata" />
+            @copy_tag="copy_tag" :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
+            @onclick_tag="onclick_child_tag" @delete_tagdata="delete_child_tagdata" />
     </form>
 </template>
 <script lang="ts">
@@ -45,7 +45,6 @@ export default class FormTagView extends HTMLTagViewBase {
     @Watch('name')
     @Watch('novalidate:')
     @Watch('target')
-    @Watch('tagclass')
     update_tagdata() {
         let tagdata: FormTagData = new FormTagData()
         tagdata.tagid = this.tagdata.tagid
@@ -200,6 +199,9 @@ export default class FormTagView extends HTMLTagViewBase {
 
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
         this.$emit("updated_tagdatas_root", tagdatas)
+    }
+    copy_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("copy_tag", tagdata)
     }
 }
 

@@ -6,7 +6,6 @@
 
 <script lang="ts">
 import MonthTagData from '@/html_tagdata/MonthTagData';
-import { readonly } from 'vue';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 

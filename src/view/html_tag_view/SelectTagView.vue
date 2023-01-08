@@ -26,7 +26,7 @@ import IMGTagData from '@/html_tagdata/IMGTagData';
     }
 })
 export default class SelectTagView extends HTMLTagViewBase {
-    tagclass = ""
+    tagclass : string
     autofocus: boolean
     disabled: boolean
     multiple: boolean

@@ -3,8 +3,8 @@
         :colspan="colspan" :rowspan="rowspan" :headers="headers" @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
             @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
-            :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_child_tag"
-            @delete_tagdata="delete_child_tagdata" />
+            @copy_tag="copy_tag" :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
+            @onclick_tag="onclick_child_tag" @delete_tagdata="delete_child_tagdata" />
     </td>
 </template>
 <script lang="ts">
@@ -25,7 +25,7 @@ import IMGTagData from '@/html_tagdata/IMGTagData';
     }
 })
 export default class TDTagView extends HTMLTagViewBase {
-    tagclass = ""
+    tagclass: string
     colspan: string
     rowspan: string
     headers: string
@@ -179,12 +179,15 @@ export default class TDTagView extends HTMLTagViewBase {
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
         this.$emit("updated_tagdatas_root", tagdatas)
     }
+    copy_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("copy_tag", tagdata)
+    }
 }
 
 </script>
 <style scoped>
 td {
-    min-width: 30px;
+    min-width: 15px;
     min-height: 30px;
 }
 </style>
