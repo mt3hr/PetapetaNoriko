@@ -98,12 +98,6 @@ export default class TableTagView extends HTMLTagViewBase {
         this.$emit('updated_tagdata', tagdata_typed)
     }
 
-    on_dragover(e: DragEvent) {
-        let tagname = e.dataTransfer.getData("ppmk/htmltag")
-        if (tagname) {
-            e.dataTransfer.dropEffect = "copy"
-        }
-    }
 
     beforeCreate(): void {
         (this as any).$options.components.HTMLTagView = HTMLTagView

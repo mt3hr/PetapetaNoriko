@@ -1,7 +1,7 @@
 <template>
-    <li draggable="true" dropzone @drop.stop="(e) => drop(e, tagdata, true)" @contextmenu.stop="show_contextmenu"
-        @dragstart.stop="(e) => dragstart(e, tagdata)" @click.stop="() => onclick_tag(tagdata)"
-        @dragover.prevent="dragover">
+    <li class="tag_struct_li" draggable="true" dropzone @drop.stop="(e) => drop(e, tagdata, true)"
+        @contextmenu.stop="show_contextmenu" @dragstart.stop="(e) => dragstart(e, tagdata)"
+        @click.stop="() => onclick_tag(tagdata)" @dragover.prevent="dragover">
         <span>{{ tagdata.tagname }}:</span>
         <span>({{ tagdata.to_string() }})</span>
         <ul v-if="tagdata.child_tagdatas.length != 0">
@@ -52,7 +52,7 @@ export default class HTMLTagPropertyView extends Vue {
 
 
     dragover(e: DragEvent) {
-        if (e.dataTransfer.getData("ppmk/struct_li_id")) {
+        if (e.dataTransfer.getData("ppmk/struct_li_id") || e.dataTransfer.getData("ppmk/move_tag_id")) {
             e.dataTransfer.dropEffect = "move"
         }
     }
@@ -106,6 +106,7 @@ export default class HTMLTagPropertyView extends Vue {
     }
 
     drop(e: DragEvent, tagdata: HTMLTagDataBase, to_child: boolean) {
+        let tagid = e.dataTransfer.getData("ppmk/struct_li_id") ? e.dataTransfer.getData("ppmk/struct_li_id") : e.dataTransfer.getData("ppmk/move_tag_id")
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             let json = JSON.stringify(this.html_tagdatas_root)
             let html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
@@ -169,8 +170,8 @@ export default class HTMLTagPropertyView extends Vue {
                 walk_tagdatas(html_tagdatas_root)
             }
             this.updated_html_tagdatas(html_tagdatas_root)
-        } else if (e.dataTransfer.getData("ppmk/struct_li_id")) {
-            if (!this.can_drop(e.dataTransfer.getData("ppmk/struct_li_id"), tagdata)) {
+        } else if (tagid) {
+            if (!this.can_drop(tagid, tagdata)) {
                 return
             }
             let html_tagdatas_root: Array<HTMLTagDataBase>
@@ -182,7 +183,7 @@ export default class HTMLTagPropertyView extends Vue {
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                 for (let i = 0; i < tagdatas.length; i++) {
-                    if (e.dataTransfer.getData("ppmk/struct_li_id") == tagdatas[i].tagid) {
+                    if (tagid == tagdatas[i].tagid) {
                         move_tagdata = tagdatas[i]
                         tagdatas.splice(i, 1)
                         return true
@@ -207,7 +208,7 @@ export default class HTMLTagPropertyView extends Vue {
                                 move_tagdata.position_x = undefined
                                 move_tagdata.position_y = undefined
                                 if (e.shiftKey) {
-                                    tagdatas[i].child_tagdatas.splice(i , 0, move_tagdata)
+                                    tagdatas[i].child_tagdatas.splice(i, 0, move_tagdata)
                                 } else if (e.ctrlKey) {
                                     tagdatas[i].child_tagdatas.splice(i + 1, 0, move_tagdata)
                                 } else {
@@ -294,5 +295,9 @@ export default class HTMLTagPropertyView extends Vue {
 <style scoped>
 li {
     margin-left: 20px;
+}
+
+.tag_struct_li {
+    width: max-content;
 }
 </style>

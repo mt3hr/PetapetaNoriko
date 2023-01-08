@@ -1,11 +1,13 @@
 <template>
     <div dropzone="true" @drop.stop="drop" @dragover.prevent="dragover">
         <h2>構造</h2>
-        <ul class="dropzone_wrap">
-            <HTMLTagStructViewLi v-for="tagdata, index in html_tagdatas" :key="index" @onclick_tag="onclick_tag"
-                @copy_tag="copy_tag" @delete_tagdata="delete_tag" :tagdata="tagdata" :html_tagdatas_root="html_tagdatas"
-                @updated_html_tagdatas="updated_html_tagdatas" />
-        </ul>
+        <div class="struct_view">
+            <ul class="dropzone_wrap">
+                <HTMLTagStructViewLi v-for="tagdata, index in html_tagdatas" :key="index" @onclick_tag="onclick_tag"
+                    @copy_tag="copy_tag" @delete_tagdata="delete_tag" :tagdata="tagdata"
+                    :html_tagdatas_root="html_tagdatas" @updated_html_tagdatas="updated_html_tagdatas" />
+            </ul>
+        </div>
     </div>
 </template>
 <script lang="ts">
@@ -93,5 +95,9 @@ li {
 
 .dropzone_wrap {
     margin-bottom: 20px;
+}
+
+.struct_view {
+    width: fit-content;
 }
 </style>

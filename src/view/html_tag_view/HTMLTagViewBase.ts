@@ -87,7 +87,15 @@ export default class HTMLTagViewBase extends Vue {
         return !exist_in_target
     }
 
+    on_dragover(e: DragEvent) {
+        const tagname = e.dataTransfer.getData("ppmk/htmltag")
+        if (tagname) {
+            e.dataTransfer.dropEffect = "copy"
+        }
+    }
+
     on_drop(e: DragEvent) {
+        const tagid = e.dataTransfer.getData("ppmk/struct_li_id") ? e.dataTransfer.getData("ppmk/struct_li_id") : e.dataTransfer.getData("ppmk/move_tag_id")
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             let json = JSON.stringify(this.tagdatas_root)
             const html_tagdatas_root = JSON.parse(json, deserialize)
@@ -96,6 +104,7 @@ export default class HTMLTagViewBase extends Vue {
             const tagname = e.dataTransfer.getData("ppmk/htmltag")
             const tagdata: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
 
+            let is_child = false
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                 for (let i = 0; i < tagdatas.length; i++) {
@@ -104,27 +113,31 @@ export default class HTMLTagViewBase extends Vue {
                             tagdata.position_style = PositionStyle.None
                             tagdata.position_x = undefined
                             tagdata.position_y = undefined
-                            if (e.altKey) {
-                                if (e.shiftKey) {
-                                    tagdatas.splice(i, 0, tagdata)
-                                } else if (e.ctrlKey) {
-                                    tagdatas.splice(i + 1, 0, tagdata)
-                                } else {
-                                    tagdatas.splice(i + 1, 0, tagdata)
-                                }
-                            } else {
-                                if (e.shiftKey) {
-                                    tagdatas[i].child_tagdatas.unshift(tagdata)
-                                } else if (e.ctrlKey) {
-                                    tagdatas[i].child_tagdatas.push(tagdata)
-                                } else {
-                                    tagdatas[i].child_tagdatas.push(tagdata)
-                                }
-                            }
-
-                            return true
+                        } else {
+                            tagdata.position_style = PositionStyle.Absolute
+                            tagdata.position_x = e.clientX
+                            tagdata.position_y = e.clientY
                         }
+                        if (tagdatas[i].has_child_tag && e.altKey) {
+                            if (e.shiftKey) {
+                                tagdatas.splice(i, 0, tagdata)
+                            } else if (e.ctrlKey) {
+                                tagdatas.splice(i + 1, 0, tagdata)
+                            } else {
+                                tagdatas.splice(i + 1, 0, tagdata)
+                            }
+                        } else {
+                            if (e.shiftKey) {
+                                tagdatas[i].child_tagdatas.unshift(tagdata)
+                            } else if (e.ctrlKey) {
+                                tagdatas[i].child_tagdatas.push(tagdata)
+                            } else {
+                                tagdatas[i].child_tagdatas.push(tagdata)
+                            }
+                        }
+                        return true
                     }
+                    is_child = true
                     if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
                         return true
                     }
@@ -133,8 +146,8 @@ export default class HTMLTagViewBase extends Vue {
             }
             walk_tagdatas(html_tagdatas_root)
             this.$emit("updated_tagdatas_root", html_tagdatas_root)
-        } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
-            if (!this.can_drop(e.dataTransfer.getData("ppmk/move_tag_id"), this.tagdata_typed)) {
+        } else if (tagid) {
+            if (!this.can_drop(tagid, this.tagdata_typed)) {
                 return
             }
             const json = JSON.stringify(this.tagdatas_root)
@@ -144,7 +157,7 @@ export default class HTMLTagViewBase extends Vue {
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                 for (let i = 0; i < tagdatas.length; i++) {
-                    if (e.dataTransfer.getData("ppmk/move_tag_id") == tagdatas[i].tagid) {
+                    if (tagid == tagdatas[i].tagid) {
                         move_tagdata = tagdatas[i]
                         tagdatas.splice(i, 1)
                         return true
@@ -165,13 +178,24 @@ export default class HTMLTagViewBase extends Vue {
                             move_tagdata.position_style = PositionStyle.None
                             move_tagdata.position_x = undefined
                             move_tagdata.position_y = undefined
-                            if (e.shiftKey) {
-                                tagdatas[i].child_tagdatas.unshift(move_tagdata)
-                            } else if (e.ctrlKey) {
-                                tagdatas[i].child_tagdatas.push(move_tagdata)
+                            if (tagdatas[i].has_child_tag && e.altKey) {
+                                if (e.shiftKey) {
+                                    tagdatas.splice(i, 0, move_tagdata)
+                                } else if (e.ctrlKey) {
+                                    tagdatas.splice(i + 1, 0, move_tagdata)
+                                } else {
+                                    tagdatas.splice(i + 1, 0, move_tagdata)
+                                }
                             } else {
-                                tagdatas[i].child_tagdatas.push(move_tagdata)
+                                if (e.shiftKey) {
+                                    tagdatas[i].child_tagdatas.unshift(move_tagdata)
+                                } else if (e.ctrlKey) {
+                                    tagdatas[i].child_tagdatas.push(move_tagdata)
+                                } else {
+                                    tagdatas[i].child_tagdatas.push(move_tagdata)
+                                }
                             }
+
 
                             return true
                         }

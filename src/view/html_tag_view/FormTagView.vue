@@ -115,13 +115,6 @@ export default class FormTagView extends HTMLTagViewBase {
         this.$emit('updated_tagdata', tagdata_typed)
     }
 
-    on_dragover(e: DragEvent) {
-        let tagname = e.dataTransfer.getData("ppmk/htmltag")
-        if (tagname) {
-            e.dataTransfer.dropEffect = "copy"
-        }
-    }
-
     on_drop(e: DragEvent) {
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             let json = JSON.stringify(this.tagdata_typed)
