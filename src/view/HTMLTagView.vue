@@ -219,14 +219,13 @@ import TextTagView from '@/view/html_tag_view/TextTagView.vue'
 import TimeTagView from '@/view/html_tag_view/TimeTagView.vue'
 import URLTagView from '@/view/html_tag_view/URLTagView.vue'
 import WeekTagView from '@/view/html_tag_view/WeekTagView.vue'
-import TextAreaTagView from '@/view/html_tag_view/TextTagView.vue'
+import TextAreaTagView from '@/view/html_tag_view/TextAreaTagView.vue'
 import SelectTagView from '@/view/html_tag_view/SelectTagView.vue'
 import OptionTagView from '@/view/html_tag_view/OptionTagView.vue'
 import LabelTagView from '@/view/html_tag_view/LabelTagView.vue'
 import DivTagView from '@/view/html_tag_view/DivTagView.vue'
 import SpanTagView from '@/view/html_tag_view/SpanTagView.vue'
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
-import LITagData from '@/html_tagdata/LITagData';
 
 @Options({
     components: {
