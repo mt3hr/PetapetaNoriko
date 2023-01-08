@@ -1,6 +1,9 @@
 import HTMLTagDataBase, { PositionStyle } from "@/html_tagdata/HTMLTagDataBase";
+import IMGTagData from "@/html_tagdata/IMGTagData";
+import { deserialize } from "@/serializable/serializable";
 import { Vue } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator"
+import { generate_tagdata_by_tagname } from "./generate_tagdata_by_tagname";
 
 export default class HTMLTagViewBase extends Vue {
     @Prop({ require: true }) tagdata: HTMLTagDataBase
@@ -8,6 +11,8 @@ export default class HTMLTagViewBase extends Vue {
     @Prop() show_border: boolean
     position_css: string
     selected_this_tag = false
+
+    get tagdata_typed(): HTMLTagDataBase { return this.tagdata }
 
     created() {
         this.update_position()
@@ -63,22 +68,135 @@ export default class HTMLTagViewBase extends Vue {
         walk_tagdatas(this.tagdatas_root)
         walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
             for (let i = 0; i < tagdatas.length; i++) {
-                if (target_tagdata.tagid== tagdatas[i].tagid) {
-                    is_in_target_tag= true
+                if (target_tagdata.tagid == tagdatas[i].tagid) {
+                    is_in_target_tag = true
                 }
                 if (is_in_target_tag) j++
-                if (is_in_target_tag&& tagdatas[i].tagid == move_tagid) {
+                if (is_in_target_tag && tagdatas[i].tagid == move_tagid) {
                     exist_in_target = true
                 }
 
                 walk_tagdatas(tagdatas[i].child_tagdatas)
                 if (is_in_target_tag) j--
-                if (is_in_target_tag&& j == 0) {
-                    is_in_target_tag= false
+                if (is_in_target_tag && j == 0) {
+                    is_in_target_tag = false
                 }
             }
         }
         // walk_tagdatas(this.tagdatas_root)
         return !exist_in_target
+    }
+
+    on_drop(e: DragEvent) {
+        if (e.dataTransfer.getData("ppmk/htmltag")) {
+            let json = JSON.stringify(this.tagdatas_root)
+            const html_tagdatas_root = JSON.parse(json, deserialize)
+            json = JSON.stringify(this.tagdata_typed)
+            const tagdata_typed = JSON.parse(json, deserialize)
+            const tagname = e.dataTransfer.getData("ppmk/htmltag")
+            const tagdata: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
+
+            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    if (tagdata_typed.tagid == tagdatas[i].tagid) {
+                        if (tagdatas[i].has_child_tag) {
+                            tagdata.position_style = PositionStyle.None
+                            tagdata.position_x = undefined
+                            tagdata.position_y = undefined
+                            if (e.altKey) {
+                                if (e.shiftKey) {
+                                    tagdatas.splice(i, 0, tagdata)
+                                } else if (e.ctrlKey) {
+                                    tagdatas.splice(i + 1, 0, tagdata)
+                                } else {
+                                    tagdatas.splice(i + 1, 0, tagdata)
+                                }
+                            } else {
+                                if (e.shiftKey) {
+                                    tagdatas[i].child_tagdatas.unshift(tagdata)
+                                } else if (e.ctrlKey) {
+                                    tagdatas[i].child_tagdatas.push(tagdata)
+                                } else {
+                                    tagdatas[i].child_tagdatas.push(tagdata)
+                                }
+                            }
+
+                            return true
+                        }
+                    }
+                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                        return true
+                    }
+                }
+                return false
+            }
+            walk_tagdatas(html_tagdatas_root)
+            this.$emit("updated_tagdatas_root", html_tagdatas_root)
+        } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
+            if (!this.can_drop(e.dataTransfer.getData("ppmk/move_tag_id"), this.tagdata_typed)) {
+                return
+            }
+            const json = JSON.stringify(this.tagdatas_root)
+            const html_tagdatas_root = JSON.parse(json, deserialize)
+            let move_tagdata: HTMLTagDataBase
+
+            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    if (e.dataTransfer.getData("ppmk/move_tag_id") == tagdatas[i].tagid) {
+                        move_tagdata = tagdatas[i]
+                        tagdatas.splice(i, 1)
+                        return true
+                    }
+                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                        return true
+                    }
+                }
+                return false
+            }
+            walk_tagdatas(html_tagdatas_root)
+
+            const tagdata_typed = this.tagdata_typed
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    if (tagdata_typed.tagid == tagdatas[i].tagid) {
+                        if (tagdatas[i].has_child_tag) {
+                            move_tagdata.position_style = PositionStyle.None
+                            move_tagdata.position_x = undefined
+                            move_tagdata.position_y = undefined
+                            if (e.shiftKey) {
+                                tagdatas[i].child_tagdatas.unshift(move_tagdata)
+                            } else if (e.ctrlKey) {
+                                tagdatas[i].child_tagdatas.push(move_tagdata)
+                            } else {
+                                tagdatas[i].child_tagdatas.push(move_tagdata)
+                            }
+
+                            return true
+                        }
+                    }
+                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                        return true
+                    }
+                }
+                return false
+            }
+            walk_tagdatas(html_tagdatas_root)
+            this.$emit("updated_tagdatas_root", html_tagdatas_root)
+        } else if (e.dataTransfer.items.length != 0) {
+            const reader = new FileReader()
+            reader.onload = (event: any) => {
+                const tagdata_typed = this.tagdata_typed
+                const tag_data = new IMGTagData()
+                tag_data.position_style = PositionStyle.None
+                tag_data.src = event.currentTarget.result
+                tagdata_typed.child_tagdatas.push(tag_data)
+                this.$emit('updated_tagdata', tagdata_typed)
+            }
+            reader.readAsDataURL(e.dataTransfer.files[0])
+            e.preventDefault()
+        }
+        e.stopPropagation()
     }
 }

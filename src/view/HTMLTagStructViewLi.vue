@@ -119,11 +119,17 @@ export default class HTMLTagPropertyView extends Vue {
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                 for (let i = 0; i < tagdatas.length; i++) {
                     if (tagdata.tagid == tagdatas[i].tagid) {
-                        if (tagdatas[i].has_child_tag) {
+                        if (tagdatas[i].has_child_tag && !e.altKey) {
                             tag_data.position_style = PositionStyle.None
                             tagdata.position_x = undefined
                             tagdata.position_y = undefined
-                            tagdatas[i].child_tagdatas.push(tag_data)
+                            if (e.shiftKey) {
+                                tagdatas[i].child_tagdatas.unshift(tag_data)
+                            } else if (e.ctrlKey) {
+                                tagdatas[i].child_tagdatas.push(tag_data)
+                            } else {
+                                tagdatas[i].child_tagdatas.push(tag_data)
+                            }
                             child_appended = true
                             return true
                         }
@@ -144,7 +150,13 @@ export default class HTMLTagPropertyView extends Vue {
                             if (!is_child) {
                                 tag_data.position_style = PositionStyle.Absolute
                             }
-                            tagdatas.splice(i, 0, tag_data)
+                            if (e.shiftKey) {
+                                tagdatas.splice(i, 0, tag_data)
+                            } else if (e.ctrlKey) {
+                                tagdatas.splice(i + 1, 0, tag_data)
+                            } else {
+                                tagdatas.splice(i + 1, 0, tag_data)
+                            }
                             return true
                         }
                         is_child = true
@@ -190,11 +202,17 @@ export default class HTMLTagPropertyView extends Vue {
                 walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                     for (let i = 0; i < tagdatas.length; i++) {
                         if (tagdata.tagid == tagdatas[i].tagid) {
-                            if (tagdatas[i].has_child_tag) {
+                            if (tagdatas[i].has_child_tag && !e.altKey) {
                                 move_tagdata.position_style = PositionStyle.None
                                 move_tagdata.position_x = undefined
                                 move_tagdata.position_y = undefined
-                                tagdatas[i].child_tagdatas.splice(i, 0, move_tagdata)
+                                if (e.shiftKey) {
+                                    tagdatas[i].child_tagdatas.splice(i , 0, move_tagdata)
+                                } else if (e.ctrlKey) {
+                                    tagdatas[i].child_tagdatas.splice(i + 1, 0, move_tagdata)
+                                } else {
+                                    tagdatas[i].child_tagdatas.splice(i + 1, 0, move_tagdata)
+                                }
                                 child_appended = true
                                 return true
                             }
@@ -215,7 +233,13 @@ export default class HTMLTagPropertyView extends Vue {
                             if (!is_child) {
                                 move_tagdata.position_style = PositionStyle.Absolute
                             }
-                            tagdatas.splice(i, 0, move_tagdata)
+                            if (e.shiftKey) {
+                                tagdatas.splice(i, 0, move_tagdata)
+                            } else if (e.ctrlKey) {
+                                tagdatas.splice(i + 1, 0, move_tagdata)
+                            } else {
+                                tagdatas.splice(i + 1, 0, move_tagdata)
+                            }
                             return true
                         }
                         is_child = true

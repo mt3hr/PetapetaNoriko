@@ -9,8 +9,10 @@ export const head = createHead()
 
 loadFonts()
 
-createApp(App)
+const app = createApp(App)
   .use(router)
   .use(vuetify)
   .use(head)
-  .mount('#app')
+app.config.errorHandler = () => null; // TODO
+app.config.warnHandler = () => null; // TODO
+app.mount('#app')

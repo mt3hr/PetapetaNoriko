@@ -38,7 +38,13 @@ export default class HTMLTagPropertyView extends Vue {
             for (let i = 0; i < tagdatas.length; i++) {
                 if (e.dataTransfer.getData("ppmk/struct_li_id") == tagdatas[i].tagid) {
                     move_tagdata = tagdatas[i]
-                    tagdatas.splice(i, 1)
+                    if (e.shiftKey) {
+                        tagdatas.splice(i, 0, move_tagdata)
+                    } else if (e.ctrlKey) {
+                        tagdatas.splice(i + 1, 0, move_tagdata)
+                    } else {
+                        tagdatas.splice(i + 1, 0, move_tagdata)
+                    }
                     return true
                 }
                 if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
@@ -48,9 +54,16 @@ export default class HTMLTagPropertyView extends Vue {
             return false
         }
         walk_tagdatas(html_tagdatas)
-
         move_tagdata.position_style = PositionStyle.Absolute
-        html_tagdatas.push(move_tagdata)
+
+        if (e.shiftKey) {
+            html_tagdatas.unshift(move_tagdata)
+        } else if (e.ctrlKey) {
+            html_tagdatas.push(move_tagdata)
+        } else {
+            html_tagdatas.push(move_tagdata)
+        }
+
         this.updated_html_tagdatas(html_tagdatas)
     }
 
