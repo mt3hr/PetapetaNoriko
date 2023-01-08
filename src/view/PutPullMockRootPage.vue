@@ -38,8 +38,8 @@
             <v-col cols="auto" class="dropzone_wrap">
                 <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
                     :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_htmltagdatas"
-                    @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata" @copy_tag="copy_tag"
-                    @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
+                    @add_page="add_page" @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata"
+                    @copy_tag="copy_tag" @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 <!--TODO-->
             </v-col>
 
@@ -274,8 +274,9 @@ class Settings {
 })
 
 export default class PutPullMockRootPage extends Vue {
-    width_dropzone = 100
-    height_dropzone = 100
+    width_dropzone = window.innerWidth - 300 - 300 - 20
+    height_dropzone = window.innerHeight - 160
+
     is_show_css_dialog = false
     is_show_writeout_dialog = false
     is_show_readin_dialog = false
@@ -511,6 +512,15 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     clicked_page(pagedata: PageData) {
+        if (!pagedata) {
+            let dropzone: any = this.$refs["dropzone"]
+            let page_property_view: any = this.$refs["page_property_view"]
+
+            page_property_view.page_data = null
+            dropzone.html_tagdatas = null
+            dropzone.html_tagdatas_root = null
+            return
+        }
         let dropzone: any = this.$refs["dropzone"]
         let html_tagdatas = pagedata.html_tagdatas
         dropzone.html_tagdatas = html_tagdatas
@@ -690,7 +700,22 @@ export default class PutPullMockRootPage extends Vue {
 
     delete_page() {
         let page_list_view: any = this.$refs['page_list_view']
+        let dropzone: any = this.$refs["dropzone"]
+        let page_property_view: any = this.$refs["page_property_view"]
         page_list_view.save_pagedatas_to_localstorage()
+        this.$nextTick(() => {
+            page_list_view.clicked_page(page_list_view.pagedatas[0])
+            page_property_view.page_data = null
+            dropzone.html_tagdatas = null
+            dropzone.html_tagdatas_root = null
+            this.update_struct_view(null)
+            this.onclick_tag(null)
+        })
+    }
+
+    add_page() {
+        let page_list_view: any = this.$refs['page_list_view']
+        page_list_view.add_page()
     }
 }
 </script>
@@ -771,6 +796,7 @@ export default class PutPullMockRootPage extends Vue {
 </style>
 <style>
 input,
+select,
 textarea {
     border: solid 1px silver !important;
 }

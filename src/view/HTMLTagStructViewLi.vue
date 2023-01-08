@@ -47,7 +47,7 @@ export default class HTMLTagPropertyView extends Vue {
 
     @Watch('clicked_tagdata')
     update_style() {
-        if (this.tagdata.tagid == this.clicked_tagdata.tagid) {
+        if (this.clicked_tagdata && this.tagdata.tagid == this.clicked_tagdata.tagid) {
             if (this.auto_scroll_tag_struct_view) {
                 const el = this.$refs['li'] as HTMLElement;
                 el?.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });

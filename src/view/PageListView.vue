@@ -100,7 +100,11 @@ export default class Page extends Vue {
         if (this.auto_save_pagedatas_to_localstorage) {
             try {
                 this.pagedatas = JSON.parse(window.localStorage.getItem("ppmk_pagedatas"), deserialize)
-                this.clicked_page(this.pagedatas[0])
+                if (this.pagedatas && this.pagedatas.length > 0) {
+                    this.clicked_page(this.pagedatas[0])
+                } else {
+                    this.clicked_page(null)
+                }
             } catch (e) {
                 this.add_page()
             }

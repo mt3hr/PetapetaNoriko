@@ -1,7 +1,7 @@
 <template>
-  <v-app>
+  <v-app @contextmenu.prevent.stop="() => { }">
     <v-main>
-      <router-view/>
+      <router-view />
     </v-main>
   </v-app>
 </template>
@@ -18,7 +18,8 @@ body {
   width: 100%;
   height: 100%;
 }
-body::-webkit-scrollbar{
+
+body::-webkit-scrollbar {
   display: none;
 }
 </style>

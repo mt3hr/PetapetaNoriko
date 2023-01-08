@@ -21,7 +21,7 @@ export default class HTMLTagViewBase extends Vue {
 
     @Watch('clicked_tagdata')
     update_clicked_style() {
-        if (this.clicked_tagdata.tagid == this.tagdata.tagid) {
+        if (this.clicked_tagdata && this.clicked_tagdata.tagid == this.tagdata.tagid) {
             this.position_css["background-color"] = "lightsteelblue"
         } else {
             this.position_css["background-color"] = undefined

@@ -4,10 +4,15 @@
             {{ style_user_edited_fixed }}
         </component>
         <h2>ドロップゾーン</h2>
-        <div id="dropzone" class="dropzone" @click="onclick" @drop.stop="on_drop" @dragover.prevent="on_dragover" :style="dropzone_style"
-            @contextmenu="show_contextmenu">
+        <div id="dropzone" class="dropzone" @click="onclick" @drop.stop="on_drop" @dragover.prevent="on_dragover"
+            :style="dropzone_style" @contextmenu="show_contextmenu">
 
             <body id="dropzone_body" class="page" :style="dropzone_style">
+                <div v-if="!html_tagdatas"
+                    :style="{ 'text-align': 'center', 'vertical-align': 'middle', 'height': '-webkit-fill-available' }">
+                    <v-btn @click="add_page"
+                        :style="{ 'margin': 'auto', 'position': 'rerative', 'top': '45%' }">ページを追加</v-btn>
+                </div>
                 <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas_root"
                     :clicked_tagdata="clicked_tagdata" :show_border="show_border" :tagdata="tagdata"
                     @updated_tagdatas_root="updated_tagdatas_root" @copy_tag="copy_tag"
@@ -115,6 +120,10 @@ export default class DropZone extends Vue {
     }
 
     on_dragover(e: DragEvent) {
+        if (!this.html_tagdatas) {
+            e.dataTransfer.dropEffect = 'none'
+            return
+        }
         if (e.dataTransfer.items.length != 0) {
             e.dataTransfer.dropEffect = "copy"
         } else if (e.dataTransfer.getData("ppmk/htmltag")) {
@@ -241,8 +250,13 @@ export default class DropZone extends Vue {
         this.y_contextmenu = e.clientY
         this.is_show_contextmenu = true
     }
+
     onclick() {
-        this.$emit('onclick_tag', new HTMLTagDataBase())
+        this.$emit('onclick_tag', null)
+    }
+
+    add_page() {
+        this.$emit('add_page')
     }
 }
 </script>
