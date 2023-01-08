@@ -6,8 +6,9 @@
         <span>({{ tagdata.to_string() }})</span>
         <ul v-if="tagdata.child_tagdatas.length != 0">
             <HTMLTagStructViewLi v-for="child_tagdata, index in tagdata.child_tagdatas" :key="index"
-                :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" :html_tagdatas_root="html_tagdatas_root"
-                :tagdata="child_tagdata" @onclick_tag="onclick_tag" @delete_tagdata="delete_tag"
+                :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view" :clicked_tagdata="clicked_tagdata"
+                @copy_tag="copy_tag" :html_tagdatas_root="html_tagdatas_root" :tagdata="child_tagdata"
+                @onclick_tag="onclick_tag" @delete_tagdata="delete_tag"
                 @updated_html_tagdatas="(tagdatas) => updated_html_tagdatas_child(tagdatas)" />
         </ul>
     </li>
