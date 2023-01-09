@@ -120,7 +120,7 @@ export default class HTMLTagPropertyView extends Vue {
             let tagname = e.dataTransfer.getData("ppmk/htmltag")
             let tag_data: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
 
-            let depth = -1
+            let depth = 0
             let child_appended = false
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -151,12 +151,12 @@ export default class HTMLTagPropertyView extends Vue {
             }
             walk_tagdatas(html_tagdatas_root)
 
-            depth = -1
+            depth = 0
             if (!child_appended) {
                 walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                     for (let i = 0; i < tagdatas.length; i++) {
                         if (tagdata.tagid == tagdatas[i].tagid) {
-                            if (depth != 0) {
+                            if (depth == 0) {
                                 tag_data.position_style = PositionStyle.Absolute
                                 const dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
                                 const dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
@@ -215,7 +215,7 @@ export default class HTMLTagPropertyView extends Vue {
             }
             walk_tagdatas(html_tagdatas_root)
 
-            let depth = -1
+            let depth = 0
             let child_appended = false
 
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -246,12 +246,12 @@ export default class HTMLTagPropertyView extends Vue {
             }
             walk_tagdatas(html_tagdatas_root)
 
-            depth = -1
+            depth = 0
             if (!child_appended) {
                 walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                     for (let i = 0; i < tagdatas.length; i++) {
                         if (tagdata.tagid == tagdatas[i].tagid) {
-                            if (depth != 0) {
+                            if (depth == 0) {
                                 move_tagdata.position_style = PositionStyle.Absolute
                                 const dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
                                 const dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
@@ -294,7 +294,7 @@ export default class HTMLTagPropertyView extends Vue {
                 let json = JSON.stringify(this.html_tagdatas_root)
                 let html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
 
-                let depth = -1
+                let depth = 0
                 let child_appended = false
                 let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
                 walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -325,12 +325,12 @@ export default class HTMLTagPropertyView extends Vue {
                 }
                 walk_tagdatas(html_tagdatas_root)
 
-                depth = -1
+                depth = 0
                 if (!child_appended) {
                     walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                         for (let i = 0; i < tagdatas.length; i++) {
                             if (tagdata.tagid == tagdatas[i].tagid) {
-                                if (depth != 0) {
+                                if (depth == 0) {
                                     tag_data.position_style = PositionStyle.Absolute
                                     const dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
                                     const dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
