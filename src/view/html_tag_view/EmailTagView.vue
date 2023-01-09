@@ -1,8 +1,9 @@
 
 <template>
-    <input type="email" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
-        :class="tagclass" :id="tagdata.tagid" :maxlength="maxlength" :autocomplete="autocomplete" :multiple="multiple" :pattern="pattern"
-        :placeholder="placeholder" :required="required">
+    <input type="email" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
+        :class="tagclass" :id="tagdata.tagid" :maxlength="maxlength" :autocomplete="autocomplete" :multiple="multiple"
+        :pattern="pattern" :placeholder="placeholder" :required="required">
 </template>
 
 <script lang="ts">

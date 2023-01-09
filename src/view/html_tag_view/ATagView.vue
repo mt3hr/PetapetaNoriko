@@ -1,7 +1,8 @@
 <template>
-    <a :style="position_css" @click.prevent.stop="onclick_tag" :href="href" :name="name" :charset="charset" :hreflang="hreflang"
-        :class="tagclass" :id="tagdata.tagid" :type="type" :rel="rel" :rev="rev" :tabindex="tabindex" :accesskey="accesskey" :shape="shape"
-        :coords="coords">{{ text }}</a>
+    <a dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" :style="position_css"
+        @click.prevent.stop="onclick_tag" :href="href" :name="name" :charset="charset" :hreflang="hreflang"
+        :class="tagclass" :id="tagdata.tagid" :type="type" :rel="rel" :rev="rev" :tabindex="tabindex"
+        :accesskey="accesskey" :shape="shape" :coords="coords">{{ text }}</a>
 </template>
 
 <script lang="ts">

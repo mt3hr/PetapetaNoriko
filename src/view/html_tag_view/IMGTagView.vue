@@ -1,6 +1,7 @@
 <template>
-    <img :class="tagclass" :id="tagdata.tagid" :style="position_css" @click.prevent.stop="onclick_tag" :src="src" :alt="alt" :usemap="usemap" :ismap="ismap"
-        :width="width" :height="height" />
+    <img :class="tagclass" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover"
+        :id="tagdata.tagid" :style="position_css" @click.prevent.stop="onclick_tag" :src="src" :alt="alt"
+        :usemap="usemap" :ismap="ismap" :width="width" :height="height" />
 </template>
 
 <script lang="ts">

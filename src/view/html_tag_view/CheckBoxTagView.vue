@@ -1,5 +1,6 @@
 <template>
-    <input type="checkbox" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :checked="checked"
+    <input type="checkbox" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :checked="checked"
         :class="tagclass" :id="tagdata.tagid">
 </template>
 

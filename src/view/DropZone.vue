@@ -124,11 +124,10 @@ export default class DropZone extends Vue {
             e.dataTransfer.dropEffect = 'none'
             return
         }
-        if (e.dataTransfer.items.length != 0) {
-            e.dataTransfer.dropEffect = "copy"
-        } else if (e.dataTransfer.getData("ppmk/htmltag")) {
-            e.dataTransfer.dropEffect = "copy"
-        } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
+        if (e.dataTransfer.getData("ppmk/struct_li_id") || e.dataTransfer.getData("ppmk/move_tag_id") ||
+            e.dataTransfer.getData("ppmk/htmltag") ||
+            e.dataTransfer.items.length != 0
+        ) {
             e.dataTransfer.dropEffect = "move"
         }
     }

@@ -1,5 +1,6 @@
 <template>
-    <input type="radio" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :checked="checked"
+    <input type="radio" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :checked="checked"
         :class="tagclass" :id="tagdata.tagid" :required="required" />
 </template>
 

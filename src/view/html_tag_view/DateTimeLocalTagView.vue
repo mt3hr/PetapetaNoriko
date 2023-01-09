@@ -1,6 +1,7 @@
 <template>
-    <input type="datetime-local" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass" :id="tagdata.tagid"
-        :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required"
+    <input type="datetime-local" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
+        :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required"
         :step="step">
 </template>
 

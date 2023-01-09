@@ -1,10 +1,10 @@
 <template>
-    <select :style="position_css" @click.prevent.stop="onclick_tag" :class="tagclass" :id="tagdata.tagid"
-        @drop="on_drop" :autofocus="autofocus" :disabled="disabled" :multiple="multiple" :name="name" :size="size"
-        @dragover.prevent="on_dragover">
+    <select :style="position_css" dropzone="true" @dragover="on_dragover" @click.prevent.stop="onclick_tag" :class="tagclass" :id="tagdata.tagid"
+        @drop="(e) => on_drop(e, tagdata)" :autofocus="autofocus" :disabled="disabled" :multiple="multiple" :name="name"
+        :size="size" @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
-            :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
-            :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
+            :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border"
+            :tagdatas_root="tagdatas_root" :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
             @onclick_tag="onclick_child_tag(child_tagdata)" @delete_tagdata="delete_child_tagdata" />
     </select>
 </template>

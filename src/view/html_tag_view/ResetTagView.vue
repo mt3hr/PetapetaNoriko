@@ -1,5 +1,6 @@
 <template>
-    <input type="reset" readonly :class="tagclass" :id="tagdata.tagid" :style="position_css" @click.prevent.stop="onclick_tag" :value="value">
+    <input type="reset" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+        :class="tagclass" :id="tagdata.tagid" :style="position_css" @click.prevent.stop="onclick_tag" :value="value">
 </template>
 
 <script lang="ts">

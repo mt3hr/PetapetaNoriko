@@ -1,6 +1,7 @@
 <template>
-    <option :class="tagclass" :id="tagdata.tagid" :style="position_css" @click.prevent.stop="onclick_tag" :disabled="disabled" :label="label"
-        :selected="selected" :value="value" />
+    <option :class="tagclass" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover"
+        :id="tagdata.tagid" :style="position_css" @click.prevent.stop="onclick_tag" :disabled="disabled" :label="label"
+        :selected="selected" :value="value"></option>
 </template>
 
 <script lang="ts">

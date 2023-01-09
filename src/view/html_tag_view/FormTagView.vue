@@ -1,11 +1,13 @@
 <template>
-    <form :style="position_css" @click.prevent.stop="onclick_tag" :class="tagclass" :id="tagdata.tagid" @drop="on_drop"
-        :acceptcharset="acceptcharset" :action="action" :autocomplete="autocomplete" :enctype="enctype" :method="method"
-        :name="name" :novalidate="novalidate" :target="target" @dragover.prevent="on_dragover">
+    <form :style="position_css" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover"
+        @click.prevent.stop="onclick_tag" :class="tagclass" :id="tagdata.tagid" :acceptcharset="acceptcharset"
+        :action="action" :autocomplete="autocomplete" :enctype="enctype" :method="method" :name="name"
+        :novalidate="novalidate" :target="target" @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
-            :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
-            @copy_tag="copy_tag" :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata"
-            @onclick_tag="onclick_child_tag" @delete_tagdata="delete_child_tagdata" />
+            :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border"
+            :tagdatas_root="tagdatas_root" @copy_tag="copy_tag" :tagdata="child_tagdata"
+            @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_child_tag"
+            @delete_tagdata="delete_child_tagdata" />
     </form>
 </template>
 <script lang="ts">
@@ -113,77 +115,6 @@ export default class FormTagView extends HTMLTagViewBase {
             tagdata_typed.child_tagdatas.splice(index, 1)
         }
         this.$emit('updated_tagdata', tagdata_typed)
-    }
-
-    on_drop(e: DragEvent) {
-        if (e.dataTransfer.getData("ppmk/htmltag")) {
-            let json = JSON.stringify(this.tagdata_typed)
-            let tagdata_typed: FormTagData = JSON.parse(json, deserialize)
-            let tagname = e.dataTransfer.getData("ppmk/htmltag")
-            let tagdata: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
-            tagdata.position_style = PositionStyle.None
-            tagdata.position_x = undefined
-            tagdata.position_y = undefined
-            tagdata_typed.child_tagdatas.push(tagdata)
-            this.$emit('updated_tagdata', tagdata_typed)
-        } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
-            if (!this.can_drop(e.dataTransfer.getData("ppmk/move_tag_id"), this.tagdata_typed)) {
-                return
-            }
-            let json = JSON.stringify(this.tagdatas_root)
-            let html_tagdatas_root = JSON.parse(json, deserialize)
-            let move_tagdata: HTMLTagDataBase
-
-            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
-            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
-                for (let i = 0; i < tagdatas.length; i++) {
-                    if (e.dataTransfer.getData("ppmk/move_tag_id") == tagdatas[i].tagid) {
-                        move_tagdata = tagdatas[i]
-                        tagdatas.splice(i, 1)
-                        return true
-                    }
-                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
-                        return true
-                    }
-                }
-                return false
-            }
-            walk_tagdatas(html_tagdatas_root)
-
-            let tagdata_typed = this.tagdata_typed
-            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
-                for (let i = 0; i < tagdatas.length; i++) {
-                    if (tagdata_typed.tagid == tagdatas[i].tagid) {
-                        if (tagdatas[i].has_child_tag) {
-                            move_tagdata.position_style = PositionStyle.None
-                            move_tagdata.position_x = undefined
-                            move_tagdata.position_y = undefined
-                            tagdatas[i].child_tagdatas.push(move_tagdata)
-                            return true
-                        }
-                    }
-                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
-                        return true
-                    }
-                }
-                return false
-            }
-            walk_tagdatas(html_tagdatas_root)
-            this.$emit("updated_tagdatas_root", html_tagdatas_root)
-        } else if (e.dataTransfer.items.length != 0) {
-            const reader = new FileReader()
-            reader.onload = (event: any) => {
-                let tagdata_typed = this.tagdata_typed
-                let tag_data = new IMGTagData()
-                tag_data.position_style = PositionStyle.None
-                tag_data.src = event.currentTarget.result
-                tagdata_typed.child_tagdatas.push(tag_data)
-                this.$emit('updated_tagdata', tagdata_typed)
-            }
-            reader.readAsDataURL(e.dataTransfer.files[0])
-            e.preventDefault()
-        }
-        e.stopPropagation()
     }
 
     beforeCreate(): void {

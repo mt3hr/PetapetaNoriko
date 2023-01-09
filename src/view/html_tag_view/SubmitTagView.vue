@@ -1,7 +1,8 @@
 <template>
-    <input type="submit" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :formaction="formaction"
-        :class="tagclass" :id="tagdata.tagid" :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
-        :formtarget="formtarget">
+    <input type="submit" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :formaction="formaction"
+        :class="tagclass" :id="tagdata.tagid" :formenctype="formenctype" :formmethod="formmethod"
+        :formnovalidate="formnovalidate" :formtarget="formtarget">
 </template>
 
 <script lang="ts">

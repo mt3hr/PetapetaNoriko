@@ -1,5 +1,6 @@
 <template>
-    <p :class="tagclass" :id="tagdata.tagid" :style="position_css" @click.prevent.stop="onclick_tag">{{ text }}</p>
+    <p :class="tagclass" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" :id="tagdata.tagid"
+        :style="position_css" @click.prevent.stop="onclick_tag">{{ text }}</p>
 </template>
 
 <script lang="ts">

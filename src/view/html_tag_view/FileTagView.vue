@@ -1,5 +1,6 @@
 <template>
-    <input type="file" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
+    <input type="file" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
         :class="tagclass" :id="tagdata.tagid" :accept="accept" :multiple="multiple" :required="required">
 </template>
 

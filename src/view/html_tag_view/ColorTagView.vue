@@ -1,6 +1,7 @@
 <template>
-    <input type="color" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass" :id="tagdata.tagid"
-        :autocomplete="autocomplete">
+    <input type="color" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
+        :id="tagdata.tagid" :autocomplete="autocomplete">
 </template>
 
 <script lang="ts">

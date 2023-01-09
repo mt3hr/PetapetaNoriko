@@ -1,6 +1,7 @@
 <template>
-    <input type="range" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass" :id="tagdata.tagid"
-        :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
+    <input type="range" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
+        :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
 </template>
 
 <script lang="ts">

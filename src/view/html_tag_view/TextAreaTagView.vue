@@ -1,6 +1,7 @@
 <template>
-    <textarea :style="position_css" readonly @click.prevent.stop="onclick_tag" :autofocus="autofocus" :cols="cols" :disabled="disabled"
-        :form="form" :maxlength="maxlength" :name="name" :placeholder="placeholder" :class="tagclass" :id="tagdata.tagid"
+    <textarea :style="position_css" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+        @click.prevent.stop="onclick_tag" :autofocus="autofocus" :cols="cols" :disabled="disabled" :form="form"
+        :maxlength="maxlength" :name="name" :placeholder="placeholder" :class="tagclass" :id="tagdata.tagid"
         :required="required" :rows="rows" :wrap="wrap"></textarea>
 </template>
 
