@@ -274,8 +274,8 @@ class Settings {
 })
 
 export default class PutPullMockRootPage extends Vue {
-    width_dropzone = window.innerWidth - 300 - 300 - 20
-    height_dropzone = window.innerHeight - 160
+    width_dropzone = window.innerWidth - 300 - 300 - 19
+    height_dropzone = window.innerHeight - 159
 
     is_show_css_dialog = false
     is_show_writeout_dialog = false
@@ -710,6 +710,9 @@ export default class PutPullMockRootPage extends Vue {
             dropzone.html_tagdatas_root = null
             this.update_struct_view(null)
             this.onclick_tag(null)
+
+            this.width_dropzone = window.innerWidth - 300 - 300 - 19
+            this.height_dropzone = window.innerHeight - 159
         })
     }
 
@@ -728,7 +731,7 @@ export default class PutPullMockRootPage extends Vue {
 
 .dropzone_wrap {
     white-space: pre-line;
-    height: calc(100vh - 105px);
+    height: calc(100vh - 104px);
     width: fit-content;
     overflow: scroll;
 }
@@ -744,15 +747,13 @@ export default class PutPullMockRootPage extends Vue {
     margin: 0px;
 }
 
-
-
 .page_list_view {
     height: 150px;
     overflow-y: scroll;
 }
 
 .html_tag_list_view {
-    height: calc(100vh - 255px);
+    height: calc(100vh - 254px);
     overflow-y: scroll;
 }
 
@@ -762,7 +763,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .property_view {
-    height: calc(100vh - 575px);
+    height: calc(100vh - 574px);
     overflow: scroll;
 }
 
