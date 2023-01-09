@@ -70,15 +70,12 @@ export default class HTMLTagPropertyView extends Vue {
         }
     }
 
-
-
     dragover(e: DragEvent) {
-        if (e.dataTransfer.getData("ppmk/struct_li_id") || e.dataTransfer.getData("ppmk/move_tag_id") ||
-            e.dataTransfer.getData("ppmk/htmltag") ||
-            e.dataTransfer.items.length != 0
-        ) {
-            e.dataTransfer.dropEffect = "move"
-        }
+        e.dataTransfer.dropEffect = "none"
+        if (e.dataTransfer.getData("ppmk/struct_li_id")) e.dataTransfer.dropEffect = "move"
+        // if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
+        if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
+        if (e.dataTransfer.files.length != 0) e.dataTransfer.dropEffect = "copy"
     }
     can_drop(move_tagid: string, target_tagdata: HTMLTagDataBase): boolean {
         if (move_tagid == target_tagdata.tagid) {
@@ -112,7 +109,10 @@ export default class HTMLTagPropertyView extends Vue {
     }
 
     drop(e: DragEvent, tagdata: HTMLTagDataBase) {
-        let tagid = e.dataTransfer.getData("ppmk/struct_li_id") ? e.dataTransfer.getData("ppmk/struct_li_id") : e.dataTransfer.getData("ppmk/move_tag_id")
+        let tagid: string = null
+        if (e.dataTransfer.getData("ppmk/struct_li_id")) tagid = e.dataTransfer.getData("ppmk/struct_li_id")
+        if (e.dataTransfer.getData("ppmk/move_tag_id")) tagid = e.dataTransfer.getData("ppmk/move_tag_id")
+
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             let json = JSON.stringify(this.html_tagdatas_root)
             let html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
