@@ -143,8 +143,26 @@ export default class DropZone extends Vue {
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
             // すでに配置されたコンポーネントの移動
             let json = JSON.stringify(this.html_tagdatas)
-            let html_tagdatas_root = JSON.parse(json, deserialize)
+            let html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
             let move_tagdata: HTMLTagDataBase
+
+            let move_in_root = false
+            for (let i = 0; i < html_tagdatas_root.length; i++) {
+                if (html_tagdatas_root[i].tagid == e.dataTransfer.getData("ppmk/move_tag_id")) {
+                    move_tagdata = html_tagdatas_root[i]
+                    move_tagdata.position_style = PositionStyle.Absolute
+                    let dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
+                    let dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
+                    move_tagdata.position_x = e.pageX - dropzone_x
+                    move_tagdata.position_y = e.pageY - dropzone_y
+                    move_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
+                    move_tagdata.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
+                    move_in_root = true
+                }
+                this.$emit('updated_htmltagdatas', html_tagdatas_root, null)
+                e.stopPropagation()
+            }
+            if (move_in_root) return
 
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {

@@ -79,7 +79,6 @@ export default class HTMLTagViewBase extends Vue {
     }
 
     on_dragover(e: DragEvent) {
-        e.dataTransfer.dropEffect = "none"
         // if (e.dataTransfer.getData("ppmk/struct_li_id")) e.dataTransfer.dropEffect = "move"
         if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
         if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
@@ -91,12 +90,13 @@ export default class HTMLTagViewBase extends Vue {
         if (e.dataTransfer.getData("ppmk/struct_li_id")) tagid = e.dataTransfer.getData("ppmk/struct_li_id")
         if (e.dataTransfer.getData("ppmk/move_tag_id")) tagid = e.dataTransfer.getData("ppmk/move_tag_id")
 
-        if (e.dataTransfer.getData("ppmk/htmltag")) {
-            const json = JSON.stringify(this.tagdatas_root)
-            const html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
+        const json = JSON.stringify(this.tagdatas_root)
+        const html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
 
+        if (e.dataTransfer.getData("ppmk/htmltag")) {
             const tagname = e.dataTransfer.getData("ppmk/htmltag")
             const tag_data: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
+            console.log(tagname)
 
             let depth = 0
             let child_appended = false
@@ -116,6 +116,7 @@ export default class HTMLTagViewBase extends Vue {
                                 tagdatas[i].child_tagdatas.push(tag_data)
                             }
                             child_appended = true
+                            console.log("a")
                             return true
                         }
                     }
@@ -123,7 +124,7 @@ export default class HTMLTagViewBase extends Vue {
                     if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
                         return true
                     }
-                    depth--
+                    depth
                 }
                 return false
             }
@@ -140,12 +141,11 @@ export default class HTMLTagViewBase extends Vue {
                                 const dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
                                 tag_data.position_x = e.pageX - dropzone_x
                                 tag_data.position_y = e.pageY - dropzone_y
-                                tag_data.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
-                                tag_data.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
                             } else {
                                 tag_data.position_style = PositionStyle.None
                                 tag_data.position_x = undefined
                                 tag_data.position_y = undefined
+                                console.log(1)
                             }
                             if (e.shiftKey) {
                                 tagdatas.splice(i, 0, tag_data)
@@ -166,15 +166,12 @@ export default class HTMLTagViewBase extends Vue {
                 }
                 walk_tagdatas(html_tagdatas_root)
             }
-            this.$emit("updated_tagdatas_root", html_tagdatas_root)
+            this.updated_html_tagdatas(html_tagdatas_root)
         } else if (tagid) {
             if (!this.can_drop(tagid, tagdata)) {
                 return
             }
             let move_tagdata: HTMLTagDataBase
-
-            const json = JSON.stringify(this.tagdatas_root)
-            const html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
 
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -236,13 +233,10 @@ export default class HTMLTagViewBase extends Vue {
                                 move_tagdata.position_y = e.pageY - dropzone_y
                                 move_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
                                 move_tagdata.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
-                                console.log(e.pageX)
-                                console.log(e.pageY)
                             } else {
                                 move_tagdata.position_style = PositionStyle.None
                                 move_tagdata.position_x = undefined
                                 move_tagdata.position_y = undefined
-                                console.log("a")
                             }
 
                             if (e.shiftKey) {
@@ -264,15 +258,12 @@ export default class HTMLTagViewBase extends Vue {
                 }
                 walk_tagdatas(html_tagdatas_root)
             }
-            this.$emit("updated_tagdatas_root", html_tagdatas_root)
+            this.updated_html_tagdatas(html_tagdatas_root)
         } else if (e.dataTransfer.items.length != 0) {
             const reader = new FileReader()
             reader.onload = (event: any) => {
                 const tag_data = new IMGTagData()
                 tag_data.src = event.currentTarget.result
-
-                const json = JSON.stringify(this.tagdatas_root)
-                const html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
 
                 let depth = 0
                 let child_appended = false
@@ -342,11 +333,16 @@ export default class HTMLTagViewBase extends Vue {
                     }
                     walk_tagdatas(html_tagdatas_root)
                 }
-                this.$emit("updated_tagdatas_root", html_tagdatas_root)
+                this.updated_html_tagdatas(html_tagdatas_root)
             }
             reader.readAsDataURL(e.dataTransfer.files[0])
             e.preventDefault()
         }
+        e.preventDefault()
         e.stopPropagation()
+    }
+
+    updated_html_tagdatas(html_tagdatas_root: Array<HTMLTagDataBase>) {
+        this.$emit('updated_tagdatas_root', html_tagdatas_root)
     }
 }

@@ -71,7 +71,6 @@ export default class HTMLTagPropertyView extends Vue {
     }
 
     dragover(e: DragEvent) {
-        e.dataTransfer.dropEffect = "none"
         if (e.dataTransfer.getData("ppmk/struct_li_id")) e.dataTransfer.dropEffect = "move"
         // if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
         if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
@@ -113,12 +112,13 @@ export default class HTMLTagPropertyView extends Vue {
         if (e.dataTransfer.getData("ppmk/struct_li_id")) tagid = e.dataTransfer.getData("ppmk/struct_li_id")
         if (e.dataTransfer.getData("ppmk/move_tag_id")) tagid = e.dataTransfer.getData("ppmk/move_tag_id")
 
-        if (e.dataTransfer.getData("ppmk/htmltag")) {
-            let json = JSON.stringify(this.html_tagdatas_root)
-            let html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
+        const json = JSON.stringify(this.html_tagdatas_root)
+        const html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
 
-            let tagname = e.dataTransfer.getData("ppmk/htmltag")
-            let tag_data: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
+        if (e.dataTransfer.getData("ppmk/htmltag")) {
+            const tagname = e.dataTransfer.getData("ppmk/htmltag")
+            const tag_data: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
+            console.log(tagname)
 
             let depth = 0
             let child_appended = false
@@ -138,6 +138,7 @@ export default class HTMLTagPropertyView extends Vue {
                                 tagdatas[i].child_tagdatas.push(tag_data)
                             }
                             child_appended = true
+                            console.log("a")
                             return true
                         }
                     }
@@ -162,12 +163,11 @@ export default class HTMLTagPropertyView extends Vue {
                                 const dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
                                 tag_data.position_x = e.pageX - dropzone_x
                                 tag_data.position_y = e.pageY - dropzone_y
-                                tag_data.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
-                                tag_data.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
                             } else {
                                 tag_data.position_style = PositionStyle.None
                                 tag_data.position_x = undefined
                                 tag_data.position_y = undefined
+                                console.log(1)
                             }
                             if (e.shiftKey) {
                                 tagdatas.splice(i, 0, tag_data)
@@ -193,11 +193,7 @@ export default class HTMLTagPropertyView extends Vue {
             if (!this.can_drop(tagid, tagdata)) {
                 return
             }
-            let html_tagdatas_root: Array<HTMLTagDataBase>
             let move_tagdata: HTMLTagDataBase
-
-            let json = JSON.stringify(this.html_tagdatas_root)
-            html_tagdatas_root = JSON.parse(json, deserialize)
 
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -253,12 +249,6 @@ export default class HTMLTagPropertyView extends Vue {
                         if (tagdata.tagid == tagdatas[i].tagid) {
                             if (depth == 0) {
                                 move_tagdata.position_style = PositionStyle.Absolute
-                                const dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
-                                const dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
-                                move_tagdata.position_x = e.pageX - dropzone_x
-                                move_tagdata.position_y = e.pageY - dropzone_y
-                                move_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
-                                move_tagdata.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
                             } else {
                                 move_tagdata.position_style = PositionStyle.None
                                 move_tagdata.position_x = undefined
@@ -290,9 +280,6 @@ export default class HTMLTagPropertyView extends Vue {
             reader.onload = (event: any) => {
                 const tag_data = new IMGTagData()
                 tag_data.src = event.currentTarget.result
-
-                let json = JSON.stringify(this.html_tagdatas_root)
-                let html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
 
                 let depth = 0
                 let child_appended = false
@@ -367,6 +354,7 @@ export default class HTMLTagPropertyView extends Vue {
             reader.readAsDataURL(e.dataTransfer.files[0])
             e.preventDefault()
         }
+        e.preventDefault()
         e.stopPropagation()
     }
 

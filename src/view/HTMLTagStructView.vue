@@ -44,13 +44,7 @@ export default class HTMLTagPropertyView extends Vue {
             for (let i = 0; i < tagdatas.length; i++) {
                 if (e.dataTransfer.getData("ppmk/struct_li_id") == tagdatas[i].tagid) {
                     move_tagdata = tagdatas[i]
-                    if (e.shiftKey) {
-                        tagdatas.splice(i, 0, move_tagdata)
-                    } else if (e.ctrlKey) {
-                        tagdatas.splice(i + 1, 0, move_tagdata)
-                    } else {
-                        tagdatas.splice(i + 1, 0, move_tagdata)
-                    }
+                    tagdatas.splice(i, 1)
                     return true
                 }
                 if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
@@ -69,14 +63,14 @@ export default class HTMLTagPropertyView extends Vue {
         } else {
             html_tagdatas.push(move_tagdata)
         }
-
         this.updated_html_tagdatas(html_tagdatas)
     }
 
     dragover(e: DragEvent) {
-        if (e.dataTransfer.getData("ppmk/struct_li_id")) {
-            e.dataTransfer.dropEffect = "move"
-        }
+        if (e.dataTransfer.getData("ppmk/struct_li_id")) e.dataTransfer.dropEffect = "move"
+        // if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
+        if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
+        if (e.dataTransfer.files.length != 0) e.dataTransfer.dropEffect = "copy"
     }
 
     onclick_tag(tagdata: HTMLTagDataBase) {
@@ -85,6 +79,7 @@ export default class HTMLTagPropertyView extends Vue {
 
     delete_tag(tagdata: HTMLTagDataBase) {
         this.$emit("delete_tagdata", tagdata)
+
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {
