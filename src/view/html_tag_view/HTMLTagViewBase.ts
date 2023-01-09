@@ -96,7 +96,7 @@ export default class HTMLTagViewBase extends Vue {
             const tagname = e.dataTransfer.getData("ppmk/htmltag")
             const tag_data: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
 
-            let depth = 0
+            let depth = -1
             let child_appended = false
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -127,7 +127,7 @@ export default class HTMLTagViewBase extends Vue {
             }
             walk_tagdatas(html_tagdatas_root)
 
-            depth = 0
+            depth = -1
             if (!child_appended) {
                 walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                     for (let i = 0; i < tagdatas.length; i++) {
@@ -190,7 +190,7 @@ export default class HTMLTagViewBase extends Vue {
             }
             walk_tagdatas(html_tagdatas_root)
 
-            let depth = 0
+            let depth = -1
             let child_appended = false
 
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -221,7 +221,7 @@ export default class HTMLTagViewBase extends Vue {
             }
             walk_tagdatas(html_tagdatas_root)
 
-            depth = 0
+            depth = -1
             if (!child_appended) {
                 walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                     for (let i = 0; i < tagdatas.length; i++) {
@@ -272,7 +272,7 @@ export default class HTMLTagViewBase extends Vue {
                 const json = JSON.stringify(this.tagdatas_root)
                 const html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
 
-                let depth = 0
+                let depth = -1
                 let child_appended = false
                 let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
                 walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -303,7 +303,7 @@ export default class HTMLTagViewBase extends Vue {
                 }
                 walk_tagdatas(html_tagdatas_root)
 
-                depth = 0
+                depth = -1
                 if (!child_appended) {
                     walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                         for (let i = 0; i < tagdatas.length; i++) {
