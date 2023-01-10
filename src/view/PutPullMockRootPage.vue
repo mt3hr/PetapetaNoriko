@@ -242,7 +242,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 //TODO テーブル
 
 //TODO タグリストアイテムの見た目画像
-//TODO タグリストアイテムの見た目画像可視不可視
+//TODO タグリストアイテムの見た目画像可視不可視git 
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView from '@/view/TagListView.vue'
