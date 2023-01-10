@@ -237,6 +237,12 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 </template>
 
 <script lang="ts">
+//TODO 簡易コンポーネントの用意
+//TODO グローバルナビゲーション
+//TODO テーブル
+
+//TODO タグリストアイテムの見た目画像
+//TODO タグリストアイテムの見た目画像可視不可視
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView from '@/view/TagListView.vue'
