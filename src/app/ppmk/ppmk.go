@@ -123,7 +123,7 @@ var (
 					panic(err)
 				}
 
-				for w.IsShown() {
+				for !w.IsShown() {
 					time.Sleep(time.Millisecond * 200)
 				}
 				err = w.ExecuteJavaScript(`// aタグがクリックされた時にelectronで開かず、デフォルトのブラウザで開く
@@ -142,7 +142,7 @@ document.addEventListener('click', (e) => {
 })
 `)
 				if err != nil {
-					// panic(err)
+					panic(err)
 				}
 
 				// Blocking pattern
