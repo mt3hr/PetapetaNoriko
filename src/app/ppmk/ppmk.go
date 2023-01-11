@@ -12,7 +12,6 @@ import (
 	"os/signal"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/asticode/go-astikit"
 	"github.com/asticode/go-astilectron"
@@ -90,7 +89,10 @@ var (
 				defer a.Close()
 
 				// Start astilectron
-				a.Start()
+				err = a.Start()
+				if err != nil {
+					panic(err)
+				}
 
 				contextIsolation := false
 				// Create a new window
@@ -123,9 +125,6 @@ var (
 					panic(err)
 				}
 
-				for !w.IsShown() {
-					time.Sleep(time.Millisecond * 200)
-				}
 				err = w.ExecuteJavaScript(`// aタグがクリックされた時にelectronで開かず、デフォルトのブラウザで開く
 document.addEventListener('click', (e) => {
   for (let i = 0; i < e.path.length; i++) {
