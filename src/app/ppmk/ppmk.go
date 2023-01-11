@@ -117,8 +117,12 @@ var (
 					}
 					return nil
 				})
-				w.Create()
-				w.ExecuteJavaScript(`// aタグがクリックされた時にelectronで開かず、デフォルトのブラウザで開く
+				err = w.Create()
+				if err != nil {
+					panic(err)
+				}
+
+				err = w.ExecuteJavaScript(`// aタグがクリックされた時にelectronで開かず、デフォルトのブラウザで開く
 document.addEventListener('click', (e) => {
   for (let i = 0; i < e.path.length; i++) {
     let element = e.path[i]
@@ -133,6 +137,9 @@ document.addEventListener('click', (e) => {
   }
 })
 `)
+				if err != nil {
+					panic(err)
+				}
 
 				// Blocking pattern
 				a.Wait()
