@@ -51,6 +51,10 @@
         :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
         @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
         @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
+    <THTagView v-if="tagdata.tagname == 'th'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
+        :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
+        @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
+        @contextmenu.stop="show_contextmenu" @onclick_tag="onclick_tag" @updated_tagdata="updated_tagdata" />
     <TRTagView v-if="tagdata.tagname == 'tr'" :tagdata="tagdata" draggable="true" @dragstart.stop="on_drag_start"
         :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" @click="onclick"
         @updated_tagdatas_root="updated_tagdatas_root" :tagdatas_root="tagdatas_root" :show_border="show_border"
@@ -226,6 +230,7 @@ import LabelTagView from '@/view/html_tag_view/LabelTagView.vue'
 import DivTagView from '@/view/html_tag_view/DivTagView.vue'
 import SpanTagView from '@/view/html_tag_view/SpanTagView.vue'
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
+import THTagView from '@/view/html_tag_view/THTagView.vue';
 
 @Options({
     components: {
@@ -244,6 +249,7 @@ import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
         TableTagView,
         TRTagView,
         TDTagView,
+        THTagView,
         FormTagView,
         ButtonTagView,
         CheckBoxTagView,

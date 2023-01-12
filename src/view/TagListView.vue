@@ -119,6 +119,7 @@ export default class TagListView extends Vue {
         "ol",
         "li",
         "table",
+        "th",
         "tr",
         "td",
         "div",
