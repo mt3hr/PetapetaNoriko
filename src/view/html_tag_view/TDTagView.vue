@@ -112,7 +112,7 @@ export default class TDTagView extends HTMLTagViewBase {
 </script>
 <style scoped>
 td {
-    min-width: 15px;
+    min-width: 30px;
     min-height: 30px;
 }
 </style>

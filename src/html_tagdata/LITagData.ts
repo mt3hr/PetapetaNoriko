@@ -3,11 +3,12 @@ import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
 
 @serializable
 export default class LITagData extends HTMLTagDataBase {
-    text = "リストアイテム"
+    text = ""
     value = ""
     constructor() {
         super()
         this.tagname = "li"
+        this.has_child_tag = true
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
@@ -16,7 +17,12 @@ export default class LITagData extends HTMLTagDataBase {
         if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
         if (this.value != "") html += " value=\"" + this.value + "\""
-        html += ">" + this.text + "</li>"
+        html += ">"
+        html += this.text + "</li>"
+        for (let i = 0; i < this.child_tagdatas.length; i++) {
+            html += this.child_tagdatas[i].generate_html(options, indent + "    ")
+            html += "\n"
+        }
         return html
     }
     override to_string(): string {

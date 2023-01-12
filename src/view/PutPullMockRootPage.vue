@@ -318,7 +318,7 @@ export default class PutPullMockRootPage extends Vue {
     clicked_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
     copied_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
 
-    tag_list_view_mode: TagListViewMode = TagListViewMode.TextAndImage
+    tag_list_view_mode: TagListViewMode = TagListViewMode.Text
 
     @Watch('export_base64_image')
     @Watch('export_head')
