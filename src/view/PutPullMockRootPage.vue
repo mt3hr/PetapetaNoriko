@@ -29,7 +29,7 @@
                     </v-row>
                     <v-row>
                         <!--タグリストビュー。ここからタグをドラッグしてドロップゾーンに貼り付ける-->
-                        <TagListView class="component html_tag_list_view" />
+                        <TagListView :mode="tag_list_view_mode" class="component html_tag_list_view" />
                     </v-row>
                 </v-container>
             </v-col>
@@ -197,6 +197,17 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 
             <v-row>
                 <v-col cols="auto">
+                    <v-text>HTML要素一覧の表示</v-text>
+                    <v-radio-group v-model="tag_list_view_mode">
+                        <v-radio :label="'タグ名とイメージ'" :value="TagListViewMode.TextAndImage" />
+                        <v-radio :label="'タグ名'" :value="TagListViewMode.Text" />
+                        <v-radio :label="'画像'" :value="TagListViewMode.Image" />
+                    </v-radio-group>
+                </v-col>
+            </v-row>
+
+            <v-row>
+                <v-col cols="auto">
                     <h3>CSS編集画面</h3>
                 </v-col>
             </v-row>
@@ -245,7 +256,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 //TODO タグリストアイテムの見た目画像可視不可視git 
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
-import TagListView from '@/view/TagListView.vue'
+import TagListView, { TagListViewMode } from '@/view/TagListView.vue'
 import DropZone from '@/view/DropZone.vue'
 import HTMLTagPropertyView from '@/view/HTMLTagPropertyView.vue'
 import PagePropertyView from '@/view/PagePropertyView.vue'
@@ -266,6 +277,7 @@ class Settings {
     transparent_page_css_view: boolean
     auto_save_pagedatas_to_localstorage: boolean
     auto_scroll_tag_struct_view: boolean
+    tag_list_view_mode: TagListViewMode
 }
 
 @Options({
@@ -280,6 +292,7 @@ class Settings {
 })
 
 export default class PutPullMockRootPage extends Vue {
+    TagListViewMode = TagListViewMode
     width_dropzone = window.innerWidth - 300 - 300 - 19
     height_dropzone = window.innerHeight - 159
 
@@ -305,6 +318,8 @@ export default class PutPullMockRootPage extends Vue {
     clicked_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
     copied_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
 
+    tag_list_view_mode: TagListViewMode = TagListViewMode.TextAndImage
+
     @Watch('export_base64_image')
     @Watch('export_head')
     @Watch('export_position_css')
@@ -312,6 +327,7 @@ export default class PutPullMockRootPage extends Vue {
     @Watch('transparent_page_css_view')
     @Watch('auto_save_pagedatas_to_localstorage')
     @Watch('auto_scroll_tag_struct_view')
+    @Watch('tag_list_view_mode')
     save_settings_to_cookie() {
         let settings = new Settings()
         settings.export_base64_image = this.export_base64_image
@@ -321,6 +337,7 @@ export default class PutPullMockRootPage extends Vue {
         settings.transparent_page_css_view = this.transparent_page_css_view
         settings.auto_save_pagedatas_to_localstorage = this.auto_save_pagedatas_to_localstorage
         settings.auto_scroll_tag_struct_view = this.auto_scroll_tag_struct_view
+        settings.tag_list_view_mode = this.tag_list_view_mode
         document.cookie = JSON.stringify(settings)
     }
 
@@ -360,6 +377,7 @@ export default class PutPullMockRootPage extends Vue {
         this.transparent_page_css_view = settings.transparent_page_css_view
         this.auto_save_pagedatas_to_localstorage = settings.auto_save_pagedatas_to_localstorage
         this.auto_scroll_tag_struct_view = settings.auto_scroll_tag_struct_view
+        this.tag_list_view_mode = settings.tag_list_view_mode
     }
 
     created(): void {
