@@ -5,12 +5,20 @@ import { Vue } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator"
 import { generate_tagdata_by_tagname } from "./generate_tagdata_by_tagname";
 import HTMLTagView from '../HTMLTagView.vue';
+import TableTagData from '@/html_tagdata/TableTagData';
+import ULTagData from '@/html_tagdata/ULTagData';
+import OLTagData from '@/html_tagdata/OLTagData';
+import generateUUID from '@/uuid';
+import TRTagData from '@/html_tagdata/TRTagData';
+import TDTagData from '@/html_tagdata/TDTagData';
+import LITagData from '@/html_tagdata/LITagData';
 
 export default class HTMLTagViewBase extends Vue {
     @Prop({ require: true }) tagdata: HTMLTagDataBase
     @Prop({ require: true }) tagdatas_root: Array<HTMLTagDataBase>
     @Prop({ require: true }) clicked_tagdata: HTMLTagDataBase
     @Prop() show_border: boolean
+    @Prop() copied_tagdata: HTMLTagDataBase
     position_css: string
     selected_this_tag = false
 
@@ -163,6 +171,34 @@ export default class HTMLTagViewBase extends Vue {
                     return false
                 }
                 walk_tagdatas(html_tagdatas_root)
+
+                switch (tagname) {
+                    case "table": {
+                        this.table_rows = 1
+                        this.table_cols = 1
+                        this.table_initialize_target = tag_data as TableTagData
+                        this.is_show_table_initialize_dialog = true
+                        break
+                    }
+                    case "ul": {
+                        this.ul_items = 1
+                        this.ul_initialize_target = tag_data as ULTagData
+                        this.is_show_ul_initialize_dialog = true
+                        break
+                    }
+                    case "ol": {
+                        this.ol_items = 1
+                        this.ol_initialize_target = tag_data as OLTagData
+                        this.is_show_ol_initialize_dialog = true
+                        break
+                    }
+                    case "img": {
+                        this.img_src = ""
+                        this.img_initialize_target = tag_data as IMGTagData
+                        this.is_show_img_initialize_dialog = true
+                        break
+                    }
+                }
             }
             this.updated_html_tagdatas(html_tagdatas_root)
             this.$nextTick(() => {
@@ -364,7 +400,153 @@ export default class HTMLTagViewBase extends Vue {
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
         this.$emit("updated_tagdatas_root", tagdatas)
     }
+
     copy_tag(tagdata: HTMLTagDataBase) {
         this.$emit("copy_tag", tagdata)
+    }
+
+    delete_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("delete_tag", tagdata)
+    }
+
+
+    is_show_contextmenu = false
+    x_contextmenu = 0
+    y_contextmenu = 0
+
+    is_show_table_initialize_dialog = false
+    table_initialize_target: TableTagData = null
+    table_rows = 1
+    table_cols = 1
+
+    is_show_ul_initialize_dialog = false
+    ul_initialize_target: ULTagData = null
+    ul_items = 1
+
+    is_show_ol_initialize_dialog = false
+    ol_initialize_target: OLTagData = null
+    ol_items = 1
+
+    is_show_img_initialize_dialog = false
+    img_initialize_target: IMGTagData = null
+    img_src = ""
+
+    paste_tag() {
+        if (this.copied_tagdata.tagname != 'tagbase') {
+            const copied_tagdata: HTMLTagDataBase = JSON.parse(JSON.stringify(this.copied_tagdata), deserialize)
+            copied_tagdata.tagid = "id_" + generateUUID()
+            copied_tagdata.position_style = PositionStyle.None
+            copied_tagdata.position_x = undefined
+            copied_tagdata.position_y = undefined
+            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                // 後で代入する
+            }
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    tagdatas[i].tagid = "id_" + generateUUID()
+                    walk_tagdatas(tagdatas[i].child_tagdatas)
+                }
+            }
+            walk_tagdatas(copied_tagdata.child_tagdatas)
+            const tagdata_typed = JSON.parse(JSON.stringify(this.tagdata_typed), deserialize)
+            this.tagdata_typed.child_tagdatas.push(copied_tagdata)
+            this.updated_child_tagdata(tagdata_typed)
+        }
+    }
+
+    get contextmenu_style(): any {
+        return {
+            display: "inline",
+            position: "absolute",
+            left: this.x_contextmenu + "px",
+            top: this.y_contextmenu + "px",
+        }
+    }
+
+    show_contextmenu(e: MouseEvent) {
+        e.preventDefault()
+        this.x_contextmenu = e.clientX
+        this.y_contextmenu = e.clientY
+        this.is_show_contextmenu = true
+    }
+
+    initialize_table() {
+        this.is_show_table_initialize_dialog = false
+        for (let i = 0; i < this.table_rows; i++) {
+            const tr_tagdata = new TRTagData()
+            tr_tagdata.position_style = PositionStyle.None
+            for (let j = 0; j < this.table_cols; j++) {
+                const td_tagdata = new TDTagData();
+                td_tagdata.position_style = PositionStyle.None
+                tr_tagdata.child_tagdatas.push(td_tagdata)
+            }
+            this.table_initialize_target.child_tagdatas.push(tr_tagdata)
+        }
+        this.updated_child_tagdata(this.table_initialize_target)
+        this.table_rows = 1
+        this.table_cols = 1
+        this.table_initialize_target = null
+    }
+
+    initialize_ul() {
+        this.is_show_ul_initialize_dialog = false
+        for (let i = 0; i < this.ul_items; i++) {
+            const li_tagdata = new LITagData()
+            li_tagdata.position_style = PositionStyle.None
+            this.ul_initialize_target.child_tagdatas.push(li_tagdata)
+        }
+        this.updated_child_tagdata(this.ul_initialize_target)
+        this.ul_items = 1
+        this.ul_initialize_target = null
+    }
+
+    initialize_ol() {
+        this.ol_initialize_target.start = "1"
+        this.is_show_ol_initialize_dialog = false
+        for (let i = 0; i < this.ol_items; i++) {
+            const li_tagdata = new LITagData()
+            li_tagdata.value = String(i + 1)
+            li_tagdata.position_style = PositionStyle.None
+            this.ol_initialize_target.child_tagdatas.push(li_tagdata)
+        }
+        this.updated_child_tagdata(this.ol_initialize_target)
+        this.ol_items = 1
+        this.ol_initialize_target = null
+    }
+
+    initialize_img() {
+        this.is_show_img_initialize_dialog = false
+        this.img_initialize_target.src = this.img_src
+        this.updated_child_tagdata(this.ol_initialize_target)
+        this.img_src = ""
+        this.img_initialize_target = null
+    }
+
+    updated_child_tagdata(tagdata: HTMLTagDataBase) {
+        const json = JSON.stringify(this.tagdata_typed)
+        const tagdata_typed: any = JSON.parse(json, deserialize)
+        for (let i = 0; i < tagdata_typed.child_tagdatas.length; i++) {
+            if (tagdata.tagid == tagdata_typed.child_tagdatas[i].tagid) {
+                tagdata_typed.child_tagdatas[i] = tagdata
+                break
+            }
+        }
+        this.$emit('updated_tagdata', tagdata_typed)
+    }
+
+    delete_child_tagdata(html_tagdata: HTMLTagDataBase) {
+        const json = JSON.stringify(this.tagdata_typed)
+        const tagdata_typed = JSON.parse(json, deserialize)
+        let index = -1
+        for (let i = 0; i < tagdata_typed.child_tagdatas.length; i++) {
+            if (html_tagdata.tagid == tagdata_typed.child_tagdatas[i].tagid) {
+                index = i
+                break
+            }
+        }
+        if (index != -1) {
+            tagdata_typed.child_tagdatas.splice(index, 1)
+        }
+        this.$emit('updated_tagdata', tagdata_typed)
     }
 }

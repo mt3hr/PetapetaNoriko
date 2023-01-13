@@ -15,7 +15,7 @@
                 </div>
                 <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas_root"
                     :clicked_tagdata="clicked_tagdata" :show_border="show_border" :tagdata="tagdata"
-                    @updated_tagdatas_root="updated_tagdatas_root" @copy_tag="copy_tag"
+                    :copied_tagdata="copied_tagdata" @updated_tagdatas_root="updated_tagdatas_root" @copy_tag="copy_tag"
                     @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag" @delete_tagdata="delete_tagdata" />
             </body>
         </div>
@@ -290,7 +290,7 @@ export default class DropZone extends Vue {
                     this.ol_initialize_target = tag_data as OLTagData
                     this.is_show_ol_initialize_dialog = true
                     break
-                } 
+                }
                 case "img": {
                     this.img_src = ""
                     this.img_initialize_target = tag_data as IMGTagData
