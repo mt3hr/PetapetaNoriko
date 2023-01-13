@@ -517,7 +517,7 @@ export default class HTMLTagViewBase extends Vue {
     initialize_img() {
         this.is_show_img_initialize_dialog = false
         this.img_initialize_target.src = this.img_src
-        this.updated_child_tagdata(this.ol_initialize_target)
+        this.updated_child_tagdata(this.img_initialize_target)
         this.img_src = ""
         this.img_initialize_target = null
     }

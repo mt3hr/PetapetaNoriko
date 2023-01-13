@@ -410,7 +410,6 @@ export default class DropZone extends Vue {
         let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
         walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
             for (let i = 0; i < tagdatas.length; i++) {
-                let html_tagdata = tagdatas[i]
                 if (tagdata.tagid == tagdatas[i].tagid) {
                     tagdatas.splice(i, 1)
                     return true
@@ -494,7 +493,7 @@ export default class DropZone extends Vue {
     initialize_img() {
         this.is_show_img_initialize_dialog = false
         this.img_initialize_target.src = this.img_src
-        this.updated_tagdata(this.ol_initialize_target)
+        this.updated_tagdata(this.img_initialize_target)
         this.img_src = ""
         this.img_initialize_target = null
     }
