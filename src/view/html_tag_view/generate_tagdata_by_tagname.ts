@@ -37,6 +37,7 @@ import TDTagData from "@/html_tagdata/TDTagData"
 import TelTagData from "@/html_tagdata/TelTagData"
 import TextAreaTagData from "@/html_tagdata/TextAreaTagData"
 import TextTagData from "@/html_tagdata/TextTagData"
+import THTagData from "@/html_tagdata/THTagData"
 import TimeTagData from "@/html_tagdata/TimeTagData"
 import TRTagData from "@/html_tagdata/TRTagData"
 import ULTagData from "@/html_tagdata/ULTagData"
@@ -85,6 +86,9 @@ export function generate_tagdata_by_tagname(tagname: string): HTMLTagDataBase {
             break
         case "table":
             tag_data = new TableTagData()
+            break
+        case "th":
+            tag_data = new THTagData()
             break
         case "tr":
             tag_data = new TRTagData()

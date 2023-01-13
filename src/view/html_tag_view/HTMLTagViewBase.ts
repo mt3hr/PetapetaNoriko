@@ -96,7 +96,6 @@ export default class HTMLTagViewBase extends Vue {
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             const tagname = e.dataTransfer.getData("ppmk/htmltag")
             const tag_data: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
-            console.log(tagname)
 
             let depth = 0
             let child_appended = false
@@ -116,7 +115,6 @@ export default class HTMLTagViewBase extends Vue {
                                 tagdatas[i].child_tagdatas.push(tag_data)
                             }
                             child_appended = true
-                            console.log("a")
                             return true
                         }
                     }
@@ -145,7 +143,6 @@ export default class HTMLTagViewBase extends Vue {
                                 tag_data.position_style = PositionStyle.None
                                 tag_data.position_x = undefined
                                 tag_data.position_y = undefined
-                                console.log(1)
                             }
                             if (e.shiftKey) {
                                 tagdatas.splice(i, 0, tag_data)

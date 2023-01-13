@@ -14,11 +14,10 @@ import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase';
 import TableTagData from '@/html_tagdata/TableTagData';
 import { deserialize } from '@/serializable/serializable';
 import { Options } from 'vue-class-component';
-import { Prop, Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 import HTMLTagView from '@/view/HTMLTagView.vue';
 import { generate_tagdata_by_tagname } from './generate_tagdata_by_tagname';
-import IMGTagData from '@/html_tagdata/IMGTagData';
+import { Watch } from 'vue-property-decorator';
 
 @Options({
     components: {

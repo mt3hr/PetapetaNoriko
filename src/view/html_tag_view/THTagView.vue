@@ -1,5 +1,5 @@
 <template>
-    <td :style="position_css" dropzone="true" @dragover="on_dragover" @click.prevent.stop="onclick_tag"
+    <th :style="position_css" dropzone="true" @dragover="on_dragover" @click.prevent.stop="onclick_tag"
         :class="tagclass" :id="tagdata.tagid" @drop="(e) => on_drop(e, tagdata)" :colspan="colspan" :rowspan="rowspan"
         :headers="headers" @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
@@ -7,11 +7,11 @@
             :tagdatas_root="tagdatas_root" @copy_tag="copy_tag" :tagdata="child_tagdata"
             @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_child_tag"
             @delete_tagdata="delete_child_tagdata" />
-    </td>
+    </th>
 </template>
 <script lang="ts">
 import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase';
-import TDTagData from '@/html_tagdata/TDTagData';
+import THTagData from '@/html_tagdata/THTagData';
 import { deserialize } from '@/serializable/serializable';
 import { Options } from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
@@ -26,7 +26,7 @@ import IMGTagData from '@/html_tagdata/IMGTagData';
         HTMLTagView,
     }
 })
-export default class TDTagView extends HTMLTagViewBase {
+export default class THTagView extends HTMLTagViewBase {
     tagclass: string
     colspan: string
     rowspan: string
@@ -37,7 +37,7 @@ export default class TDTagView extends HTMLTagViewBase {
     @Watch('rowspan')
     @Watch('headers')
     update_tagdata() {
-        let tagdata: TDTagData = new TDTagData()
+        let tagdata: THTagData = new THTagData()
         tagdata.tagid = this.tagdata.tagid
         tagdata.tagclass = this.tagclass
         tagdata.colspan = this.colspan
@@ -46,7 +46,7 @@ export default class TDTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): TDTagData { return this.tagdata as TDTagData }
+    get tagdata_typed(): THTagData { return this.tagdata as THTagData }
 
     @Watch('tagdata')
     update_view() {
@@ -70,7 +70,7 @@ export default class TDTagView extends HTMLTagViewBase {
 
     updated_child_tagdata(tagdata: HTMLTagDataBase) {
         let json = JSON.stringify(this.tagdata_typed)
-        let tagdata_typed: TDTagData = JSON.parse(json, deserialize)
+        let tagdata_typed: THTagData = JSON.parse(json, deserialize)
         for (let i = 0; i < tagdata_typed.child_tagdatas.length; i++) {
             if (tagdata.tagid == tagdata_typed.child_tagdatas[i].tagid) {
                 tagdata_typed.child_tagdatas[i] = tagdata
@@ -82,7 +82,7 @@ export default class TDTagView extends HTMLTagViewBase {
 
     delete_child_tagdata(html_tagdata: HTMLTagDataBase) {
         let json = JSON.stringify(this.tagdata_typed)
-        let tagdata_typed: TDTagData = JSON.parse(json, deserialize)
+        let tagdata_typed: THTagData = JSON.parse(json, deserialize)
         let index = -1
         for (let i = 0; i < tagdata_typed.child_tagdatas.length; i++) {
             if (html_tagdata.tagid == tagdata_typed.child_tagdatas[i].tagid) {
@@ -95,7 +95,6 @@ export default class TDTagView extends HTMLTagViewBase {
         }
         this.$emit('updated_tagdata', tagdata_typed)
     }
-
 
     beforeCreate(): void {
         (this as any).$options.components.HTMLTagView = HTMLTagView
@@ -111,7 +110,7 @@ export default class TDTagView extends HTMLTagViewBase {
 
 </script>
 <style scoped>
-td {
+th {
     min-width: 30px;
     min-height: 30px;
 }

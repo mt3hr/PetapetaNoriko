@@ -24,6 +24,89 @@
                 <v-list-item @click="paste_tag">貼り付け</v-list-item>
             </v-list>
         </v-menu>
+        <v-dialog v-model="is_show_table_initialize_dialog">
+            <v-card class="pa-5">
+                <v-card-title>
+                    <v-row>
+                        <v-col cols="auto">
+                            Table初期化
+                        </v-col>
+                        <v-spacer />
+                    </v-row>
+                </v-card-title>
+                <v-row>
+                    <v-col cols="auto">行数</v-col>
+                    <v-col cols="auto"><input @keypress.enter="initialize_table" type="number" v-model="table_rows"
+                            default="1" /></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">列数</v-col>
+                    <v-col cols="auto"><input @keypress.enter="initialize_table" type="number" v-model="table_cols"
+                            default="1" /></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_table_initialize_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="initialize_table">作成</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_ul_initialize_dialog">
+            <v-card class="pa-5">
+                <v-card-title>
+                    <v-row>
+                        <v-col cols="auto">
+                            UL初期化
+                        </v-col>
+                        <v-spacer />
+                    </v-row>
+                </v-card-title>
+                <v-row>
+                    <v-col cols="auto">アイテム数</v-col>
+                    <v-col cols="auto"><input @keypress.enter="initialize_ul" type="number" v-model="ul_items"
+                            default="1" /></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_ul_initialize_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="initialize_ul">作成</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_ol_initialize_dialog">
+            <v-card class="pa-5">
+                <v-card-title>
+                    <v-row>
+                        <v-col cols="auto">
+                            OL初期化
+                        </v-col>
+                        <v-spacer />
+                    </v-row>
+                </v-card-title>
+                <v-row>
+                    <v-col cols="auto">アイテム数</v-col>
+                    <v-col cols="auto"><input @keypress.enter="initialize_ol" type="number" v-model="ol_items"
+                            default="1" /></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_ol_initialize_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="initialize_ol">作成</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -36,6 +119,12 @@ import { Prop } from 'vue-property-decorator'
 import { deserialize } from '@/serializable/serializable'
 import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by_tagname'
 import generateUUID from '@/uuid'
+import TableTagData from '@/html_tagdata/TableTagData'
+import TRTagData from '@/html_tagdata/TRTagData'
+import TDTagData from '@/html_tagdata/TDTagData'
+import ULTagData from '@/html_tagdata/ULTagData'
+import OLTagData from '@/html_tagdata/OLTagData'
+import LITagData from '@/html_tagdata/LITagData'
 
 @Options({
     components: {
@@ -55,6 +144,19 @@ export default class DropZone extends Vue {
     is_show_contextmenu = false
     x_contextmenu = 0
     y_contextmenu = 0
+
+    is_show_table_initialize_dialog = false
+    table_initialize_target: TableTagData = null
+    table_rows = 1
+    table_cols = 1
+
+    is_show_ul_initialize_dialog = false
+    ul_initialize_target: ULTagData = null
+    ul_items = 1
+
+    is_show_ol_initialize_dialog = false
+    ol_initialize_target: OLTagData = null
+    ol_items = 1
 
     paste_tag() {
         if (this.copied_tagdata.tagname != 'tagbase') {
@@ -138,6 +240,29 @@ export default class DropZone extends Vue {
             let tag_data: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
             tag_data.position_x = e.offsetX
             tag_data.position_y = e.offsetY
+
+            switch (tagname) {
+                case "table": {
+                    this.table_rows = 1
+                    this.table_cols = 1
+                    this.table_initialize_target = tag_data as TableTagData
+                    this.is_show_table_initialize_dialog = true
+                    break
+                }
+                case "ul": {
+                    this.ul_items
+                    this.ul_initialize_target = tag_data as ULTagData
+                    this.is_show_ul_initialize_dialog = true
+                    break
+                }
+                case "ol": {
+                    this.ol_items
+                    this.ol_initialize_target = tag_data as OLTagData
+                    this.is_show_ol_initialize_dialog = true
+                    break
+                }
+            }
+
             this.html_tagdatas.push(tag_data)
             this.updated_tagdata(tag_data)
             this.$nextTick(() => {
@@ -284,6 +409,46 @@ export default class DropZone extends Vue {
 
     add_page() {
         this.$emit('add_page')
+    }
+
+    initialize_table() {
+        this.is_show_table_initialize_dialog = false
+        for (let i = 0; i < this.table_rows; i++) {
+            let tr_tagdata = new TRTagData()
+            tr_tagdata.position_style = PositionStyle.None
+            for (let j = 0; j < this.table_cols; j++) {
+                let td_tagdata = new TDTagData();
+                td_tagdata.position_style = PositionStyle.None
+                tr_tagdata.child_tagdatas.push(td_tagdata)
+            }
+            this.table_initialize_target.child_tagdatas.push(tr_tagdata)
+        }
+        this.updated_tagdata(this.table_initialize_target)
+        this.table_initialize_target = null
+    }
+
+    initialize_ul() {
+        this.is_show_ul_initialize_dialog = false
+        for (let i = 0; i < this.ul_items; i++) {
+            let li_tagdata = new LITagData()
+            li_tagdata.position_style = PositionStyle.None
+            this.ul_initialize_target.child_tagdatas.push(li_tagdata)
+        }
+        this.updated_tagdata(this.ul_initialize_target)
+        this.ul_initialize_target = null
+    }
+
+    initialize_ol() {
+        this.ol_initialize_target.start = "1"
+        this.is_show_ol_initialize_dialog = false
+        for (let i = 0; i < this.ol_items; i++) {
+            let li_tagdata = new LITagData()
+            li_tagdata.value = String(i + 1)
+            li_tagdata.position_style = PositionStyle.None
+            this.ol_initialize_target.child_tagdatas.push(li_tagdata)
+        }
+        this.updated_tagdata(this.ol_initialize_target)
+        this.ol_initialize_target = null
     }
 }
 </script>

@@ -99,7 +99,7 @@ export default class TRTagView extends HTMLTagViewBase {
 </script>
 <style scoped>
 tr {
-    min-width: 15px;
+    min-width: 30px;
     min-height: 30px;
 }
 </style>

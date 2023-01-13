@@ -6,11 +6,11 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"os/signal"
 	"runtime"
-	"strconv"
 	"strings"
 
 	"github.com/asticode/go-astikit"
@@ -22,13 +22,17 @@ import (
 func init() {
 	cobra.MousetrapHelpText = "" // Windowsでマウスから起動しても怒られないようにする
 	cmd.AddCommand(serverCmd)
+	cmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", proxy, "proxy")
+	cmd.PersistentFlags().Uint16VarP(&port, "port", "p", port, "port")
 }
 
 var (
 	//go:embed dist
 	htmlFS embed.FS // htmlファイル郡
 
-	port      = 51520
+	port  = uint16(51520)
+	proxy = ""
+
 	serverCmd = &cobra.Command{
 		Use: "server",
 		PersistentPreRun: func(_ *cobra.Command, _ []string) {
@@ -40,8 +44,19 @@ var (
 		},
 	}
 	cmd = &cobra.Command{
-		Use: "rykv",
+		Use: "ppmk",
 		PersistentPreRun: func(_ *cobra.Command, _ []string) {
+			if proxy != "" {
+
+				proxyUrl, err := url.Parse(proxy)
+				if err != nil {
+					panic(err)
+				}
+				http.DefaultTransport = &http.Transport{
+					Proxy: http.ProxyURL(proxyUrl),
+				}
+			}
+
 		},
 		Run: func(_ *cobra.Command, _ []string) {
 			interceptCh := make(chan os.Signal)
@@ -60,7 +75,7 @@ var (
 
 				address := ""
 				address += "http://localhost"
-				address += ":" + strconv.Itoa(port)
+				address += ":" + fmt.Sprintf("%d", port)
 
 				// Initialize astilectron
 				a, err := astilectron.New(nil, astilectron.Options{
@@ -74,7 +89,10 @@ var (
 				defer a.Close()
 
 				// Start astilectron
-				a.Start()
+				err = a.Start()
+				if err != nil {
+					panic(err)
+				}
 
 				contextIsolation := false
 				// Create a new window
@@ -102,8 +120,12 @@ var (
 					}
 					return nil
 				})
-				w.Create()
-				w.ExecuteJavaScript(`// aタグがクリックされた時にelectronで開かず、デフォルトのブラウザで開く
+				err = w.Create()
+				if err != nil {
+					panic(err)
+				}
+
+				err = w.ExecuteJavaScript(`// aタグがクリックされた時にelectronで開かず、デフォルトのブラウザで開く
 document.addEventListener('click', (e) => {
   for (let i = 0; i < e.path.length; i++) {
     let element = e.path[i]
@@ -118,6 +140,9 @@ document.addEventListener('click', (e) => {
   }
 })
 `)
+				if err != nil {
+					panic(err)
+				}
 
 				// Blocking pattern
 				a.Wait()
@@ -159,7 +184,7 @@ func launchServer() error {
 	router.PathPrefix("/").Handler(http.FileServer(http.FS(html)))
 
 	var handler http.Handler = router
-	err = http.ListenAndServe(":"+strconv.Itoa(port), handler)
+	err = http.ListenAndServe(":"+fmt.Sprintf("%d", port), handler)
 	if err != nil {
 		err = fmt.Errorf("failed to launch server: %w", err)
 		return err
