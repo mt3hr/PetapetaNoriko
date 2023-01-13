@@ -140,6 +140,11 @@ export default class DropZone extends Vue {
             tag_data.position_y = e.offsetY
             this.html_tagdatas.push(tag_data)
             this.updated_tagdata(tag_data)
+            this.$nextTick(() => {
+                this.$nextTick(() => {
+                    this.onclick_tag(tag_data)
+                })
+            })
         } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
             // すでに配置されたコンポーネントの移動
             let json = JSON.stringify(this.html_tagdatas)
@@ -161,6 +166,11 @@ export default class DropZone extends Vue {
                 }
                 this.$emit('updated_htmltagdatas', html_tagdatas_root, null)
                 e.stopPropagation()
+                this.$nextTick(() => {
+                    this.$nextTick(() => {
+                        this.onclick_tag(move_tagdata)
+                    })
+                })
             }
             if (move_in_root) return
 
