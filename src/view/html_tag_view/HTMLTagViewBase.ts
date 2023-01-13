@@ -1,7 +1,7 @@
 import HTMLTagDataBase, { PositionStyle } from "@/html_tagdata/HTMLTagDataBase";
 import IMGTagData from "@/html_tagdata/IMGTagData";
 import { deserialize } from "@/serializable/serializable";
-import { Vue } from "vue-class-component";
+import { Options, Vue } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator"
 import { generate_tagdata_by_tagname } from "./generate_tagdata_by_tagname";
 import HTMLTagView from '../HTMLTagView.vue';
@@ -13,6 +13,12 @@ import TRTagData from '@/html_tagdata/TRTagData';
 import TDTagData from '@/html_tagdata/TDTagData';
 import LITagData from '@/html_tagdata/LITagData';
 
+
+@Options({
+    components: {
+        HTMLTagView,
+    }
+})
 export default class HTMLTagViewBase extends Vue {
     @Prop({ require: true }) tagdata: HTMLTagDataBase
     @Prop({ require: true }) tagdatas_root: Array<HTMLTagDataBase>
@@ -408,7 +414,6 @@ export default class HTMLTagViewBase extends Vue {
     delete_tag(tagdata: HTMLTagDataBase) {
         this.$emit("delete_tag", tagdata)
     }
-
 
     is_show_contextmenu = false
     x_contextmenu = 0

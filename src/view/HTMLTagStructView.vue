@@ -10,6 +10,121 @@
                     :html_tagdatas_root="html_tagdatas" @updated_html_tagdatas="updated_html_tagdatas" />
             </ul>
         </div>
+        <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
+            <v-list>
+                <v-list-item v-if="copied_tagdata.tagname != 'tagbase'" @click="paste_tag">貼り付け</v-list-item>
+            </v-list>
+        </v-menu>
+        <v-dialog v-model="is_show_table_initialize_dialog">
+            <v-card class="pa-5">
+                <v-card-title>
+                    <v-row>
+                        <v-col cols="auto">
+                            Table初期化
+                        </v-col>
+                        <v-spacer />
+                    </v-row>
+                </v-card-title>
+                <v-row>
+                    <v-col cols="auto">行数</v-col>
+                    <v-col cols="auto"><input @keypress.enter="initialize_table" type="number" v-model="table_rows"
+                            default="1" /></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">列数</v-col>
+                    <v-col cols="auto"><input @keypress.enter="initialize_table" type="number" v-model="table_cols"
+                            default="1" /></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_table_initialize_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="initialize_table">作成</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_ul_initialize_dialog">
+            <v-card class="pa-5">
+                <v-card-title>
+                    <v-row>
+                        <v-col cols="auto">
+                            UL初期化
+                        </v-col>
+                        <v-spacer />
+                    </v-row>
+                </v-card-title>
+                <v-row>
+                    <v-col cols="auto">アイテム数</v-col>
+                    <v-col cols="auto"><input @keypress.enter="initialize_ul" type="number" v-model="ul_items"
+                            default="1" /></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_ul_initialize_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="initialize_ul">作成</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_ol_initialize_dialog">
+            <v-card class="pa-5">
+                <v-card-title>
+                    <v-row>
+                        <v-col cols="auto">
+                            OL初期化
+                        </v-col>
+                        <v-spacer />
+                    </v-row>
+                </v-card-title>
+                <v-row>
+                    <v-col cols="auto">アイテム数</v-col>
+                    <v-col cols="auto"><input @keypress.enter="initialize_ol" type="number" v-model="ol_items"
+                            default="1" /></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_ol_initialize_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="initialize_ol">作成</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_img_initialize_dialog">
+            <v-card class="pa-5">
+                <v-card-title>
+                    <v-row>
+                        <v-col cols="auto">
+                            IMG初期化
+                        </v-col>
+                        <v-spacer />
+                    </v-row>
+                </v-card-title>
+                <v-row>
+                    <v-col cols="auto">URL</v-col>
+                    <v-col cols="auto"><input @keypress.enter="initialize_img" type="url" v-model="img_src"
+                            default="1" /></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_img_initialize_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="initialize_img">作成</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+
     </div>
 </template>
 <script lang="ts">
@@ -18,6 +133,15 @@ import { Options, Vue } from 'vue-class-component';
 import HTMLTagStructViewLi from '@/view/HTMLTagStructViewLi.vue'
 import { deserialize } from '@/serializable/serializable';
 import { Prop } from 'vue-property-decorator';
+import TableTagData from '@/html_tagdata/TableTagData';
+import ULTagData from '@/html_tagdata/ULTagData';
+import OLTagData from '@/html_tagdata/OLTagData';
+import IMGTagData from '@/html_tagdata/IMGTagData';
+import generateUUID from '@/uuid';
+import TRTagData from '@/html_tagdata/TRTagData';
+import TDTagData from '@/html_tagdata/TDTagData';
+import LITagData from '@/html_tagdata/LITagData';
+import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by_tagname';
 
 @Options({
     components: {
@@ -41,30 +165,76 @@ export default class HTMLTagPropertyView extends Vue {
         let json = JSON.stringify(this.html_tagdatas)
         html_tagdatas = JSON.parse(json, deserialize)
 
-        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
-        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
-            for (let i = 0; i < tagdatas.length; i++) {
-                if (e.dataTransfer.getData("ppmk/struct_li_id") == tagdatas[i].tagid) {
-                    move_tagdata = tagdatas[i]
-                    tagdatas.splice(i, 1)
-                    return true
+        let tagid: string = null
+        if (e.dataTransfer.getData("ppmk/struct_li_id")) tagid = e.dataTransfer.getData("ppmk/struct_li_id")
+        if (e.dataTransfer.getData("ppmk/move_tag_id")) tagid = e.dataTransfer.getData("ppmk/move_tag_id")
+
+        if (e.dataTransfer.getData("ppmk/htmltag")) {
+            const tagname = e.dataTransfer.getData("ppmk/htmltag")
+            const tagdata: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
+
+            if (e.shiftKey) {
+                html_tagdatas.unshift(tagdata)
+            } else if (e.ctrlKey) {
+                html_tagdatas.push(tagdata)
+            } else {
+                html_tagdatas.push(tagdata)
+            }
+
+            switch (tagname) {
+                case "table": {
+                    this.table_rows = 1
+                    this.table_cols = 1
+                    this.table_initialize_target = tagdata as TableTagData
+                    this.is_show_table_initialize_dialog = true
+                    break
                 }
-                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
-                    return true
+                case "ul": {
+                    this.ul_items = 1
+                    this.ul_initialize_target = tagdata as ULTagData
+                    this.is_show_ul_initialize_dialog = true
+                    break
+                }
+                case "ol": {
+                    this.ol_items = 1
+                    this.ol_initialize_target = tagdata as OLTagData
+                    this.is_show_ol_initialize_dialog = true
+                    break
+                }
+                case "img": {
+                    this.img_src = ""
+                    this.img_initialize_target = tagdata as IMGTagData
+                    this.is_show_img_initialize_dialog = true
+                    break
                 }
             }
-            return false
-        }
-        walk_tagdatas(html_tagdatas)
-        move_tagdata.position_style = PositionStyle.Absolute
+        } else if (tagid) {
+            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    if (e.dataTransfer.getData("ppmk/struct_li_id") == tagdatas[i].tagid) {
+                        move_tagdata = tagdatas[i]
+                        tagdatas.splice(i, 1)
+                        return true
+                    }
+                    if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                        return true
+                    }
+                }
+                return false
+            }
+            walk_tagdatas(html_tagdatas)
+            move_tagdata.position_style = PositionStyle.Absolute
 
-        if (e.shiftKey) {
-            html_tagdatas.unshift(move_tagdata)
-        } else if (e.ctrlKey) {
-            html_tagdatas.push(move_tagdata)
-        } else {
-            html_tagdatas.push(move_tagdata)
+            if (e.shiftKey) {
+                html_tagdatas.unshift(move_tagdata)
+            } else if (e.ctrlKey) {
+                html_tagdatas.push(move_tagdata)
+            } else {
+                html_tagdatas.push(move_tagdata)
+            }
         }
+
         this.updated_html_tagdatas(html_tagdatas)
     }
 
@@ -90,6 +260,118 @@ export default class HTMLTagPropertyView extends Vue {
 
     updated_tagdata(tagdata: HTMLTagDataBase) {
         this.$emit('updated_tagdata', tagdata)
+    }
+
+    is_show_contextmenu = false
+    x_contextmenu = 0
+    y_contextmenu = 0
+
+    is_show_table_initialize_dialog = false
+    table_initialize_target: TableTagData = null
+    table_rows = 1
+    table_cols = 1
+
+    is_show_ul_initialize_dialog = false
+    ul_initialize_target: ULTagData = null
+    ul_items = 1
+
+    is_show_ol_initialize_dialog = false
+    ol_initialize_target: OLTagData = null
+    ol_items = 1
+
+    is_show_img_initialize_dialog = false
+    img_initialize_target: IMGTagData = null
+    img_src = ""
+
+    paste_tag() {
+        if (this.copied_tagdata.tagname != 'tagbase') {
+            const copied_tagdata: HTMLTagDataBase = JSON.parse(JSON.stringify(this.copied_tagdata), deserialize)
+            copied_tagdata.tagid = "id_" + generateUUID()
+            copied_tagdata.position_style = PositionStyle.None
+            copied_tagdata.position_x = undefined
+            copied_tagdata.position_y = undefined
+            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                // 後で代入する
+            }
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    tagdatas[i].tagid = "id_" + generateUUID()
+                    walk_tagdatas(tagdatas[i].child_tagdatas)
+                }
+            }
+            walk_tagdatas(copied_tagdata.child_tagdatas)
+            const tagdatas = JSON.parse(JSON.stringify(this.html_tagdatas), deserialize)
+            tagdatas.push(copied_tagdata)
+            this.updated_tagdata(tagdatas)
+        }
+    }
+
+    get contextmenu_style(): any {
+        return {
+            display: "inline",
+            position: "absolute",
+            left: this.x_contextmenu + "px",
+            top: this.y_contextmenu + "px",
+        }
+    }
+
+    show_contextmenu(e: MouseEvent) {
+        e.preventDefault()
+        this.x_contextmenu = e.clientX
+        this.y_contextmenu = e.clientY
+        this.is_show_contextmenu = true
+    }
+
+    initialize_table() {
+        this.is_show_table_initialize_dialog = false
+        for (let i = 0; i < this.table_rows; i++) {
+            const tr_tagdata = new TRTagData()
+            tr_tagdata.position_style = PositionStyle.None
+            for (let j = 0; j < this.table_cols; j++) {
+                const td_tagdata = new TDTagData();
+                td_tagdata.position_style = PositionStyle.None
+                tr_tagdata.child_tagdatas.push(td_tagdata)
+            }
+            this.table_initialize_target.child_tagdatas.push(tr_tagdata)
+        }
+        this.updated_tagdata(this.table_initialize_target)
+        this.table_rows = 1
+        this.table_cols = 1
+        this.table_initialize_target = null
+    }
+
+    initialize_ul() {
+        this.is_show_ul_initialize_dialog = false
+        for (let i = 0; i < this.ul_items; i++) {
+            const li_tagdata = new LITagData()
+            li_tagdata.position_style = PositionStyle.None
+            this.ul_initialize_target.child_tagdatas.push(li_tagdata)
+        }
+        this.updated_tagdata(this.ul_initialize_target)
+        this.ul_items = 1
+        this.ul_initialize_target = null
+    }
+
+    initialize_ol() {
+        this.ol_initialize_target.start = "1"
+        this.is_show_ol_initialize_dialog = false
+        for (let i = 0; i < this.ol_items; i++) {
+            const li_tagdata = new LITagData()
+            li_tagdata.value = String(i + 1)
+            li_tagdata.position_style = PositionStyle.None
+            this.ol_initialize_target.child_tagdatas.push(li_tagdata)
+        }
+        this.updated_tagdata(this.ol_initialize_target)
+        this.ol_items = 1
+        this.ol_initialize_target = null
+    }
+
+    initialize_img() {
+        this.is_show_img_initialize_dialog = false
+        this.img_initialize_target.src = this.img_src
+        this.updated_tagdata(this.img_initialize_target)
+        this.img_src = ""
+        this.img_initialize_target = null
     }
 }
 </script>

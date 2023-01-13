@@ -336,6 +336,10 @@ export default class HTMLTagView extends Vue {
     copy_tag(tagdata: HTMLTagDataBase) {
         this.$emit("copy_tag", tagdata)
     }
+
+    beforeCreate(): void {
+        (this as any).$options.components.HTMLTagView = HTMLTagView
+    }
 }
 </script>
 <style scoped>
