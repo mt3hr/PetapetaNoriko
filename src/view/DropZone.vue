@@ -107,6 +107,32 @@
                 </v-row>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="is_show_img_initialize_dialog">
+            <v-card class="pa-5">
+                <v-card-title>
+                    <v-row>
+                        <v-col cols="auto">
+                            IMG初期化
+                        </v-col>
+                        <v-spacer />
+                    </v-row>
+                </v-card-title>
+                <v-row>
+                    <v-col cols="auto">URL</v-col>
+                    <v-col cols="auto"><input @keypress.enter="initialize_img" type="url" v-model="img_src"
+                            default="1" /></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_img_initialize_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="initialize_img">作成</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -157,6 +183,10 @@ export default class DropZone extends Vue {
     is_show_ol_initialize_dialog = false
     ol_initialize_target: OLTagData = null
     ol_items = 1
+
+    is_show_img_initialize_dialog = false
+    img_initialize_target: IMGTagData = null
+    img_src = ""
 
     paste_tag() {
         if (this.copied_tagdata.tagname != 'tagbase') {
@@ -250,15 +280,21 @@ export default class DropZone extends Vue {
                     break
                 }
                 case "ul": {
-                    this.ul_items
+                    this.ul_items = 1
                     this.ul_initialize_target = tag_data as ULTagData
                     this.is_show_ul_initialize_dialog = true
                     break
                 }
                 case "ol": {
-                    this.ol_items
+                    this.ol_items = 1
                     this.ol_initialize_target = tag_data as OLTagData
                     this.is_show_ol_initialize_dialog = true
+                    break
+                } 
+                case "img": {
+                    this.img_src = ""
+                    this.img_initialize_target = tag_data as IMGTagData
+                    this.is_show_img_initialize_dialog = true
                     break
                 }
             }
@@ -424,6 +460,8 @@ export default class DropZone extends Vue {
             this.table_initialize_target.child_tagdatas.push(tr_tagdata)
         }
         this.updated_tagdata(this.table_initialize_target)
+        this.table_rows = 1
+        this.table_cols = 1
         this.table_initialize_target = null
     }
 
@@ -435,6 +473,7 @@ export default class DropZone extends Vue {
             this.ul_initialize_target.child_tagdatas.push(li_tagdata)
         }
         this.updated_tagdata(this.ul_initialize_target)
+        this.ul_items = 1
         this.ul_initialize_target = null
     }
 
@@ -448,7 +487,16 @@ export default class DropZone extends Vue {
             this.ol_initialize_target.child_tagdatas.push(li_tagdata)
         }
         this.updated_tagdata(this.ol_initialize_target)
+        this.ol_items = 1
         this.ol_initialize_target = null
+    }
+
+    initialize_img() {
+        this.is_show_img_initialize_dialog = false
+        this.img_initialize_target.src = this.img_src
+        this.updated_tagdata(this.ol_initialize_target)
+        this.img_src = ""
+        this.img_initialize_target = null
     }
 }
 </script>

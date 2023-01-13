@@ -1,11 +1,11 @@
 <template>
     <div :style="position_css" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover"
-        @click.prevent.stop="onclick_tag" :class="tagclass" :id="tagdata.tagid"
+        @click.prevent.stop="onclick_tag(tagdata)" :class="tagclass" :id="tagdata.tagid"
         @drop.prevent.stop="(e) => on_drop(e, tagdata)" @dragover.prevent="on_dragover">
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
             :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border"
             :tagdatas_root="tagdatas_root" @copy_tag="copy_tag" :tagdata="child_tagdata"
-            @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_child_tag"
+            @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_tag"
             @delete_tagdata="delete_child_tagdata" />
     </div>
 </template>
@@ -48,14 +48,6 @@ export default class DivTagView extends HTMLTagViewBase {
         this.update_view()
     }
 
-    onclick_tag() {
-        this.$emit("onclick_tag", this.tagdata_typed)
-    }
-
-    onclick_child_tag(tagdata: HTMLTagDataBase) {
-        this.$emit("onclick_tag", tagdata)
-    }
-
     updated_child_tagdata(tagdata: HTMLTagDataBase) {
         let json = JSON.stringify(this.tagdata_typed)
         let tagdata_typed: DivTagData = JSON.parse(json, deserialize)
@@ -82,17 +74,6 @@ export default class DivTagView extends HTMLTagViewBase {
             tagdata_typed.child_tagdatas.splice(index, 1)
         }
         this.$emit('updated_tagdata', tagdata_typed)
-    }
-
-    beforeCreate(): void {
-        (this as any).$options.components.HTMLTagView = HTMLTagView
-    }
-
-    updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
-        this.$emit("updated_tagdatas_root", tagdatas)
-    }
-    copy_tag(tagdata: HTMLTagDataBase) {
-        this.$emit("copy_tag", tagdata)
     }
 }
 

@@ -4,6 +4,7 @@ import { deserialize } from "@/serializable/serializable";
 import { Vue } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator"
 import { generate_tagdata_by_tagname } from "./generate_tagdata_by_tagname";
+import HTMLTagView from '../HTMLTagView.vue';
 
 export default class HTMLTagViewBase extends Vue {
     @Prop({ require: true }) tagdata: HTMLTagDataBase
@@ -164,6 +165,9 @@ export default class HTMLTagViewBase extends Vue {
                 walk_tagdatas(html_tagdatas_root)
             }
             this.updated_html_tagdatas(html_tagdatas_root)
+            this.$nextTick(() => {
+                this.onclick_tag(tag_data)
+            })
         } else if (tagid) {
             if (!this.can_drop(tagid, tagdata)) {
                 return
@@ -256,6 +260,9 @@ export default class HTMLTagViewBase extends Vue {
                 walk_tagdatas(html_tagdatas_root)
             }
             this.updated_html_tagdatas(html_tagdatas_root)
+            this.$nextTick(() => {
+                this.onclick_tag(move_tagdata)
+            })
         } else if (e.dataTransfer.items.length != 0) {
             const reader = new FileReader()
             reader.onload = (event: any) => {
@@ -331,6 +338,9 @@ export default class HTMLTagViewBase extends Vue {
                     walk_tagdatas(html_tagdatas_root)
                 }
                 this.updated_html_tagdatas(html_tagdatas_root)
+                this.$nextTick(() => {
+                    this.onclick_tag(tag_data)
+                })
             }
             reader.readAsDataURL(e.dataTransfer.files[0])
             e.preventDefault()
@@ -341,5 +351,20 @@ export default class HTMLTagViewBase extends Vue {
 
     updated_html_tagdatas(html_tagdatas_root: Array<HTMLTagDataBase>) {
         this.$emit('updated_tagdatas_root', html_tagdatas_root)
+    }
+
+    onclick_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("onclick_tag", tagdata)
+    }
+
+    beforeCreate(): void {
+        (this as any).$options.components.HTMLTagView = HTMLTagView
+    }
+
+    updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
+        this.$emit("updated_tagdatas_root", tagdatas)
+    }
+    copy_tag(tagdata: HTMLTagDataBase) {
+        this.$emit("copy_tag", tagdata)
     }
 }
