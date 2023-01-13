@@ -449,7 +449,7 @@ export default class HTMLTagViewBase extends Vue {
             }
             walk_tagdatas(copied_tagdata.child_tagdatas)
             const tagdata_typed = JSON.parse(JSON.stringify(this.tagdata_typed), deserialize)
-            this.tagdata_typed.child_tagdatas.push(copied_tagdata)
+            tagdata_typed.child_tagdatas.push(copied_tagdata)
             this.updated_child_tagdata(tagdata_typed)
         }
     }

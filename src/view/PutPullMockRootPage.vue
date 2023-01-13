@@ -64,6 +64,7 @@
                         <v-col cols="auto">
                             <!--構造ビュー-->
                             <HTMLTagStructView @onclick_tag="onclick_tag" class="component struct_view"
+                                @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
                                 :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" ref="struct_view"
                                 :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view"
                                 @delete_tagdata="delete_tagdata"
@@ -738,6 +739,11 @@ export default class PutPullMockRootPage extends Vue {
     add_page() {
         let page_list_view: any = this.$refs['page_list_view']
         page_list_view.add_page()
+    }
+
+    updated_tagdata(tagdata: HTMLTagDataBase) {
+        let dropzone: any = this.$refs["dropzone"]
+        dropzone.updated_tagdata(tagdata)
     }
 }
 </script>

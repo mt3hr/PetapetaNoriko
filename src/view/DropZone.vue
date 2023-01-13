@@ -21,7 +21,7 @@
         </div>
         <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
             <v-list v-if="copied_tagdata.tagname != 'tagbase'">
-                <v-list-item @click="paste_tag">貼り付け</v-list-item>
+                <v-list-item v-if="copied_tagdata.tagname != 'tagbase'" @click="paste_tag">貼り付け</v-list-item>
             </v-list>
         </v-menu>
         <v-dialog v-model="is_show_table_initialize_dialog">

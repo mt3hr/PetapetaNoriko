@@ -6,6 +6,7 @@
         <span>({{ tagdata.to_string() }})</span>
         <ul v-if="tagdata.child_tagdatas.length != 0">
             <HTMLTagStructViewLi v-for="child_tagdata, index in tagdata.child_tagdatas" :key="index"
+                @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
                 :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view" :clicked_tagdata="clicked_tagdata"
                 @copy_tag="copy_tag" :html_tagdatas_root="html_tagdatas_root" :tagdata="child_tagdata"
                 @onclick_tag="onclick_tag" @delete_tagdata="delete_tag"
@@ -15,6 +16,8 @@
     <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
         <v-list>
             <v-list-item @click="copy_tag(tagdata)">コピー</v-list-item>
+            <v-list-item v-if="copied_tagdata.tagname != 'tagbase' && tagdata.has_child_tag"
+                @click="paste_tag_to_child">貼り付け</v-list-item>
             <v-list-item @click="delete_tag(tagdata)">削除</v-list-item>
         </v-list>
     </v-menu>
@@ -27,6 +30,7 @@ import HTMLTagStructViewLi_ref from '@/view/HTMLTagStructViewLi.vue'
 import { deserialize } from '@/serializable/serializable';
 import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by_tagname';
 import IMGTagData from '@/html_tagdata/IMGTagData';
+import generateUUID from '@/uuid';
 
 @Options({
     components: {
@@ -39,6 +43,7 @@ export default class HTMLTagPropertyView extends Vue {
     @Prop() tagdata: HTMLTagDataBase
     @Prop() clicked_tagdata: HTMLTagDataBase
     @Prop() auto_scroll_tag_struct_view: boolean
+    @Prop() copied_tagdata: HTMLTagDataBase
 
     is_show_contextmenu = false
     x_contextmenu = 0
@@ -388,6 +393,40 @@ export default class HTMLTagPropertyView extends Vue {
 
     copy_tag(tagdata: HTMLTagDataBase) {
         this.$emit("copy_tag", tagdata)
+    }
+
+    paste_tag_to_child(e) {
+        if (this.copied_tagdata.tagname != 'tagbase') {
+            const copied_tagdata: HTMLTagDataBase = JSON.parse(JSON.stringify(this.copied_tagdata), deserialize)
+            copied_tagdata.tagid = "id_" + generateUUID()
+            copied_tagdata.position_style = PositionStyle.None
+            copied_tagdata.position_x = undefined
+            copied_tagdata.position_y = undefined
+            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                // 後で代入する
+            }
+            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                for (let i = 0; i < tagdatas.length; i++) {
+                    tagdatas[i].tagid = "id_" + generateUUID()
+                    walk_tagdatas(tagdatas[i].child_tagdatas)
+                }
+            }
+            walk_tagdatas(copied_tagdata.child_tagdatas)
+            const tagdata_typed: HTMLTagDataBase = JSON.parse(JSON.stringify(this.tagdata), deserialize)
+
+            if (e.shiftKey) {
+                tagdata_typed.child_tagdatas.unshift(copied_tagdata)
+            } else if (e.ctrlKey) {
+                tagdata_typed.child_tagdatas.push(copied_tagdata)
+            } else {
+                tagdata_typed.child_tagdatas.push(copied_tagdata)
+            }
+
+            this.updated_tagdata(tagdata_typed)
+        }
+    }
+    updated_tagdata(tagdata: HTMLTagDataBase) {
+        this.$emit('updated_tagdata', tagdata)
     }
 }
 </script>
