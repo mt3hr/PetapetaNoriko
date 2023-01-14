@@ -435,6 +435,11 @@ export default class DropZone extends Vue {
         this.img_src = ""
         this.img_initialize_target = null
     }
+
+    cut_tag(tagdata: HTMLTagDataBase) {
+        this.copy_tag(tagdata)
+        this.delete_tagdata(tagdata)
+    }
 }
 </script>
 <style scoped>

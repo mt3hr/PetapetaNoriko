@@ -249,7 +249,8 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 </template>
 
 <script lang="ts">
-//TODO グローバルナビゲーション
+//TODO グローバルナビゲーション 横並びリスト
+//TODO 選択されているところにペーストしたくない？
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView, { TagListViewMode } from '@/view/TagListView.vue'

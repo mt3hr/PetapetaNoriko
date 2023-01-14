@@ -132,7 +132,7 @@ import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase';
 import { Options, Vue } from 'vue-class-component';
 import HTMLTagStructViewLi from '@/view/HTMLTagStructViewLi.vue'
 import { deserialize } from '@/serializable/serializable';
-import { Prop } from 'vue-property-decorator';
+import { Prop, Watch } from 'vue-property-decorator';
 import TableTagData from '@/html_tagdata/TableTagData';
 import ULTagData from '@/html_tagdata/ULTagData';
 import OLTagData from '@/html_tagdata/OLTagData';

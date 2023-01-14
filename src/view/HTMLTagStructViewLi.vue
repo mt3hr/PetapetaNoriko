@@ -12,9 +12,11 @@
                 @onclick_tag="onclick_tag" @delete_tagdata="delete_tag"
                 @updated_html_tagdatas="(tagdatas) => updated_html_tagdatas_child(tagdatas)" />
         </ul>
-        <v-menu v-if="is_show_contextmenu" v-model="is_show_contextmenu" :style="contextmenu_style">
+        <v-menu v-if="is_show_contextmenu && clicked_tagdata.tagid == tagdata.tagid" v-model="is_show_contextmenu"
+            :style="contextmenu_style">
             <v-list>
                 <v-list-item @click="copy_tag(tagdata)">コピー</v-list-item>
+                <v-list-item @click="cut_tag(tagdata)">切り取り</v-list-item>
                 <v-list-item v-if="copied_tagdata.tagname != 'tagbase' && tagdata.has_child_tag"
                     @click="paste_tag_to_child">貼り付け</v-list-item>
                 <v-list-item @click="delete_tag(tagdata)">削除</v-list-item>
@@ -612,6 +614,7 @@ export default class HTMLTagPropertyView extends Vue {
     }
 
     show_contextmenu(e: MouseEvent) {
+        this.$emit('onclick_tag', this.tagdata)
         e.preventDefault()
         this.x_contextmenu = e.clientX
         this.y_contextmenu = e.clientY
@@ -696,6 +699,18 @@ export default class HTMLTagPropertyView extends Vue {
             tagdata_typed.child_tagdatas.splice(index, 1)
         }
         this.$emit('updated_tagdata', tagdata_typed)
+    }
+
+    cut_tag(tagdata: HTMLTagDataBase) {
+        this.copy_tag(tagdata)
+        this.delete_tag(tagdata)
+    }
+
+    @Watch('clicked_tagdata')
+    update_show_contextmenu_state() {
+        if (this.clicked_tagdata.tagid != this.tagdata.tagid) {
+            this.is_show_contextmenu = false
+        }
     }
 }
 </script>

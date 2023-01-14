@@ -8,9 +8,11 @@
             @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
             :tagdata="child_tagdata" @updated_tagdata="updated_child_tagdata" @onclick_tag="onclick_tag"
             @delete_tagdata="delete_child_tagdata" />
-        <v-menu v-if="is_show_contextmenu" v-model="is_show_contextmenu" :style="contextmenu_style">
+        <v-menu v-if="is_show_contextmenu && clicked_tagdata.tagid == tagdata.tagid" v-model="is_show_contextmenu"
+            :style="contextmenu_style">
             <v-list>
                 <v-list-item @click="copy_tag(tagdata)">コピー</v-list-item>
+                <v-list-item @click="cut_tag(tagdata)">切り取り</v-list-item>
                 <v-list-item v-if="copied_tagdata.tagname != 'tagbase'" @click="paste_tag">貼り付け</v-list-item>
                 <v-list-item @click="delete_tag(tagdata)">削除</v-list-item>
             </v-list>
@@ -109,6 +111,19 @@ export default class SelectTagView extends HTMLTagViewBase {
     created(): void {
         this.update_view()
     }
+
+    cut_tag(tagdata: HTMLTagDataBase) {
+        this.copy_tag(tagdata)
+        this.delete_tag(tagdata)
+    }
+
+    @Watch('clicked_tagdata')
+    update_show_contextmenu_state() {
+        if (this.clicked_tagdata.tagid != this.tagdata.tagid) {
+            this.is_show_contextmenu = false
+        }
+    }
+
 }
 
 </script>
