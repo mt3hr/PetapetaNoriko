@@ -18,7 +18,7 @@
         </v-menu>
         <div
             v-if="is_show_table_initialize_dialog || is_show_ol_initialize_dialog || is_show_ul_initialize_dialog || is_show_img_initialize_dialog">
-            <v-dialog v-model="is_show_table_initialize_dialog">
+            <v-dialog v-model="is_show_table_initialize_dialog" class="init_dialog">
                 <v-card class="pa-5">
                     <v-card-title>
                         <v-row>
@@ -49,7 +49,7 @@
                     </v-row>
                 </v-card>
             </v-dialog>
-            <v-dialog v-model="is_show_ul_initialize_dialog">
+            <v-dialog v-model="is_show_ul_initialize_dialog" class="init_dialog">
                 <v-card class="pa-5">
                     <v-card-title>
                         <v-row>
@@ -75,7 +75,7 @@
                     </v-row>
                 </v-card>
             </v-dialog>
-            <v-dialog v-model="is_show_ol_initialize_dialog">
+            <v-dialog v-model="is_show_ol_initialize_dialog" class="init_dialog">
                 <v-card class="pa-5">
                     <v-card-title>
                         <v-row>
@@ -101,7 +101,7 @@
                     </v-row>
                 </v-card>
             </v-dialog>
-            <v-dialog v-model="is_show_img_initialize_dialog">
+            <v-dialog v-model="is_show_img_initialize_dialog" class="init_dialog">
                 <v-card class="pa-5">
                     <v-card-title>
                         <v-row>
@@ -239,5 +239,9 @@ export default class FormTagView extends HTMLTagViewBase {
 form {
     min-width: 30px;
     min-height: 30px;
+}
+
+.init_dialog {
+    width: 280px;
 }
 </style>

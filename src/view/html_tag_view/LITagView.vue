@@ -18,7 +18,7 @@
         </v-menu>
         <div
             v-if="is_show_table_initialize_dialog || is_show_ol_initialize_dialog || is_show_ul_initialize_dialog || is_show_img_initialize_dialog">
-            <v-dialog v-model="is_show_table_initialize_dialog">
+            <v-dialog v-model="is_show_table_initialize_dialog" class="init_dialog">
                 <v-card class="pa-5">
                     <v-card-title>
                         <v-row>
@@ -45,84 +45,6 @@
                         <v-spacer />
                         <v-col cols="auto">
                             <v-btn @click="initialize_table">作成</v-btn>
-                        </v-col>
-                    </v-row>
-                </v-card>
-            </v-dialog>
-            <v-dialog v-model="is_show_ul_initialize_dialog">
-                <v-card class="pa-5">
-                    <v-card-title>
-                        <v-row>
-                            <v-col cols="auto">
-                                UL初期化
-                            </v-col>
-                            <v-spacer />
-                        </v-row>
-                    </v-card-title>
-                    <v-row>
-                        <v-col cols="auto">アイテム数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_ul" type="number" v-model="ul_items"
-                                default="1" /></v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="auto">
-                            <v-btn @click="is_show_ul_initialize_dialog = false">閉じる</v-btn>
-                        </v-col>
-                        <v-spacer />
-                        <v-col cols="auto">
-                            <v-btn @click="initialize_ul">作成</v-btn>
-                        </v-col>
-                    </v-row>
-                </v-card>
-            </v-dialog>
-            <v-dialog v-model="is_show_ol_initialize_dialog">
-                <v-card class="pa-5">
-                    <v-card-title>
-                        <v-row>
-                            <v-col cols="auto">
-                                OL初期化
-                            </v-col>
-                            <v-spacer />
-                        </v-row>
-                    </v-card-title>
-                    <v-row>
-                        <v-col cols="auto">アイテム数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_ol" type="number" v-model="ol_items"
-                                default="1" /></v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="auto">
-                            <v-btn @click="is_show_ol_initialize_dialog = false">閉じる</v-btn>
-                        </v-col>
-                        <v-spacer />
-                        <v-col cols="auto">
-                            <v-btn @click="initialize_ol">作成</v-btn>
-                        </v-col>
-                    </v-row>
-                </v-card>
-            </v-dialog>
-            <v-dialog v-model="is_show_img_initialize_dialog">
-                <v-card class="pa-5">
-                    <v-card-title>
-                        <v-row>
-                            <v-col cols="auto">
-                                IMG初期化
-                            </v-col>
-                            <v-spacer />
-                        </v-row>
-                    </v-card-title>
-                    <v-row>
-                        <v-col cols="auto">URL</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_img" type="url" v-model="img_src"
-                                default="1" /></v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="auto">
-                            <v-btn @click="is_show_img_initialize_dialog = false">閉じる</v-btn>
-                        </v-col>
-                        <v-spacer />
-                        <v-col cols="auto">
-                            <v-btn @click="initialize_img">作成</v-btn>
                         </v-col>
                     </v-row>
                 </v-card>
@@ -177,3 +99,8 @@ export default class LITagView extends HTMLTagViewBase {
     }
 }
 </script>
+<style scoped>
+.init_dialog {
+    width: 280px;
+}
+</style>

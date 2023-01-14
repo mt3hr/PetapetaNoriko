@@ -394,6 +394,10 @@ export default class PutPullMockRootPage extends Vue {
                 dropzone.delete_tagdata(this.clicked_tagdata)
                 this.clicked_tagdata = null
             }
+            if (e.code == "Delete" && this.clicked_tagdata) {
+                let dropzone: any = this.$refs["dropzone"]
+                dropzone.delete_tagdata(this.clicked_tagdata)
+            }
         })
     }
 
