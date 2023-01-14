@@ -24,8 +24,7 @@
                 <v-list-item v-if="copied_tagdata.tagname != 'tagbase'" @click="paste_tag">貼り付け</v-list-item>
             </v-list>
         </v-menu>
-        <div
-            v-if="is_show_table_initialize_dialog || is_show_ol_initialize_dialog || is_show_ul_initialize_dialog || is_show_img_initialize_dialog">
+        <div>
             <v-dialog v-model="is_show_table_initialize_dialog" class="init_dialog">
                 <v-card class="pa-5">
                     <v-card-title>
@@ -254,7 +253,7 @@ export default class DropZone extends Vue {
                     move_tagdata.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
                     move_in_root = true
                 }
-                this.$emit('updated_htmltagdatas', html_tagdatas_root, null)
+                this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
                 e.stopPropagation()
                 this.$nextTick(() => {
                     this.$nextTick(() => {
@@ -295,7 +294,7 @@ export default class DropZone extends Vue {
                 html_tagdatas_root.push(move_tagdata)
             }
 
-            this.$emit('updated_htmltagdatas', html_tagdatas_root, null)
+            this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
             e.stopPropagation()
         } else if (e.dataTransfer.items.length != 0) {
             const reader = new FileReader()
@@ -337,7 +336,7 @@ export default class DropZone extends Vue {
         this.html_tagdatas = new Array<HTMLTagDataBase>()
         this.$nextTick(() => {
             this.html_tagdatas = html_tagdatas_root
-            this.$emit('updated_htmltagdatas', html_tagdatas_root, tagdata)
+            this.$emit('updated_htmltagdatas', html_tagdatas_root, tagdata, true)
         })
     }
 
@@ -358,7 +357,7 @@ export default class DropZone extends Vue {
             }
         }
         walk_tagdatas(html_tagdatas_root)
-        this.$emit('updated_htmltagdatas', html_tagdatas_root, null)
+        this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
     }
 
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {

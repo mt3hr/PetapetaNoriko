@@ -155,7 +155,7 @@ export default class HTMLTagPropertyView extends Vue {
     @Prop() copied_tagdata: HTMLTagDataBase
 
     updated_html_tagdatas(html_tagdatas: Array<HTMLTagDataBase>) {
-        this.$emit("updated_html_tagdatas", html_tagdatas)
+        this.$emit("updated_html_tagdatas", html_tagdatas, null, true)
     }
 
     drop(e: DragEvent) {

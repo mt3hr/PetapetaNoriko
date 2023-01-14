@@ -22,6 +22,7 @@
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
                         <PageListView class="component page_list_view" ref="page_list_view"
+                            @updated_htmltagdatas="updated_htmltagdatas"
                             :auto_save_pagedatas_to_localstorage="auto_save_pagedatas_to_localstorage"
                             @delete_page="delete_page"
                             @update_auto_save_pagedatas_to_localstorage="update_auto_save_pagedatas_to_localstorage"
@@ -67,8 +68,7 @@
                                 @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
                                 :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" ref="struct_view"
                                 :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view"
-                                @delete_tagdata="delete_tagdata"
-                                @updated_html_tagdatas="(html_tagdatas) => updated_htmltagdatas(html_tagdatas, null)" />
+                                @delete_tagdata="delete_tagdata" @updated_html_tagdatas="updated_htmltagdatas" />
                         </v-col>
                     </v-row>
                 </v-container>
@@ -265,6 +265,7 @@ import { deserialize, serializable } from '@/serializable/serializable'
 import { head } from '@/main'
 import sample_project_json from '@/sample/ppmk_sample_project.json'
 import generateUUID from '@/uuid'
+import History from './History'
 
 @serializable
 class Settings {
@@ -318,6 +319,7 @@ export default class PutPullMockRootPage extends Vue {
 
     tag_list_view_mode: TagListViewMode = TagListViewMode.Text
 
+
     @Watch('export_base64_image')
     @Watch('export_head')
     @Watch('export_position_css')
@@ -362,7 +364,7 @@ export default class PutPullMockRootPage extends Vue {
                 let page_list_view: any = this.$refs['page_list_view']
 
                 page_list_view.pagedatas = pagedatas
-                this.updated_htmltagdatas(about_ppmk_pagedata.html_tagdatas, null)
+                this.updated_htmltagdatas(about_ppmk_pagedata.html_tagdatas, null, false)
                 this.$nextTick(() => {
                     page_list_view.clicked_page(about_ppmk_pagedata)
                 })
@@ -465,6 +467,11 @@ export default class PutPullMockRootPage extends Vue {
                 let dropzone: any = this.$refs["dropzone"]
                 dropzone.delete_tagdata(this.clicked_tagdata)
             }
+        })
+        this.$nextTick(() => {
+            let page_list_view: any = this.$refs['page_list_view']
+            page_list_view.history = new History()
+            page_list_view.history.page_datas = JSON.parse(JSON.stringify(page_list_view.pagedatas), deserialize)
         })
     }
 
@@ -608,8 +615,9 @@ export default class PutPullMockRootPage extends Vue {
         this.page_html = html
     }
 
-    updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase) {
+    updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase, history_mode: boolean) {
         let page_list_view: any = this.$refs["page_list_view"]
+
         page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = html_tagdatas
         if (tagdata) {
             this.onclick_tag(tagdata)
@@ -617,6 +625,10 @@ export default class PutPullMockRootPage extends Vue {
         page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
         page_list_view.save_pagedatas_to_localstorage()
+
+        if (history_mode) {
+            page_list_view.append_history()
+        }
     }
 
     clicked_page(pagedata: PageData) {
@@ -651,10 +663,8 @@ export default class PutPullMockRootPage extends Vue {
     onclick_tag(tagdata: HTMLTagDataBase) {
         let property_view: any = this.$refs["property_view"]
         property_view.html_tagdata = new HTMLTagDataBase()
-        this.$nextTick(() => {
-            property_view.html_tagdata = tagdata
-            this.clicked_tagdata = tagdata
-        })
+        property_view.html_tagdata = tagdata
+        this.clicked_tagdata = tagdata
     }
 
     updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
@@ -720,10 +730,8 @@ export default class PutPullMockRootPage extends Vue {
                     css_text_area.value.substr(0, css_text_area.selectionStart) +
                     "    " +
                     css_text_area.value.substr(css_text_area.selectionStart)
-                this.$nextTick(() => {
                     css_text_area.selectionStart = selectionStart + 4
                     css_text_area.selectionEnd = selectionStart + 4
-                })
                 return
             }
         }
@@ -810,7 +818,6 @@ export default class PutPullMockRootPage extends Vue {
         let dropzone: any = this.$refs["dropzone"]
         let page_property_view: any = this.$refs["page_property_view"]
         page_list_view.save_pagedatas_to_localstorage()
-        this.$nextTick(() => {
             page_list_view.clicked_page(page_list_view.pagedatas[0])
             page_property_view.page_data = null
             dropzone.html_tagdatas = null
@@ -820,7 +827,6 @@ export default class PutPullMockRootPage extends Vue {
 
             this.width_dropzone = window.innerWidth - 300 - 300 - 19
             this.height_dropzone = window.innerHeight - 159
-        })
     }
 
     add_page() {
