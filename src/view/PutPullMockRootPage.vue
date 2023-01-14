@@ -384,7 +384,7 @@ export default class PutPullMockRootPage extends Vue {
             if (e.ctrlKey && e.code == "KeyC") {
                 this.copy_tag(this.clicked_tagdata)
             }
-            if (e.ctrlKey && e.code == "KeyV" && this.copied_tagdata) {
+            if (e.ctrlKey && e.code == "KeyV" && this.copied_tagdata.tagname != "tagbase") {
                 if (!this.clicked_tagdata) {
                     let dropzone: any = this.$refs["dropzone"]
                     dropzone.paste_tag()
@@ -448,6 +448,11 @@ export default class PutPullMockRootPage extends Vue {
                         }
                         dropzone.updated_tagdata(clicked_tagdata)
                     }
+                    this.$nextTick(() => {
+                        this.$nextTick(() => {
+                            this.onclick_tag(clicked_tagdata)
+                        })
+                    })
                 }
             }
             if (e.ctrlKey && e.code == "KeyX" && this.clicked_tagdata) {
