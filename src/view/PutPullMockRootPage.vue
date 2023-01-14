@@ -378,6 +378,23 @@ export default class PutPullMockRootPage extends Vue {
 
     created(): void {
         this.load_settings_from_cookie()
+        window.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.code == "KeyC") {
+                this.copy_tag(this.clicked_tagdata)
+            }
+            if (e.ctrlKey && e.code == "KeyV" && this.copied_tagdata) {
+                // if (!this.clicked_tagdata) {
+                let dropzone: any = this.$refs["dropzone"]
+                dropzone.paste_tag()
+                // }
+            }
+            if (e.ctrlKey && e.code == "KeyX" && this.clicked_tagdata) {
+                this.copy_tag(this.clicked_tagdata)
+                let dropzone: any = this.$refs["dropzone"]
+                dropzone.delete_tagdata(this.clicked_tagdata)
+                this.clicked_tagdata = null
+            }
+        })
     }
 
     get page_css_view_style(): any {
@@ -694,7 +711,6 @@ export default class PutPullMockRootPage extends Vue {
         let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
         walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
             for (let i = 0; i < tagdatas.length; i++) {
-                let html_tagdata = tagdatas[i]
                 if (tagdata.tagid == tagdatas[i].tagid) {
                     tagdatas.splice(i, 1)
                     return true

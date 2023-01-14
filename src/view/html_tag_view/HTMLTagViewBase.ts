@@ -71,8 +71,8 @@ export default class HTMLTagViewBase extends Vue {
         let is_in_drag_tag = false
         let j = 0
         let exist_in_target = false
-        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) { return }
-        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
             for (let i = 0; i < tagdatas.length; i++) {
                 if (move_tagid == tagdatas[i].tagid) {
                     is_in_drag_tag = true
@@ -80,9 +80,12 @@ export default class HTMLTagViewBase extends Vue {
                 if (is_in_drag_tag) j++
                 if (is_in_drag_tag && tagdatas[i].tagid == target_tagdata.tagid) {
                     exist_in_target = true
+                    return true
                 }
 
-                walk_tagdatas(tagdatas[i].child_tagdatas)
+                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                    return true
+                }
                 if (is_in_drag_tag) j--
                 if (is_in_drag_tag && j == 0) {
                     is_in_drag_tag = false
@@ -177,35 +180,35 @@ export default class HTMLTagViewBase extends Vue {
                     return false
                 }
                 walk_tagdatas(html_tagdatas_root)
-
-                switch (tagname) {
-                    case "table": {
-                        this.table_rows = 1
-                        this.table_cols = 1
-                        this.table_initialize_target = tag_data as TableTagData
-                        this.is_show_table_initialize_dialog = true
-                        break
-                    }
-                    case "ul": {
-                        this.ul_items = 1
-                        this.ul_initialize_target = tag_data as ULTagData
-                        this.is_show_ul_initialize_dialog = true
-                        break
-                    }
-                    case "ol": {
-                        this.ol_items = 1
-                        this.ol_initialize_target = tag_data as OLTagData
-                        this.is_show_ol_initialize_dialog = true
-                        break
-                    }
-                    case "img": {
-                        this.img_src = ""
-                        this.img_initialize_target = tag_data as IMGTagData
-                        this.is_show_img_initialize_dialog = true
-                        break
-                    }
+            }
+            switch (tagname) {
+                case "table": {
+                    this.table_rows = 1
+                    this.table_cols = 1
+                    this.table_initialize_target = tag_data as TableTagData
+                    this.is_show_table_initialize_dialog = true
+                    break
+                }
+                case "ul": {
+                    this.ul_items = 1
+                    this.ul_initialize_target = tag_data as ULTagData
+                    this.is_show_ul_initialize_dialog = true
+                    break
+                }
+                case "ol": {
+                    this.ol_items = 1
+                    this.ol_initialize_target = tag_data as OLTagData
+                    this.is_show_ol_initialize_dialog = true
+                    break
+                }
+                case "img": {
+                    this.img_src = ""
+                    this.img_initialize_target = tag_data as IMGTagData
+                    this.is_show_img_initialize_dialog = true
+                    break
                 }
             }
+
             this.updated_html_tagdatas(html_tagdatas_root)
             this.$nextTick(() => {
                 this.onclick_tag(tag_data)

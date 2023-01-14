@@ -189,11 +189,10 @@ export default class HTMLTagPropertyView extends Vue {
         }
 
         let is_in_drag_tag = false
-        let is_in_target_tag = false
         let j = 0
         let exist_in_target = false
-        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) { return }
-        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return }
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
             for (let i = 0; i < tagdatas.length; i++) {
                 if (move_tagid == tagdatas[i].tagid) {
                     is_in_drag_tag = true
@@ -201,9 +200,12 @@ export default class HTMLTagPropertyView extends Vue {
                 if (is_in_drag_tag) j++
                 if (is_in_drag_tag && tagdatas[i].tagid == target_tagdata.tagid) {
                     exist_in_target = true
+                    return true
                 }
 
-                walk_tagdatas(tagdatas[i].child_tagdatas)
+                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                    return true
+                }
                 if (is_in_drag_tag) j--
                 if (is_in_drag_tag && j == 0) {
                     is_in_drag_tag = false
