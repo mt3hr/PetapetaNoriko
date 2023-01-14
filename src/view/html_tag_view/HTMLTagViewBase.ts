@@ -13,12 +13,6 @@ import TRTagData from '@/html_tagdata/TRTagData';
 import TDTagData from '@/html_tagdata/TDTagData';
 import LITagData from '@/html_tagdata/LITagData';
 
-
-@Options({
-    components: {
-        HTMLTagView,
-    }
-})
 export default class HTMLTagViewBase extends Vue {
     @Prop({ require: true }) tagdata: HTMLTagDataBase
     @Prop({ require: true }) tagdatas_root: Array<HTMLTagDataBase>
