@@ -24,7 +24,8 @@
                 <v-list-item v-if="copied_tagdata.tagname != 'tagbase'" @click="paste_tag">貼り付け</v-list-item>
             </v-list>
         </v-menu>
-        <div>
+        <div
+            v-if="is_show_table_initialize_dialog || is_show_ol_initialize_dialog || is_show_ul_initialize_dialog || is_show_img_initialize_dialog">
             <v-dialog v-model="is_show_table_initialize_dialog" class="init_dialog">
                 <v-card class="pa-5">
                     <v-card-title>
@@ -56,6 +57,86 @@
                     </v-row>
                 </v-card>
             </v-dialog>
+            <v-dialog v-model="is_show_ul_initialize_dialog" class="init_dialog">
+                <v-card class="pa-5">
+                    <v-card-title>
+                        <v-row>
+                            <v-col cols="auto">
+                                UL初期化
+                            </v-col>
+                            <v-spacer />
+                        </v-row>
+                    </v-card-title>
+                    <v-row>
+                        <v-col cols="auto">アイテム数</v-col>
+                        <v-col cols="auto"><input @keypress.enter="initialize_ul" type="number" v-model="ul_items"
+                                default="1" /></v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="auto">
+                            <v-btn @click="is_show_ul_initialize_dialog = false">閉じる</v-btn>
+                        </v-col>
+                        <v-spacer />
+                        <v-col cols="auto">
+                            <v-btn @click="initialize_ul">作成</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-card>
+            </v-dialog>
+            <v-dialog v-model="is_show_ol_initialize_dialog" class="init_dialog">
+                <v-card class="pa-5">
+                    <v-card-title>
+                        <v-row>
+                            <v-col cols="auto">
+                                OL初期化
+                            </v-col>
+                            <v-spacer />
+                        </v-row>
+                    </v-card-title>
+                    <v-row>
+                        <v-col cols="auto">アイテム数</v-col>
+                        <v-col cols="auto"><input @keypress.enter="initialize_ol" type="number" v-model="ol_items"
+                                default="1" /></v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="auto">
+                            <v-btn @click="is_show_ol_initialize_dialog = false">閉じる</v-btn>
+                        </v-col>
+                        <v-spacer />
+                        <v-col cols="auto">
+                            <v-btn @click="initialize_ol">作成</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-card>
+            </v-dialog>
+            <v-dialog v-model="is_show_img_initialize_dialog" class="init_dialog">
+                <v-card class="pa-5">
+                    <v-card-title>
+                        <v-row>
+                            <v-col cols="auto">
+                                IMG初期化
+                            </v-col>
+                            <v-spacer />
+                        </v-row>
+                    </v-card-title>
+                    <v-row>
+                        <v-col cols="auto">URL</v-col>
+                        <v-col cols="auto"><input @keypress.enter="initialize_img" type="url" v-model="img_src"
+                                default="1" /></v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="auto">
+                            <v-btn @click="is_show_img_initialize_dialog = false">閉じる</v-btn>
+                        </v-col>
+                        <v-spacer />
+                        <v-col cols="auto">
+                            <v-btn @click="initialize_img">作成</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-card>
+            </v-dialog>
+
+
         </div>
     </div>
 </template>
@@ -199,6 +280,14 @@ export default class DropZone extends Vue {
             tag_data.position_x = e.offsetX
             tag_data.position_y = e.offsetY
 
+            this.html_tagdatas.push(tag_data)
+            this.updated_tagdata(tag_data)
+            this.$nextTick(() => {
+                this.$nextTick(() => {
+                    this.onclick_tag(tag_data)
+                })
+            })
+
             switch (tagname) {
                 case "table": {
                     this.table_rows = 1
@@ -226,14 +315,6 @@ export default class DropZone extends Vue {
                     break
                 }
             }
-
-            this.html_tagdatas.push(tag_data)
-            this.updated_tagdata(tag_data)
-            this.$nextTick(() => {
-                this.$nextTick(() => {
-                    this.onclick_tag(tag_data)
-                })
-            })
         } else if (tagid) {
             // すでに配置されたコンポーネントの移動
             let json = JSON.stringify(this.html_tagdatas)
@@ -256,9 +337,9 @@ export default class DropZone extends Vue {
                 this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
                 e.stopPropagation()
                 // this.$nextTick(() => {
-                    this.$nextTick(() => {
-                        this.onclick_tag(move_tagdata)
-                    })
+                this.$nextTick(() => {
+                    this.onclick_tag(move_tagdata)
+                })
                 // })
             }
             if (move_in_root) return
@@ -335,8 +416,8 @@ export default class DropZone extends Vue {
         walk_tagdatas(html_tagdatas_root)
         this.html_tagdatas = new Array<HTMLTagDataBase>()
         // this.$nextTick(() => {
-            this.html_tagdatas = html_tagdatas_root
-            this.$emit('updated_htmltagdatas', html_tagdatas_root, tagdata, true)
+        this.html_tagdatas = html_tagdatas_root
+        this.$emit('updated_htmltagdatas', html_tagdatas_root, tagdata, true)
         // })
     }
 

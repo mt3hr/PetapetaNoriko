@@ -82,6 +82,9 @@ export default class Page extends Vue {
         }
         this.$nextTick(() => {
             this.$emit('clicked_page', pagedata)
+            this.$nextTick(() => {
+                this.append_history()
+            })
         })
     }
 
@@ -100,14 +103,14 @@ export default class Page extends Vue {
     }
 
     append_history() {
-        this.history_stack.push(JSON.parse(JSON.stringify(this.pagedatas), deserialize))
-        this.advance_stack = new Stack()
+        // this.history_stack.push(this.pagedatas)
+        // this.advance_stack = new Stack()
     }
 
     created(): void {
         window.addEventListener('keypress', (e: KeyboardEvent) => {
             if (e.ctrlKey && e.code == "KeyZ") {
-                let pagedatas = this.history_stack.pop() as Array<PageData>
+                let pagedatas = this.history_stack.pop()
                 if (pagedatas) {
                     this.advance_stack.push(pagedatas)
                     this.pagedatas = pagedatas
@@ -121,7 +124,7 @@ export default class Page extends Vue {
                 }
             }
             if (e.ctrlKey && e.code == "KeyY") {
-                let pagedatas = this.advance_stack.pop() as Array<PageData>
+                let pagedatas = this.advance_stack.pop()
                 if (pagedatas) {
                     this.history_stack.push(pagedatas)
                     this.pagedatas = pagedatas
