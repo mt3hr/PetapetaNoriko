@@ -419,7 +419,7 @@ export default class PutPullMockRootPage extends Vue {
                             for (let i = 0; i < tagdatas.length; i++) {
                                 if (clicked_tagdata.tagid == tagdatas[i].tagid) {
                                     parent_node = parent
-                                    index_at_parent_node = parent_index
+                                    index_at_parent_node = i
                                     return true
                                 }
                                 if (walk_tagdatas(tagdatas[i].child_tagdatas, tagdatas[i], i)) {
