@@ -34,9 +34,9 @@
 import PageData from '@/page/PageData';
 import PageListItem from '@/page/PageListItem.vue';
 import { deserialize } from '@/serializable/serializable';
+import Stack from '@/stack/Stack';
 import { Options, Vue } from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
-import History from './History'
 
 @Options({
     components: {
@@ -50,7 +50,8 @@ export default class Page extends Vue {
 
     is_show_oversize_localstorage_dialog = false
 
-    history: History
+    history_stack: Stack = new Stack
+    advance_stack: Stack = new Stack
 
     @Watch('pagedatas')
     save_pagedatas_to_localstorage() {
@@ -99,77 +100,38 @@ export default class Page extends Vue {
     }
 
     append_history() {
-        let history: History = new History()
-        history.page_datas = JSON.parse(JSON.stringify(this.pagedatas), deserialize)
-        history.prev = this.history
-        this.history.next = history
-        this.history = history
+        this.history_stack.push(JSON.parse(JSON.stringify(this.pagedatas), deserialize))
+        this.advance_stack = new Stack()
     }
 
     created(): void {
         window.addEventListener('keypress', (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.code == "KeyZ" && this.history && this.history.prev) {
-                let found = false
-                for (let history: History = this.history; history && history.id; history = history.next) {
-                    if (history.id == this.history.prev.id) {
-                        this.history = history
-                        found = true
-                        console.log(2)
-                        break
-                    }
-                }
-                if (!found) {
-                    for (let history: History = this.history; history && history.id; history = history.prev) {
-                        if (history.id == this.history.prev.id) {
-                            this.history = history
-                            console.log(1)
-                            break
-                        }
-                    }
-                }
-                this.pagedatas = this.history.page_datas
-                try {
-                    this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
-                    this.$nextTick(() => {
+            if (e.ctrlKey && e.code == "KeyZ") {
+                let pagedatas = this.history_stack.pop() as Array<PageData>
+                if (pagedatas) {
+                    this.advance_stack.push(pagedatas)
+                    this.pagedatas = pagedatas
+                    try {
+                        this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
+                        this.clicked_page(this.pagedatas[this.selected_index])
+                    } catch (e) {
+                        this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
                         this.clicked_page(this.pagedatas[0])
-                    })
-                } catch (e) {
-                    this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
-                    this.$nextTick(() => {
-                        this.clicked_page(this.pagedatas[0])
-                    })
+                    }
                 }
             }
-            if (e.ctrlKey && e.code == "KeyY" && this.history && this.history.next) {
-                let found = false
-                for (let history: History = this.history; history != null; history = history.next) {
-                    if (history.id == this.history.next.id) {
-                        this.history = history
-                        found = true
-                        console.log(3)
-                        break
-                    }
-                }
-                if (!found) {
-                    for (let history: History = this.history; history != null; history = history.next) {
-                        if (history.id == this.history.next.id) {
-                            this.history = history
-                            console.log(4)
-                            break
-                        }
-                    }
-                }
-                this.pagedatas = this.history.page_datas
-                try {
-                    this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
-                    this.$nextTick(() => {
+            if (e.ctrlKey && e.code == "KeyY") {
+                let pagedatas = this.advance_stack.pop() as Array<PageData>
+                if (pagedatas) {
+                    this.history_stack.push(pagedatas)
+                    this.pagedatas = pagedatas
+                    try {
+                        this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
+                        this.clicked_page(this.pagedatas[this.selected_index])
+                    } catch (e) {
+                        this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
                         this.clicked_page(this.pagedatas[0])
-                    })
-                } catch (e) {
-                    this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
-                    this.$nextTick(() => {
-                        this.clicked_page(this.pagedatas[0])
-                    })
+                    }
                 }
             }
         })
@@ -202,9 +164,9 @@ export default class Page extends Vue {
     add_page() {
         let pagedata = new PageData()
         this.pagedatas.push(pagedata)
-        this.$nextTick(() => {
-            this.clicked_page(pagedata)
-        })
+        // this.$nextTick(() => {
+        this.clicked_page(pagedata)
+        // })
     }
 
     copy_page(pagedata: any, index: number) {

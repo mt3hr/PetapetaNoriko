@@ -255,11 +255,11 @@ export default class DropZone extends Vue {
                 }
                 this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
                 e.stopPropagation()
-                this.$nextTick(() => {
+                // this.$nextTick(() => {
                     this.$nextTick(() => {
                         this.onclick_tag(move_tagdata)
                     })
-                })
+                // })
             }
             if (move_in_root) return
 
@@ -334,10 +334,10 @@ export default class DropZone extends Vue {
         }
         walk_tagdatas(html_tagdatas_root)
         this.html_tagdatas = new Array<HTMLTagDataBase>()
-        this.$nextTick(() => {
+        // this.$nextTick(() => {
             this.html_tagdatas = html_tagdatas_root
             this.$emit('updated_htmltagdatas', html_tagdatas_root, tagdata, true)
-        })
+        // })
     }
 
     delete_tagdata(tagdata: HTMLTagDataBase) {

@@ -730,8 +730,8 @@ export default class PutPullMockRootPage extends Vue {
                     css_text_area.value.substr(0, css_text_area.selectionStart) +
                     "    " +
                     css_text_area.value.substr(css_text_area.selectionStart)
-                    css_text_area.selectionStart = selectionStart + 4
-                    css_text_area.selectionEnd = selectionStart + 4
+                css_text_area.selectionStart = selectionStart + 4
+                css_text_area.selectionEnd = selectionStart + 4
                 return
             }
         }
@@ -818,15 +818,15 @@ export default class PutPullMockRootPage extends Vue {
         let dropzone: any = this.$refs["dropzone"]
         let page_property_view: any = this.$refs["page_property_view"]
         page_list_view.save_pagedatas_to_localstorage()
-            page_list_view.clicked_page(page_list_view.pagedatas[0])
-            page_property_view.page_data = null
-            dropzone.html_tagdatas = null
-            dropzone.html_tagdatas_root = null
-            this.update_struct_view(null)
-            this.onclick_tag(null)
+        page_list_view.clicked_page(page_list_view.pagedatas[0])
+        page_property_view.page_data = null
+        dropzone.html_tagdatas = null
+        dropzone.html_tagdatas_root = null
+        this.update_struct_view(null)
+        this.onclick_tag(null)
 
-            this.width_dropzone = window.innerWidth - 300 - 300 - 19
-            this.height_dropzone = window.innerHeight - 159
+        this.width_dropzone = window.innerWidth - 300 - 300 - 19
+        this.height_dropzone = window.innerHeight - 159
     }
 
     add_page() {
