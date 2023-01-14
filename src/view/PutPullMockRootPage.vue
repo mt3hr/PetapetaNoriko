@@ -257,13 +257,14 @@ import TagListView, { TagListViewMode } from '@/view/TagListView.vue'
 import DropZone from '@/view/DropZone.vue'
 import HTMLTagPropertyView from '@/view/HTMLTagPropertyView.vue'
 import PagePropertyView from '@/view/PagePropertyView.vue'
-import HTMLTagDataBase, { GenerateHTMLOptions } from '@/html_tagdata/HTMLTagDataBase'
+import HTMLTagDataBase, { GenerateHTMLOptions, PositionStyle } from '@/html_tagdata/HTMLTagDataBase'
 import PageData from '@/page/PageData'
 import HTMLTagStructView from './HTMLTagStructView.vue'
 import { Watch } from 'vue-property-decorator'
 import { deserialize, serializable } from '@/serializable/serializable'
 import { head } from '@/main'
 import sample_project_json from '@/sample/ppmk_sample_project.json'
+import generateUUID from '@/uuid'
 
 @serializable
 class Settings {
@@ -384,10 +385,70 @@ export default class PutPullMockRootPage extends Vue {
                 this.copy_tag(this.clicked_tagdata)
             }
             if (e.ctrlKey && e.code == "KeyV" && this.copied_tagdata) {
-                // if (!this.clicked_tagdata) {
-                let dropzone: any = this.$refs["dropzone"]
-                dropzone.paste_tag()
-                // }
+                if (!this.clicked_tagdata) {
+                    let dropzone: any = this.$refs["dropzone"]
+                    dropzone.paste_tag()
+                } else {
+                    const copied_tagdata: HTMLTagDataBase = JSON.parse(JSON.stringify(this.copied_tagdata), deserialize)
+                    copied_tagdata.tagid = "id_" + generateUUID()
+                    copied_tagdata.position_style = PositionStyle.None
+                    copied_tagdata.position_x = undefined
+                    copied_tagdata.position_y = undefined
+                    let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                        // 後で代入する
+                    }
+                    walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                        for (let i = 0; i < tagdatas.length; i++) {
+                            tagdatas[i].tagid = "id_" + generateUUID()
+                            walk_tagdatas(tagdatas[i].child_tagdatas)
+                        }
+                    }
+                    walk_tagdatas(copied_tagdata.child_tagdatas)
+
+                    let dropzone: any = this.$refs["dropzone"]
+                    let json = JSON.stringify(dropzone.html_tagdatas)
+                    const html_tagdatas: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
+                    json = JSON.stringify(this.clicked_tagdata)
+                    const clicked_tagdata: HTMLTagDataBase = JSON.parse(json, deserialize)
+
+                    if (e.altKey || !clicked_tagdata.has_child_tag) {
+                        let parent_node: HTMLTagDataBase
+                        let index_at_parent_node = -1
+                        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>, parent: HTMLTagDataBase, parent_index: number): boolean { return false }
+                        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>, parent: HTMLTagDataBase, parent_index: number): boolean {
+                            for (let i = 0; i < tagdatas.length; i++) {
+                                if (clicked_tagdata.tagid == tagdatas[i].tagid) {
+                                    parent_node = parent
+                                    index_at_parent_node = parent_index
+                                    return true
+                                }
+                                if (walk_tagdatas(tagdatas[i].child_tagdatas, tagdatas[i], i)) {
+                                    return true
+                                }
+                            }
+                            return false
+                        }
+                        walk_tagdatas(html_tagdatas, null, -1)
+
+                        if (e.shiftKey) {
+                            parent_node.child_tagdatas.splice(index_at_parent_node, 0, copied_tagdata)
+                        } else if (e.ctrlKey) {
+                            parent_node.child_tagdatas.splice(index_at_parent_node + 1, 0, copied_tagdata)
+                        } else {
+                            parent_node.child_tagdatas.splice(index_at_parent_node + 1, 0, copied_tagdata)
+                        }
+                        dropzone.updated_tagdata(parent_node)
+                    } else {
+                        if (e.shiftKey) {
+                            clicked_tagdata.child_tagdatas.unshift(copied_tagdata)
+                        } else if (e.ctrlKey) {
+                            clicked_tagdata.child_tagdatas.push(copied_tagdata)
+                        } else {
+                            clicked_tagdata.child_tagdatas.push(copied_tagdata)
+                        }
+                        dropzone.updated_tagdata(clicked_tagdata)
+                    }
+                }
             }
             if (e.ctrlKey && e.code == "KeyX" && this.clicked_tagdata) {
                 this.copy_tag(this.clicked_tagdata)
