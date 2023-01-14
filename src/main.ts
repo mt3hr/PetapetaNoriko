@@ -13,6 +13,6 @@ const app = createApp(App)
   .use(router)
   .use(vuetify)
   .use(head)
-// app.config.errorHandler = () => null; // TODO
-// app.config.warnHandler = () => null; // TODO
+app.config.errorHandler = () => null; // TODO
+app.config.warnHandler = () => null; // TODO
 app.mount('#app')

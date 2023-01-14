@@ -265,6 +265,10 @@ export default class DropZone extends Vue {
     }
 
     on_drop(e: DragEvent) {
+        let tagid: string = null
+        if (e.dataTransfer.getData("ppmk/struct_li_id")) tagid = e.dataTransfer.getData("ppmk/struct_li_id")
+        if (e.dataTransfer.getData("ppmk/move_tag_id")) tagid = e.dataTransfer.getData("ppmk/move_tag_id")
+
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             let tagname = e.dataTransfer.getData("ppmk/htmltag")
             let tag_data: HTMLTagDataBase = generate_tagdata_by_tagname(tagname)
@@ -306,7 +310,7 @@ export default class DropZone extends Vue {
                     this.onclick_tag(tag_data)
                 })
             })
-        } else if (e.dataTransfer.getData("ppmk/move_tag_id")) {
+        } else if (tagid) {
             // すでに配置されたコンポーネントの移動
             let json = JSON.stringify(this.html_tagdatas)
             let html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
@@ -314,7 +318,7 @@ export default class DropZone extends Vue {
 
             let move_in_root = false
             for (let i = 0; i < html_tagdatas_root.length; i++) {
-                if (html_tagdatas_root[i].tagid == e.dataTransfer.getData("ppmk/move_tag_id")) {
+                if (html_tagdatas_root[i].tagid == tagid) {
                     move_tagdata = html_tagdatas_root[i]
                     move_tagdata.position_style = PositionStyle.Absolute
                     let dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
@@ -339,7 +343,7 @@ export default class DropZone extends Vue {
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                 for (let i = 0; i < tagdatas.length; i++) {
                     let html_tagdata = tagdatas[i]
-                    if (e.dataTransfer.getData("ppmk/move_tag_id") == tagdatas[i].tagid) {
+                    if (tagid == tagdatas[i].tagid) {
                         move_tagdata = tagdatas[i]
                         move_tagdata.position_style = PositionStyle.Absolute
                         tagdatas.splice(i, 1)
@@ -347,8 +351,8 @@ export default class DropZone extends Vue {
                         let dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
                         html_tagdata.position_x = e.pageX - dropzone_x
                         html_tagdata.position_y = e.pageY - dropzone_y
-                        html_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
-                        html_tagdata.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
+                        if (e.dataTransfer.getData("ppmk/move_tag_offset_x")) html_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
+                        if (e.dataTransfer.getData("ppmk/move_tag_offset_y")) html_tagdata.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
                         return true
                     }
                     if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
