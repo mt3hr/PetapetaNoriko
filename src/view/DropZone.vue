@@ -318,17 +318,26 @@ export default class DropZone extends Vue {
     }
 
     updated_tagdata(tagdata: HTMLTagDataBase) {
-        for (let i = 0; i < this.html_tagdatas.length; i++) {
-            if (tagdata.tagid == this.html_tagdatas[i].tagid) {
-                this.html_tagdatas[i] = tagdata
-                break
+        let json = JSON.stringify(this.html_tagdatas)
+        let html_tagdatas_root = JSON.parse(json, deserialize)
+
+        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
+        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
+            for (let i = 0; i < tagdatas.length; i++) {
+                if (tagdata.tagid == tagdatas[i].tagid) {
+                    tagdatas[i] = tagdata
+                    return true
+                }
+                if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
+                    return true
+                }
             }
         }
-        let html_tagdatas = this.html_tagdatas
+        walk_tagdatas(html_tagdatas_root)
         this.html_tagdatas = new Array<HTMLTagDataBase>()
         this.$nextTick(() => {
-            this.html_tagdatas = html_tagdatas
-            this.$emit('updated_htmltagdatas', html_tagdatas, tagdata)
+            this.html_tagdatas = html_tagdatas_root
+            this.$emit('updated_htmltagdatas', html_tagdatas_root, tagdata)
         })
     }
 
