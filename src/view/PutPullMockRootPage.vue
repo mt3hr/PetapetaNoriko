@@ -192,7 +192,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
             <v-row>
                 <v-col cols="auto">
-                    <v-checkbox class="checkbox" v-model="use_undo" :label="'Undo機能'" />
+                    <v-checkbox class="checkbox" v-model="use_undo" :label="'Undo機能（ベータ機能）（CTRL+Z、CTRL+Y連打の必要あり）'" />
                 </v-col>
             </v-row>
             <v-row>
