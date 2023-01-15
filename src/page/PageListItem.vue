@@ -5,8 +5,6 @@
     <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
         <v-list>
             <v-list-item @click="copy_page()">コピーを作成</v-list-item>
-        </v-list>
-        <v-list>
             <v-list-item @click="delete_page()">削除</v-list-item>
         </v-list>
     </v-menu>
