@@ -5,7 +5,7 @@
             "pageid": "d4c84155-99d0-4a95-bfea-66d3e2b173ca",
             "pagename": "About Put Pull Mock",
             "width": "700",
-            "height": "2500",
+            "height": "2800",
             "html_tagdatas": [
                 {
                     "__serializeName": "DivTagData",
@@ -393,6 +393,78 @@
                                 "__serializeValue": {
                                     "child_tagdatas": [],
                                     "tagname": "h4",
+                                    "tagid": "id_1ad7068b-9cd3-48f5-a388-5f6c69448c9b",
+                                    "tagclass": "",
+                                    "position_style": 1,
+                                    "selected_this_tag": false,
+                                    "text": "全般-Undo機能"
+                                }
+                            },
+                            {
+                                "__serializeName": "PTagData",
+                                "__serializeValue": {
+                                    "child_tagdatas": [],
+                                    "tagname": "p",
+                                    "tagid": "id_34cc85d9-6db3-493c-97e6-52d3c8b03d46",
+                                    "tagclass": "",
+                                    "position_style": 1,
+                                    "selected_this_tag": false,
+                                    "text": "Undo機能の有効無効を設定できます。\nCTRL＋Z: 戻る\nCTRL+Y: 進む"
+                                }
+                            },
+                            {
+                                "__serializeName": "H4TagData",
+                                "__serializeValue": {
+                                    "child_tagdatas": [],
+                                    "tagname": "h4",
+                                    "tagid": "id_54eaa6c7-aa69-48fb-803e-757656a1f455",
+                                    "tagclass": "",
+                                    "position_style": 1,
+                                    "selected_this_tag": false,
+                                    "text": "全般-構造ビュー自動スクロール"
+                                }
+                            },
+                            {
+                                "__serializeName": "PTagData",
+                                "__serializeValue": {
+                                    "child_tagdatas": [],
+                                    "tagname": "p",
+                                    "tagid": "id_963cc5c5-3324-487a-b7d6-8796c04cdcba",
+                                    "tagclass": "",
+                                    "position_style": 1,
+                                    "selected_this_tag": false,
+                                    "text": "ドロップゾーン内でクリックされたタグまで自動でスクロールします"
+                                }
+                            },
+                            {
+                                "__serializeName": "H4TagData",
+                                "__serializeValue": {
+                                    "child_tagdatas": [],
+                                    "tagname": "h4",
+                                    "tagid": "id_ee5d883e-cdd3-4f8e-9a94-0a13b78a0392",
+                                    "tagclass": "",
+                                    "position_style": 1,
+                                    "selected_this_tag": false,
+                                    "text": "全般-HTML要素一覧の表示"
+                                }
+                            },
+                            {
+                                "__serializeName": "PTagData",
+                                "__serializeValue": {
+                                    "child_tagdatas": [],
+                                    "tagname": "p",
+                                    "tagid": "id_cc0cdf1e-8f4d-4c98-89f4-eb4a7ca29183",
+                                    "tagclass": "",
+                                    "position_style": 1,
+                                    "selected_this_tag": false,
+                                    "text": "HTML要素一覧の表示を切り替えられます。"
+                                }
+                            },
+                            {
+                                "__serializeName": "H4TagData",
+                                "__serializeValue": {
+                                    "child_tagdatas": [],
+                                    "tagname": "h4",
                                     "tagid": "id_c3e48f1b-f6bc-4cf7-b19d-48188446cd3c",
                                     "tagclass": "",
                                     "position_style": 1,
@@ -494,6 +566,20 @@
                         "position_style": 0,
                         "selected_this_tag": false
                     }
+                },
+                {
+                    "__serializeName": "PTagData",
+                    "__serializeValue": {
+                        "child_tagdatas": [],
+                        "tagname": "p",
+                        "tagid": "id_1dfe0b7d-e4f1-4d55-aa63-d74e9318f432",
+                        "tagclass": "rokkasen",
+                        "position_x": 547,
+                        "position_y": 2769,
+                        "position_style": 0,
+                        "selected_this_tag": false,
+                        "text": "©チームろっかせん"
+                    }
                 }
             ],
             "css": "p {\n    margin-bottom: 20px;\n}\nimg {\n    width: 700px;\n}",
@@ -508,7 +594,7 @@
             "pageid": "5959b7cd-2370-49c5-b87d-cf048560a7d1",
             "pagename": "全タグリスト",
             "width": "600",
-            "height": "1000",
+            "height": "950",
             "html_tagdatas": [
                 {
                     "__serializeName": "H1TagData",
@@ -517,8 +603,8 @@
                         "tagname": "h1",
                         "tagid": "id_e840c2a4-6f09-4237-937b-3faf664f2bff",
                         "tagclass": "",
-                        "position_x": 13,
-                        "position_y": 7,
+                        "position_x": "0",
+                        "position_y": "0",
                         "position_style": 0,
                         "selected_this_tag": false,
                         "text": "全タグリスト"
@@ -662,6 +748,7 @@
                                             "__serializeName": "LITagData",
                                             "__serializeValue": {
                                                 "child_tagdatas": [],
+                                                "has_child_tag": true,
                                                 "tagname": "li",
                                                 "tagid": "id_167e4174-4fd6-42b7-94ac-442eedcd5347",
                                                 "tagclass": "",
@@ -675,6 +762,7 @@
                                             "__serializeName": "LITagData",
                                             "__serializeValue": {
                                                 "child_tagdatas": [],
+                                                "has_child_tag": true,
                                                 "tagname": "li",
                                                 "tagid": "id_c8a6ebe5-234b-44f1-8772-98eae06d1405",
                                                 "tagclass": "",
@@ -701,26 +789,28 @@
                                             "__serializeName": "LITagData",
                                             "__serializeValue": {
                                                 "child_tagdatas": [],
+                                                "has_child_tag": true,
                                                 "tagname": "li",
                                                 "tagid": "id_78b15196-65c4-426d-b654-b99e38fdaa21",
                                                 "tagclass": "",
                                                 "position_style": 1,
                                                 "selected_this_tag": false,
                                                 "text": "リストアイテム",
-                                                "value": ""
+                                                "value": "1"
                                             }
                                         },
                                         {
                                             "__serializeName": "LITagData",
                                             "__serializeValue": {
                                                 "child_tagdatas": [],
+                                                "has_child_tag": true,
                                                 "tagname": "li",
                                                 "tagid": "id_45019535-c82c-45cd-bde6-69e7d1dbfcbe",
                                                 "tagclass": "",
                                                 "position_style": 1,
                                                 "selected_this_tag": false,
                                                 "text": "リストアイテム",
-                                                "value": ""
+                                                "value": "2"
                                             }
                                         }
                                     ],
@@ -993,7 +1083,7 @@
                                                 "selected_this_tag": false,
                                                 "name": "",
                                                 "value": "",
-                                                "checked": false
+                                                "checked": true
                                             }
                                         },
                                         {
@@ -1020,7 +1110,7 @@
                                                 "position_style": 1,
                                                 "selected_this_tag": false,
                                                 "name": "",
-                                                "value": "",
+                                                "value": "2023-01-15",
                                                 "autocomplete": "",
                                                 "list": "",
                                                 "max": "",
@@ -1040,7 +1130,7 @@
                                                 "position_style": 1,
                                                 "selected_this_tag": false,
                                                 "name": "",
-                                                "value": "",
+                                                "value": "1996-12-24 19:00",
                                                 "autocomplete": "",
                                                 "list": "",
                                                 "max": "",
@@ -1049,28 +1139,7 @@
                                                 "required": false,
                                                 "step": ""
                                             }
-                                        }
-                                    ],
-                                    "has_child_tag": true,
-                                    "tagname": "form",
-                                    "tagid": "id_56cc0078-e7f2-4f9b-9643-1f00fcb2905b",
-                                    "tagclass": "",
-                                    "position_style": 1,
-                                    "selected_this_tag": false,
-                                    "acceptcharset": "",
-                                    "action": "",
-                                    "autocomplete": "",
-                                    "enctype": "",
-                                    "method": "",
-                                    "name": "",
-                                    "novalidate": false,
-                                    "target": ""
-                                }
-                            },
-                            {
-                                "__serializeName": "FormTagData",
-                                "__serializeValue": {
-                                    "child_tagdatas": [
+                                        },
                                         {
                                             "__serializeName": "EmailTagData",
                                             "__serializeValue": {
@@ -1087,7 +1156,7 @@
                                                 "autocomplete": "",
                                                 "multiple": false,
                                                 "pattern": "",
-                                                "placeholder": "",
+                                                "placeholder": "21jy0216@jec.ac.jp",
                                                 "readonly": false,
                                                 "required": false
                                             }
@@ -1108,28 +1177,7 @@
                                                 "multiple": false,
                                                 "required": false
                                             }
-                                        }
-                                    ],
-                                    "has_child_tag": true,
-                                    "tagname": "form",
-                                    "tagid": "id_7e535c29-649f-4911-a263-bb18bd1cc08e",
-                                    "tagclass": "",
-                                    "position_style": 1,
-                                    "selected_this_tag": false,
-                                    "acceptcharset": "",
-                                    "action": "",
-                                    "autocomplete": "",
-                                    "enctype": "",
-                                    "method": "",
-                                    "name": "",
-                                    "novalidate": false,
-                                    "target": ""
-                                }
-                            },
-                            {
-                                "__serializeName": "FormTagData",
-                                "__serializeValue": {
-                                    "child_tagdatas": [
+                                        },
                                         {
                                             "__serializeName": "ImageTagData",
                                             "__serializeValue": {
@@ -1162,7 +1210,7 @@
                                                 "position_style": 1,
                                                 "selected_this_tag": false,
                                                 "name": "",
-                                                "value": "",
+                                                "value": "2021-04",
                                                 "autocomplete": "",
                                                 "list": "",
                                                 "max": "",
@@ -1182,7 +1230,7 @@
                                                 "position_style": 1,
                                                 "selected_this_tag": false,
                                                 "name": "",
-                                                "value": "",
+                                                "value": "100",
                                                 "autocomplete": "",
                                                 "list": "",
                                                 "max": "",
@@ -1202,7 +1250,7 @@
                                                 "position_style": 1,
                                                 "selected_this_tag": false,
                                                 "name": "",
-                                                "value": "",
+                                                "value": "jec21jy0216",
                                                 "size": "",
                                                 "maxlength": "",
                                                 "autocomplete": "",
@@ -1211,28 +1259,7 @@
                                                 "readonly": false,
                                                 "required": false
                                             }
-                                        }
-                                    ],
-                                    "has_child_tag": true,
-                                    "tagname": "form",
-                                    "tagid": "id_fc4f3c05-a25d-4ea9-8210-8f682a41f901",
-                                    "tagclass": "",
-                                    "position_style": 1,
-                                    "selected_this_tag": false,
-                                    "acceptcharset": "",
-                                    "action": "",
-                                    "autocomplete": "",
-                                    "enctype": "",
-                                    "method": "",
-                                    "name": "",
-                                    "novalidate": false,
-                                    "target": ""
-                                }
-                            },
-                            {
-                                "__serializeName": "FormTagData",
-                                "__serializeValue": {
-                                    "child_tagdatas": [
+                                        },
                                         {
                                             "__serializeName": "RadioTagData",
                                             "__serializeValue": {
@@ -1244,7 +1271,7 @@
                                                 "selected_this_tag": false,
                                                 "name": "",
                                                 "value": "",
-                                                "checked": false,
+                                                "checked": true,
                                                 "required": false
                                             }
                                         },
@@ -1293,7 +1320,7 @@
                                                 "maxlength": "",
                                                 "autocomplete": "",
                                                 "pattern": "",
-                                                "placeholder": "",
+                                                "placeholder": "検索",
                                                 "readonly": false,
                                                 "required": false,
                                                 "list": ""
@@ -1316,28 +1343,49 @@
                                                 "formnovalidate": false,
                                                 "formtarget": ""
                                             }
-                                        }
-                                    ],
-                                    "has_child_tag": true,
-                                    "tagname": "form",
-                                    "tagid": "id_33694015-e6f8-4925-a6f2-485ea46d8a82",
-                                    "tagclass": "",
-                                    "position_style": 1,
-                                    "selected_this_tag": false,
-                                    "acceptcharset": "",
-                                    "action": "",
-                                    "autocomplete": "",
-                                    "enctype": "",
-                                    "method": "",
-                                    "name": "",
-                                    "novalidate": false,
-                                    "target": ""
-                                }
-                            },
-                            {
-                                "__serializeName": "FormTagData",
-                                "__serializeValue": {
-                                    "child_tagdatas": [
+                                        },
+                                        {
+                                            "__serializeName": "URLTagData",
+                                            "__serializeValue": {
+                                                "child_tagdatas": [],
+                                                "has_child_tag": true,
+                                                "tagname": "url",
+                                                "tagid": "id_22670a49-2a11-495a-8a50-da6173d787a0",
+                                                "tagclass": "",
+                                                "position_style": 1,
+                                                "selected_this_tag": false,
+                                                "name": "",
+                                                "value": "",
+                                                "size": "",
+                                                "maxlength": "",
+                                                "autocomplete": "",
+                                                "pattern": "",
+                                                "placeholder": "https://www.jec.ac.jp/",
+                                                "readonly": false,
+                                                "required": false,
+                                                "list": ""
+                                            }
+                                        },
+                                        {
+                                            "__serializeName": "WeekTagData",
+                                            "__serializeValue": {
+                                                "child_tagdatas": [],
+                                                "tagname": "week",
+                                                "tagid": "id_2a773717-23cc-4aa7-b7ea-ef19bc28a35a",
+                                                "tagclass": "",
+                                                "position_style": 1,
+                                                "selected_this_tag": false,
+                                                "name": "",
+                                                "value": "2023-W01",
+                                                "autocomplete": "",
+                                                "list": "",
+                                                "max": "",
+                                                "min": "",
+                                                "readonly": false,
+                                                "required": false,
+                                                "step": ""
+                                            }
+                                        },
                                         {
                                             "__serializeName": "TelTagData",
                                             "__serializeValue": {
@@ -1353,7 +1401,7 @@
                                                 "maxlength": "",
                                                 "autocomplete": "",
                                                 "pattern": "",
-                                                "placeholder": "",
+                                                "placeholder": "03-3363-7761",
                                                 "readonly": false,
                                                 "required": false,
                                                 "list": ""
@@ -1374,7 +1422,7 @@
                                                 "maxlength": "",
                                                 "autocomplete": "",
                                                 "pattern": "",
-                                                "placeholder": "",
+                                                "placeholder": "テキスト",
                                                 "readonly": false,
                                                 "required": false,
                                                 "list": ""
@@ -1390,7 +1438,7 @@
                                                 "position_style": 1,
                                                 "selected_this_tag": false,
                                                 "name": "",
-                                                "value": "",
+                                                "value": "09:20",
                                                 "autocomplete": "",
                                                 "list": "",
                                                 "max": "",
@@ -1402,70 +1450,7 @@
                                     ],
                                     "has_child_tag": true,
                                     "tagname": "form",
-                                    "tagid": "id_134b0781-455d-4d0e-8dfe-e825f914b1a3",
-                                    "tagclass": "",
-                                    "position_style": 1,
-                                    "selected_this_tag": false,
-                                    "acceptcharset": "",
-                                    "action": "",
-                                    "autocomplete": "",
-                                    "enctype": "",
-                                    "method": "",
-                                    "name": "",
-                                    "novalidate": false,
-                                    "target": ""
-                                }
-                            },
-                            {
-                                "__serializeName": "FormTagData",
-                                "__serializeValue": {
-                                    "child_tagdatas": [
-                                        {
-                                            "__serializeName": "URLTagData",
-                                            "__serializeValue": {
-                                                "child_tagdatas": [],
-                                                "has_child_tag": true,
-                                                "tagname": "url",
-                                                "tagid": "id_22670a49-2a11-495a-8a50-da6173d787a0",
-                                                "tagclass": "",
-                                                "position_style": 1,
-                                                "selected_this_tag": false,
-                                                "name": "",
-                                                "value": "",
-                                                "size": "",
-                                                "maxlength": "",
-                                                "autocomplete": "",
-                                                "pattern": "",
-                                                "placeholder": "",
-                                                "readonly": false,
-                                                "required": false,
-                                                "list": ""
-                                            }
-                                        },
-                                        {
-                                            "__serializeName": "WeekTagData",
-                                            "__serializeValue": {
-                                                "child_tagdatas": [],
-                                                "tagname": "week",
-                                                "tagid": "id_2a773717-23cc-4aa7-b7ea-ef19bc28a35a",
-                                                "tagclass": "",
-                                                "position_style": 1,
-                                                "selected_this_tag": false,
-                                                "name": "",
-                                                "value": "",
-                                                "autocomplete": "",
-                                                "list": "",
-                                                "max": "",
-                                                "min": "",
-                                                "readonly": false,
-                                                "required": false,
-                                                "step": ""
-                                            }
-                                        }
-                                    ],
-                                    "has_child_tag": true,
-                                    "tagname": "form",
-                                    "tagid": "id_013840d0-8fae-451e-bde7-1cf25c6e724b",
+                                    "tagid": "id_56cc0078-e7f2-4f9b-9643-1f00fcb2905b",
                                     "tagclass": "",
                                     "position_style": 1,
                                     "selected_this_tag": false,
@@ -1494,7 +1479,7 @@
                                     "form": "",
                                     "maxlength": "",
                                     "name": "",
-                                    "placeholder": "",
+                                    "placeholder": "テキストエリア",
                                     "readonly": false,
                                     "required": false,
                                     "rows": "",
@@ -1568,10 +1553,24 @@
                         "tagname": "div",
                         "tagid": "id_d028df16-069c-4995-b9a1-8267751d95af",
                         "tagclass": "",
-                        "position_x": 39,
-                        "position_y": 115,
+                        "position_x": "25",
+                        "position_y": "50",
                         "position_style": 0,
                         "selected_this_tag": false
+                    }
+                },
+                {
+                    "__serializeName": "PTagData",
+                    "__serializeValue": {
+                        "child_tagdatas": [],
+                        "tagname": "p",
+                        "tagid": "id_ccfdb4db-bfd2-4dfe-9099-8cc2a4c84868",
+                        "tagclass": "rokkasen",
+                        "position_x": 452,
+                        "position_y": 916,
+                        "position_style": 0,
+                        "selected_this_tag": false,
+                        "text": "©チームろっかせん"
                     }
                 }
             ],
@@ -2029,6 +2028,7 @@
                                                                                                                                                                                             "__serializeName": "LITagData",
                                                                                                                                                                                             "__serializeValue": {
                                                                                                                                                                                                 "child_tagdatas": [],
+                                                                                                                                                                                                "has_child_tag": true,
                                                                                                                                                                                                 "tagname": "li",
                                                                                                                                                                                                 "tagid": "id_c2c1c164-6f68-491a-bd9a-701da84a0e51",
                                                                                                                                                                                                 "tagclass": "selected",
@@ -2042,6 +2042,7 @@
                                                                                                                                                                                             "__serializeName": "LITagData",
                                                                                                                                                                                             "__serializeValue": {
                                                                                                                                                                                                 "child_tagdatas": [],
+                                                                                                                                                                                                "has_child_tag": true,
                                                                                                                                                                                                 "tagname": "li",
                                                                                                                                                                                                 "tagid": "id_e3eed3ae-4afc-4083-af2d-0723b43d6238",
                                                                                                                                                                                                 "tagclass": "",
@@ -2055,6 +2056,7 @@
                                                                                                                                                                                             "__serializeName": "LITagData",
                                                                                                                                                                                             "__serializeValue": {
                                                                                                                                                                                                 "child_tagdatas": [],
+                                                                                                                                                                                                "has_child_tag": true,
                                                                                                                                                                                                 "tagname": "li",
                                                                                                                                                                                                 "tagid": "id_bbea7586-54ba-4cbd-9212-fa83c375704b",
                                                                                                                                                                                                 "tagclass": "",
@@ -2068,6 +2070,7 @@
                                                                                                                                                                                             "__serializeName": "LITagData",
                                                                                                                                                                                             "__serializeValue": {
                                                                                                                                                                                                 "child_tagdatas": [],
+                                                                                                                                                                                                "has_child_tag": true,
                                                                                                                                                                                                 "tagname": "li",
                                                                                                                                                                                                 "tagid": "id_006f48d4-1778-4230-ac7c-f477e5d16fcd",
                                                                                                                                                                                                 "tagclass": "",
@@ -2207,6 +2210,7 @@
                                                                                                                                 "__serializeName": "LITagData",
                                                                                                                                 "__serializeValue": {
                                                                                                                                     "child_tagdatas": [],
+                                                                                                                                    "has_child_tag": true,
                                                                                                                                     "tagname": "li",
                                                                                                                                     "tagid": "id_7fed89f9-ba2e-47e2-a592-5dd0dcf201bc",
                                                                                                                                     "tagclass": "",
@@ -2220,6 +2224,7 @@
                                                                                                                                 "__serializeName": "LITagData",
                                                                                                                                 "__serializeValue": {
                                                                                                                                     "child_tagdatas": [],
+                                                                                                                                    "has_child_tag": true,
                                                                                                                                     "tagname": "li",
                                                                                                                                     "tagid": "id_7f3e07ca-709d-4ed3-926b-a30957316564",
                                                                                                                                     "tagclass": "",
@@ -2233,6 +2238,7 @@
                                                                                                                                 "__serializeName": "LITagData",
                                                                                                                                 "__serializeValue": {
                                                                                                                                     "child_tagdatas": [],
+                                                                                                                                    "has_child_tag": true,
                                                                                                                                     "tagname": "li",
                                                                                                                                     "tagid": "id_2d3ccf90-23e2-4d3b-8c5c-1fe0186b22f2",
                                                                                                                                     "tagclass": "",
@@ -2246,6 +2252,7 @@
                                                                                                                                 "__serializeName": "LITagData",
                                                                                                                                 "__serializeValue": {
                                                                                                                                     "child_tagdatas": [],
+                                                                                                                                    "has_child_tag": true,
                                                                                                                                     "tagname": "li",
                                                                                                                                     "tagid": "id_edc3fe35-fe54-4cbf-9981-b88f8d36d6f4",
                                                                                                                                     "tagclass": "selected",
@@ -3754,11 +3761,11 @@
                                                                                                                                 "__serializeValue": {
                                                                                                                                     "child_tagdatas": [],
                                                                                                                                     "tagname": "p",
-                                                                                                                                    "tagid": "id_84447550-c61a-423f-8d67-dad9b5c77c5d",
-                                                                                                                                    "tagclass": "",
+                                                                                                                                    "tagid": "id_8d452db2-cef9-4c14-a264-386e19eb32e6",
+                                                                                                                                    "tagclass": "rokkasen",
                                                                                                                                     "position_style": 1,
                                                                                                                                     "selected_this_tag": false,
-                                                                                                                                    "text": "場所: 日本電子専門学校 1252教室"
+                                                                                                                                    "text": "©チームろっかせん"
                                                                                                                                 }
                                                                                                                             }
                                                                                                                         ],
@@ -3925,6 +3932,7 @@
                                 "__serializeName": "LITagData",
                                 "__serializeValue": {
                                     "child_tagdatas": [],
+                                    "has_child_tag": true,
                                     "tagname": "li",
                                     "tagid": "id_1523c43d-e917-44a1-a08b-fc844bcf4b3e",
                                     "tagclass": "menu_item",
@@ -3938,6 +3946,7 @@
                                 "__serializeName": "LITagData",
                                 "__serializeValue": {
                                     "child_tagdatas": [],
+                                    "has_child_tag": true,
                                     "tagname": "li",
                                     "tagid": "id_ecfe0db0-3536-4de7-88d0-3fa48d2f7b8f",
                                     "tagclass": "menu_item",
@@ -3951,6 +3960,7 @@
                                 "__serializeName": "LITagData",
                                 "__serializeValue": {
                                     "child_tagdatas": [],
+                                    "has_child_tag": true,
                                     "tagname": "li",
                                     "tagid": "id_cdedac61-5e4d-44cf-a2f5-bbaee4d89802",
                                     "tagclass": "menu_item",
@@ -3964,6 +3974,7 @@
                                 "__serializeName": "LITagData",
                                 "__serializeValue": {
                                     "child_tagdatas": [],
+                                    "has_child_tag": true,
                                     "tagname": "li",
                                     "tagid": "id_f4b39bc9-442b-4989-bd8d-3d3d591b5f02",
                                     "tagclass": "menu_item",
@@ -4044,6 +4055,7 @@
                                 "__serializeName": "LITagData",
                                 "__serializeValue": {
                                     "child_tagdatas": [],
+                                    "has_child_tag": true,
                                     "tagname": "li",
                                     "tagid": "id_550752c2-4b7b-4cbd-96f8-6fda1cef6517",
                                     "tagclass": "menu_item",
@@ -4057,6 +4069,7 @@
                                 "__serializeName": "LITagData",
                                 "__serializeValue": {
                                     "child_tagdatas": [],
+                                    "has_child_tag": true,
                                     "tagname": "li",
                                     "tagid": "id_9cb5deb4-a0f8-4331-b2bb-a74a79f7e553",
                                     "tagclass": "menu_item",
@@ -4408,6 +4421,20 @@
                         "ismap": "",
                         "width": "",
                         "height": ""
+                    }
+                },
+                {
+                    "__serializeName": "PTagData",
+                    "__serializeValue": {
+                        "child_tagdatas": [],
+                        "tagname": "p",
+                        "tagid": "id_979f8846-8134-49f0-9159-6554de3993e7",
+                        "tagclass": "rokkasen",
+                        "position_x": 1141,
+                        "position_y": 670,
+                        "position_style": 0,
+                        "selected_this_tag": false,
+                        "text": "©チームろっかせん"
                     }
                 }
             ],
