@@ -402,7 +402,6 @@ export default class PutPullMockRootPage extends Vue {
                     this.histories.index -= 1
                 }
                 let pagedatas: Array<PageData> = this.histories.histories[this.histories.index]
-                console.log(pagedatas)
                 // if (!this.back) this.advance_stack.push(this.history_stack.pop())
 
                 if (pagedatas) {
@@ -418,7 +417,6 @@ export default class PutPullMockRootPage extends Vue {
                     this.histories.index += 1
                     pagedatas = this.histories.histories[this.histories.index]
                 }
-                console.log(pagedatas)
                 // if (!this.foward) this.history_stack.push(this.advance_stack.pop())
                 if (pagedatas) {
                     page_list_view.pagedatas = pagedatas
@@ -863,11 +861,9 @@ export default class PutPullMockRootPage extends Vue {
         if (!page_list_view.pagedatas) {
             return
         }
-
         this.histories.histories.length = this.histories.index + 1
         this.histories.histories[this.histories.histories.length - 1] = JSON.parse(JSON.stringify(page_list_view.pagedatas), deserialize)
         this.histories.index = this.histories.histories.length
-        console.log(this.histories.index)
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {
