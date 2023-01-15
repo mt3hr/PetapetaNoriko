@@ -368,6 +368,7 @@ export default class PutPullMockRootPage extends Vue {
                 this.$nextTick(() => {
                     page_list_view.clicked_page(about_ppmk_pagedata)
                 })
+                page_list_view.append_history()
             })
         }
         this.export_base64_image = settings.export_base64_image
@@ -470,8 +471,7 @@ export default class PutPullMockRootPage extends Vue {
         })
         this.$nextTick(() => {
             let page_list_view: any = this.$refs['page_list_view']
-            page_list_view.history = new History()
-            page_list_view.history.page_datas = JSON.parse(JSON.stringify(page_list_view.pagedatas), deserialize)
+            page_list_view.append_history()
         })
     }
 
@@ -492,6 +492,7 @@ export default class PutPullMockRootPage extends Vue {
             let pagedatas = JSON.parse(e.target.result.toString(), deserialize)
             page_list_view.pagedatas = pagedatas
             page_list_view.clicked_page(page_list_view.pagedatas[0])
+            page_list_view.append_history()
             this.is_show_readin_dialog = false
         })
         reader.readAsText(e.target.files[0])
@@ -618,17 +619,20 @@ export default class PutPullMockRootPage extends Vue {
     updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase, history_mode: boolean) {
         let page_list_view: any = this.$refs["page_list_view"]
 
+        page_list_view.history_mode = history_mode
+        page_list_view.append_history()
+
         page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = html_tagdatas
         if (tagdata) {
             this.onclick_tag(tagdata)
         }
+
+        page_list_view.history_mode = history_mode
+        page_list_view.append_history()
+
         page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
         page_list_view.save_pagedatas_to_localstorage()
-
-        if (history_mode) {
-            page_list_view.append_history()
-        }
     }
 
     clicked_page(pagedata: PageData) {
@@ -802,6 +806,7 @@ export default class PutPullMockRootPage extends Vue {
         walk_tagdatas(tagdatas)
         page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = tagdatas
         this.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
+        page_list_view.append_history()
         page_list_view.save_pagedatas_to_localstorage()
     }
 
@@ -827,6 +832,7 @@ export default class PutPullMockRootPage extends Vue {
 
         this.width_dropzone = window.innerWidth - 300 - 300 - 19
         this.height_dropzone = window.innerHeight - 159
+        page_list_view.append_history
     }
 
     add_page() {

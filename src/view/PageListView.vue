@@ -50,14 +50,16 @@ export default class Page extends Vue {
 
     is_show_oversize_localstorage_dialog = false
 
+    history_mode = true
     history_stack: Stack = new Stack
     advance_stack: Stack = new Stack
 
     @Watch('pagedatas')
     save_pagedatas_to_localstorage() {
+        let pagedata = JSON.stringify(this.pagedatas)
         if (this.auto_save_pagedatas_to_localstorage) {
             try {
-                window.localStorage.setItem("ppmk_pagedatas", JSON.stringify(this.pagedatas))
+                window.localStorage.setItem("ppmk_pagedatas", pagedata)
             } catch (e) {
                 this.is_show_oversize_localstorage_dialog = true
                 this.$emit("update_auto_save_pagedatas_to_localstorage", false)
@@ -82,9 +84,6 @@ export default class Page extends Vue {
         }
         this.$nextTick(() => {
             this.$emit('clicked_page', pagedata)
-            this.$nextTick(() => {
-                this.append_history()
-            })
         })
     }
 
@@ -103,38 +102,34 @@ export default class Page extends Vue {
     }
 
     append_history() {
-        // this.history_stack.push(this.pagedatas)
-        // this.advance_stack = new Stack()
+        if (this.history_mode) {
+            this.advance_stack = new Stack()
+            this.history_stack.push(JSON.parse(JSON.stringify(this.pagedatas), deserialize))
+        }
     }
 
     created(): void {
         window.addEventListener('keypress', (e: KeyboardEvent) => {
             if (e.ctrlKey && e.code == "KeyZ") {
+                // if (!this.back) this.advance_stack.push(this.history_stack.pop())
                 let pagedatas = this.history_stack.pop()
                 if (pagedatas) {
                     this.advance_stack.push(pagedatas)
                     this.pagedatas = pagedatas
-                    try {
+                    this.$nextTick(() => {
                         this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
-                        this.clicked_page(this.pagedatas[this.selected_index])
-                    } catch (e) {
-                        this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
-                        this.clicked_page(this.pagedatas[0])
-                    }
+                    })
                 }
             }
             if (e.ctrlKey && e.code == "KeyY") {
+                // if (!this.foward) this.history_stack.push(this.advance_stack.pop())
                 let pagedatas = this.advance_stack.pop()
                 if (pagedatas) {
                     this.history_stack.push(pagedatas)
                     this.pagedatas = pagedatas
-                    try {
+                    this.$nextTick(() => {
                         this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
-                        this.clicked_page(this.pagedatas[this.selected_index])
-                    } catch (e) {
-                        this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
-                        this.clicked_page(this.pagedatas[0])
-                    }
+                    })
                 }
             }
         })
@@ -167,9 +162,8 @@ export default class Page extends Vue {
     add_page() {
         let pagedata = new PageData()
         this.pagedatas.push(pagedata)
-        // this.$nextTick(() => {
         this.clicked_page(pagedata)
-        // })
+        this.append_history()
     }
 
     copy_page(pagedata: any, index: number) {

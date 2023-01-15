@@ -219,8 +219,7 @@
         :tagdatas_root="tagdatas_root" :show_border="show_border" @onclick_tag="onclick_tag"
         @updated_tagdata="updated_tagdata" />
 
-    <v-menu v-if="is_show_contextmenu && clicked_tagdata.tagid == tagdata.tagid" v-model="is_show_contextmenu"
-        :style="contextmenu_style">
+    <v-menu v-if="is_show_contextmenu" v-model="is_show_contextmenu" :style="contextmenu_style">
         <v-list>
             <v-list-item @click="copy_tag(tagdata)">コピー</v-list-item>
             <v-list-item @click="cut_tag(tagdata)">切り取り</v-list-item>

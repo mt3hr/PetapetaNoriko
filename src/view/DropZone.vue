@@ -135,8 +135,6 @@
                     </v-row>
                 </v-card>
             </v-dialog>
-
-
         </div>
     </div>
 </template>
@@ -442,7 +440,7 @@ export default class DropZone extends Vue {
     }
 
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {
-        this.$emit('updated_tagdatas_root', tagdatas, null)
+        this.$emit('updated_tagdatas_root', tagdatas, null, true)
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {
@@ -519,6 +517,9 @@ export default class DropZone extends Vue {
     cut_tag(tagdata: HTMLTagDataBase) {
         this.copy_tag(tagdata)
         this.delete_tagdata(tagdata)
+    }
+    created(): void {
+        this.$emit('updated_htmltagdatas', this.html_tagdatas, null, true)
     }
 }
 </script>
