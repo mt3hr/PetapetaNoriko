@@ -41,7 +41,6 @@
                     :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_htmltagdatas"
                     @add_page="add_page" @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata"
                     @copy_tag="copy_tag" @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
-                <!--TODO-->
             </v-col>
 
             <!--プロパティビュー-->
@@ -255,7 +254,6 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 
 <script lang="ts">
 //TODO グローバルナビゲーション 横並びリスト
-//TODO 選択されているところにペーストしたくない？
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView, { TagListViewMode } from '@/view/TagListView.vue'
@@ -403,24 +401,28 @@ export default class PutPullMockRootPage extends Vue {
                         this.histories.index = this.histories.histories.length - 1
                     }
                 } else {
-                    this.histories.index = 0
+                    this.histories.index = 1
                 }
-                let pagedatas: Array<PageData> = this.histories.histories[--this.histories.index]
+                this.histories.index--
+                let pagedatas: Array<PageData> = this.histories.histories[this.histories.index]
                 if (pagedatas) {
                     page_list_view.pagedatas = pagedatas
+                    page_list_view.selected_index = this.histories.page_index[this.histories.index]
                     this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
-                    // page_list_view.clicked_page(page_list_view.pagedatas[0])
+                    this.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
                 }
             }
             if (e.ctrlKey && e.code == "KeyY") {
                 let pagedatas: Array<PageData>
                 if (this.histories.histories.length > this.histories.index + 1) {
-                    pagedatas = this.histories.histories[++this.histories.index]
+                    this.histories.index++
+                    pagedatas = this.histories.histories[this.histories.index]
                 }
                 if (pagedatas) {
                     page_list_view.pagedatas = pagedatas
+                    page_list_view.selected_index = this.histories.page_index[this.histories.index]
                     this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
-                    //page_list_view.clicked_page(page_list_view.pagedatas[0])
+                    this.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
                 }
             }
         })
@@ -513,7 +515,6 @@ export default class PutPullMockRootPage extends Vue {
             }
         })
         this.$nextTick(() => {
-            let page_list_view: any = this.$refs['page_list_view']
             this.append_history()
         })
     }
@@ -860,8 +861,11 @@ export default class PutPullMockRootPage extends Vue {
             }
         }
 
-        this.histories.histories.length = this.histories.index + 1
-        this.histories.histories[this.histories.index++] = JSON.parse(JSON.stringify(page_list_view.pagedatas), deserialize)
+        this.histories.histories.length = this.histories.index
+        this.histories.histories[this.histories.index] = JSON.parse(JSON.stringify(page_list_view.pagedatas), deserialize)
+        this.histories.page_index.length = this.histories.index + 1
+        this.histories.page_index[this.histories.index] = page_list_view.selected_index
+        this.histories.index++
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {
