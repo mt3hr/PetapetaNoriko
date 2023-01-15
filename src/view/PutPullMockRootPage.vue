@@ -192,7 +192,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
             <v-row>
                 <v-col cols="auto">
-                    <v-checkbox class="checkbox" v-model="use_undo" :label="'Undo機能（ベータ機能）（CTRL+Z、CTRL+Y連打の必要あり）'" />
+                    <v-checkbox class="checkbox" v-model="use_undo" :label="'Undo機能'" />
                 </v-col>
             </v-row>
             <v-row>
@@ -395,16 +395,16 @@ export default class PutPullMockRootPage extends Vue {
 
     created(): void {
         this.load_settings_from_cookie()
-        window.addEventListener('keypress', (e: KeyboardEvent) => {
+        window.addEventListener('keyup', (e: KeyboardEvent) => {
             let page_list_view: any = this.$refs['page_list_view']
             if (e.ctrlKey && e.code == "KeyZ") {
                 if (this.histories.index > 0) {
                     if (this.histories.index >= this.histories.histories.length) {
                         this.histories.index = this.histories.histories.length - 1
                     }
+                } else {
+                    this.histories.index = 0
                 }
-                console.log("index: " + String(this.histories.index))
-                console.log("length: " + String(this.histories.histories.length))
                 let pagedatas: Array<PageData> = this.histories.histories[--this.histories.index]
                 if (pagedatas) {
                     page_list_view.pagedatas = pagedatas
@@ -417,8 +417,6 @@ export default class PutPullMockRootPage extends Vue {
                 if (this.histories.histories.length > this.histories.index + 1) {
                     pagedatas = this.histories.histories[++this.histories.index]
                 }
-                console.log("index: " + String(this.histories.index))
-                console.log("length: " + String(this.histories.histories.length))
                 if (pagedatas) {
                     page_list_view.pagedatas = pagedatas
                     this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
@@ -864,8 +862,6 @@ export default class PutPullMockRootPage extends Vue {
 
         this.histories.histories.length = this.histories.index + 1
         this.histories.histories[this.histories.index++] = JSON.parse(JSON.stringify(page_list_view.pagedatas), deserialize)
-        console.log("index: " + String(this.histories.index))
-        console.log("length: " + String(this.histories.histories.length))
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {

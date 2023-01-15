@@ -13,7 +13,7 @@
                     <v-btn @click="add_page"
                         :style="{ 'margin': 'auto', 'position': 'rerative', 'top': '45%' }">ページを追加</v-btn>
                 </div>
-                <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas_root"
+                <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas"
                     :clicked_tagdata="clicked_tagdata" :show_border="show_border" :tagdata="tagdata"
                     :copied_tagdata="copied_tagdata" @updated_tagdatas_root="updated_tagdatas_root" @copy_tag="copy_tag"
                     @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag" @delete_tagdata="delete_tagdata" />
@@ -163,7 +163,6 @@ import LITagData from '@/html_tagdata/LITagData'
 
 export default class DropZone extends Vue {
     html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
-    html_tagdatas_root: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
     style_user_edited = ""
     @Prop() show_border: boolean
     @Prop() dropzone_style: any
@@ -278,14 +277,14 @@ export default class DropZone extends Vue {
             tag_data.position_x = e.offsetX
             tag_data.position_y = e.offsetY
 
-            this.html_tagdatas.push(tag_data)
-            this.updated_tagdata(tag_data)
+            let html_tagdatas: Array<HTMLTagDataBase> = JSON.parse(JSON.stringify(this.html_tagdatas), deserialize)
+            html_tagdatas.push(tag_data)
+            this.$emit('updated_htmltagdatas', html_tagdatas, null, true)
             this.$nextTick(() => {
                 this.$nextTick(() => {
                     this.onclick_tag(tag_data)
                 })
             })
-            this.$emit('updated_htmltagdatas', this.html_tagdatas, null, true)
 
             switch (tagname) {
                 case "table": {
@@ -414,10 +413,8 @@ export default class DropZone extends Vue {
         }
         walk_tagdatas(html_tagdatas_root)
         this.html_tagdatas = new Array<HTMLTagDataBase>()
-        // this.$nextTick(() => {
         this.html_tagdatas = html_tagdatas_root
         this.$emit('updated_htmltagdatas', html_tagdatas_root, tagdata, true)
-        // })
     }
 
     delete_tagdata(tagdata: HTMLTagDataBase) {
