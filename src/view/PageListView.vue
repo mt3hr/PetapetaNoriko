@@ -34,7 +34,6 @@
 import PageData from '@/page/PageData';
 import PageListItem from '@/page/PageListItem.vue';
 import { deserialize } from '@/serializable/serializable';
-import Stack from '@/stack/Stack';
 import { Options, Vue } from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
 
@@ -49,10 +48,6 @@ export default class Page extends Vue {
     @Prop() auto_save_pagedatas_to_localstorage: boolean
 
     is_show_oversize_localstorage_dialog = false
-
-    history_mode = true
-    history_stack: Stack = new Stack
-    advance_stack: Stack = new Stack
 
     @Watch('pagedatas')
     save_pagedatas_to_localstorage() {
@@ -101,39 +96,7 @@ export default class Page extends Vue {
         }
     }
 
-    append_history() {
-        if (this.history_mode) {
-            this.advance_stack = new Stack()
-            this.history_stack.push(JSON.parse(JSON.stringify(this.pagedatas), deserialize))
-        }
-    }
-
     created(): void {
-        window.addEventListener('keypress', (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.code == "KeyZ") {
-                // if (!this.back) this.advance_stack.push(this.history_stack.pop())
-                let pagedatas = this.history_stack.pop()
-                if (pagedatas) {
-                    this.advance_stack.push(pagedatas)
-                    this.pagedatas = pagedatas
-                    this.$nextTick(() => {
-                        this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
-                    })
-                }
-            }
-            if (e.ctrlKey && e.code == "KeyY") {
-                // if (!this.foward) this.history_stack.push(this.advance_stack.pop())
-                let pagedatas = this.advance_stack.pop()
-                if (pagedatas) {
-                    this.history_stack.push(pagedatas)
-                    this.pagedatas = pagedatas
-                    this.$nextTick(() => {
-                        this.$emit("updated_htmltagdatas", this.pagedatas[this.selected_index].html_tagdatas, null, false)
-                    })
-                }
-            }
-        })
-
         if (this.auto_save_pagedatas_to_localstorage) {
             try {
                 this.pagedatas = JSON.parse(window.localStorage.getItem("ppmk_pagedatas"), deserialize)
@@ -163,7 +126,6 @@ export default class Page extends Vue {
         let pagedata = new PageData()
         this.pagedatas.push(pagedata)
         this.clicked_page(pagedata)
-        this.append_history()
     }
 
     copy_page(pagedata: any, index: number) {

@@ -192,6 +192,11 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
             <v-row>
                 <v-col cols="auto">
+                    <v-checkbox class="checkbox" v-model="use_undo" :label="'Undo機能'" />
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
                     <v-checkbox class="checkbox" v-model="auto_scroll_tag_struct_view" :label="'構造ビュー自動スクロール'" />
                 </v-col>
             </v-row>
@@ -265,7 +270,7 @@ import { deserialize, serializable } from '@/serializable/serializable'
 import { head } from '@/main'
 import sample_project_json from '@/sample/ppmk_sample_project.json'
 import generateUUID from '@/uuid'
-import History from './History'
+import { Histories } from './History'
 
 @serializable
 class Settings {
@@ -277,6 +282,7 @@ class Settings {
     auto_save_pagedatas_to_localstorage: boolean
     auto_scroll_tag_struct_view: boolean
     tag_list_view_mode: TagListViewMode
+    use_undo: boolean
 }
 
 @Options({
@@ -319,6 +325,9 @@ export default class PutPullMockRootPage extends Vue {
 
     tag_list_view_mode: TagListViewMode = TagListViewMode.Text
 
+    histories: Histories = new Histories()
+
+    use_undo = true
 
     @Watch('export_base64_image')
     @Watch('export_head')
@@ -328,6 +337,7 @@ export default class PutPullMockRootPage extends Vue {
     @Watch('auto_save_pagedatas_to_localstorage')
     @Watch('auto_scroll_tag_struct_view')
     @Watch('tag_list_view_mode')
+    @Watch('use_undo')
     save_settings_to_cookie() {
         let settings = new Settings()
         settings.export_base64_image = this.export_base64_image
@@ -338,6 +348,7 @@ export default class PutPullMockRootPage extends Vue {
         settings.auto_save_pagedatas_to_localstorage = this.auto_save_pagedatas_to_localstorage
         settings.auto_scroll_tag_struct_view = this.auto_scroll_tag_struct_view
         settings.tag_list_view_mode = this.tag_list_view_mode
+        settings.use_undo = this.use_undo
         document.cookie = JSON.stringify(settings)
     }
 
@@ -368,7 +379,7 @@ export default class PutPullMockRootPage extends Vue {
                 this.$nextTick(() => {
                     page_list_view.clicked_page(about_ppmk_pagedata)
                 })
-                page_list_view.append_history()
+                this.append_history()
             })
         }
         this.export_base64_image = settings.export_base64_image
@@ -379,10 +390,46 @@ export default class PutPullMockRootPage extends Vue {
         this.auto_save_pagedatas_to_localstorage = settings.auto_save_pagedatas_to_localstorage
         this.auto_scroll_tag_struct_view = settings.auto_scroll_tag_struct_view
         this.tag_list_view_mode = settings.tag_list_view_mode
+        this.use_undo = settings.use_undo
     }
 
     created(): void {
         this.load_settings_from_cookie()
+        window.addEventListener('keypress', (e: KeyboardEvent) => {
+            let page_list_view: any = this.$refs['page_list_view']
+            if (e.ctrlKey && e.code == "KeyZ") {
+                if (this.histories.index > 0) {
+                    this.histories.index -= 1
+                }
+                let pagedatas: Array<PageData> = this.histories.histories[this.histories.index]
+                console.log(pagedatas)
+                // if (!this.back) this.advance_stack.push(this.history_stack.pop())
+
+                if (pagedatas) {
+                    page_list_view.pagedatas = pagedatas
+                    this.$nextTick(() => {
+                        this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
+                    })
+                }
+            }
+            if (e.ctrlKey && e.code == "KeyY") {
+                let pagedatas: Array<PageData>
+                if (this.histories.histories.length > this.histories.index + 1) {
+                    this.histories.index += 1
+                    pagedatas = this.histories.histories[this.histories.index]
+                }
+                console.log(pagedatas)
+                // if (!this.foward) this.history_stack.push(this.advance_stack.pop())
+                if (pagedatas) {
+                    page_list_view.pagedatas = pagedatas
+                    this.$nextTick(() => {
+                        this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
+                    })
+                }
+            }
+        })
+
+
         window.addEventListener('keydown', (e: KeyboardEvent) => {
             if (e.ctrlKey && e.code == "KeyC") {
                 this.copy_tag(this.clicked_tagdata)
@@ -471,7 +518,7 @@ export default class PutPullMockRootPage extends Vue {
         })
         this.$nextTick(() => {
             let page_list_view: any = this.$refs['page_list_view']
-            page_list_view.append_history()
+            this.append_history()
         })
     }
 
@@ -492,7 +539,7 @@ export default class PutPullMockRootPage extends Vue {
             let pagedatas = JSON.parse(e.target.result.toString(), deserialize)
             page_list_view.pagedatas = pagedatas
             page_list_view.clicked_page(page_list_view.pagedatas[0])
-            page_list_view.append_history()
+            this.append_history()
             this.is_show_readin_dialog = false
         })
         reader.readAsText(e.target.files[0])
@@ -619,16 +666,14 @@ export default class PutPullMockRootPage extends Vue {
     updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase, history_mode: boolean) {
         let page_list_view: any = this.$refs["page_list_view"]
 
-        page_list_view.history_mode = history_mode
-        page_list_view.append_history()
+        if (history_mode) this.append_history()
 
         page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = html_tagdatas
         if (tagdata) {
             this.onclick_tag(tagdata)
         }
 
-        page_list_view.history_mode = history_mode
-        page_list_view.append_history()
+        if (history_mode) this.append_history()
 
         page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
@@ -788,6 +833,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     delete_tagdata(tagdata: HTMLTagDataBase) {
+        this.append_history()
         let page_list_view: any = this.$refs['page_list_view']
         let tagdatas: Array<HTMLTagDataBase> = page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas
 
@@ -806,8 +852,22 @@ export default class PutPullMockRootPage extends Vue {
         walk_tagdatas(tagdatas)
         page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = tagdatas
         this.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
-        page_list_view.append_history()
         page_list_view.save_pagedatas_to_localstorage()
+    }
+
+    append_history() {
+        if (!this.use_undo) {
+            return
+        }
+        let page_list_view: any = this.$refs['page_list_view']
+        if (!page_list_view.pagedatas) {
+            return
+        }
+
+        this.histories.histories.length = this.histories.index + 1
+        this.histories.histories[this.histories.histories.length - 1] = JSON.parse(JSON.stringify(page_list_view.pagedatas), deserialize)
+        this.histories.index = this.histories.histories.length
+        console.log(this.histories.index)
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {
@@ -832,7 +892,6 @@ export default class PutPullMockRootPage extends Vue {
 
         this.width_dropzone = window.innerWidth - 300 - 300 - 19
         this.height_dropzone = window.innerHeight - 159
-        page_list_view.append_history
     }
 
     add_page() {
