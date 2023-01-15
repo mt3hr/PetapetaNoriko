@@ -399,30 +399,30 @@ export default class PutPullMockRootPage extends Vue {
             let page_list_view: any = this.$refs['page_list_view']
             if (e.ctrlKey && e.code == "KeyZ") {
                 if (this.histories.index > 0) {
-                    this.histories.index -= 1
+                    if (this.histories.index >= this.histories.histories.length) {
+                        this.histories.index = this.histories.histories.length - 1
+                    }
                 }
-                let pagedatas: Array<PageData> = this.histories.histories[this.histories.index]
-                // if (!this.back) this.advance_stack.push(this.history_stack.pop())
-
+                console.log("index: " + String(this.histories.index))
+                console.log("length: " + String(this.histories.histories.length))
+                let pagedatas: Array<PageData> = this.histories.histories[--this.histories.index]
                 if (pagedatas) {
                     page_list_view.pagedatas = pagedatas
-                    this.$nextTick(() => {
-                        this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
-                    })
+                    this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
+                    // page_list_view.clicked_page(page_list_view.pagedatas[0])
                 }
             }
             if (e.ctrlKey && e.code == "KeyY") {
                 let pagedatas: Array<PageData>
                 if (this.histories.histories.length > this.histories.index + 1) {
-                    this.histories.index += 1
-                    pagedatas = this.histories.histories[this.histories.index]
+                    pagedatas = this.histories.histories[++this.histories.index]
                 }
-                // if (!this.foward) this.history_stack.push(this.advance_stack.pop())
+                console.log("index: " + String(this.histories.index))
+                console.log("length: " + String(this.histories.histories.length))
                 if (pagedatas) {
                     page_list_view.pagedatas = pagedatas
-                    this.$nextTick(() => {
-                        this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
-                    })
+                    this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
+                    //page_list_view.clicked_page(page_list_view.pagedatas[0])
                 }
             }
         })
@@ -662,20 +662,15 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase, history_mode: boolean) {
+        if (history_mode) this.append_history()
         let page_list_view: any = this.$refs["page_list_view"]
 
-        if (history_mode) this.append_history()
-
         page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = html_tagdatas
-        if (tagdata) {
-            this.onclick_tag(tagdata)
-        }
-
-        if (history_mode) this.append_history()
 
         page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
         this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
         page_list_view.save_pagedatas_to_localstorage()
+        if (history_mode) this.append_history()
     }
 
     clicked_page(pagedata: PageData) {
@@ -861,9 +856,16 @@ export default class PutPullMockRootPage extends Vue {
         if (!page_list_view.pagedatas) {
             return
         }
+        if (this.histories.histories[this.histories.index - 1]) {
+            if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(page_list_view.pagedatas)) {
+                return
+            }
+        }
+
         this.histories.histories.length = this.histories.index + 1
-        this.histories.histories[this.histories.histories.length - 1] = JSON.parse(JSON.stringify(page_list_view.pagedatas), deserialize)
-        this.histories.index = this.histories.histories.length
+        this.histories.histories[this.histories.index++] = JSON.parse(JSON.stringify(page_list_view.pagedatas), deserialize)
+        console.log("index: " + String(this.histories.index))
+        console.log("length: " + String(this.histories.histories.length))
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {

@@ -285,6 +285,7 @@ export default class DropZone extends Vue {
                     this.onclick_tag(tag_data)
                 })
             })
+            this.$emit('updated_htmltagdatas', this.html_tagdatas, null, true)
 
             switch (tagname) {
                 case "table": {
