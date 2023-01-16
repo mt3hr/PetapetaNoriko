@@ -23,7 +23,7 @@
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
 import { deserialize } from '@/serializable/serializable';
 import { Vue } from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
+import { Prop, Watch } from 'vue-property-decorator';
 
 class Property {
     name: string
@@ -34,6 +34,7 @@ class Property {
 export default class HTMLTagPropertyView extends Vue {
     html_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
     properties: Array<Property> = new Array<Property>()
+    @Prop() auto_focus_tag_property_view: boolean
 
     @Watch("html_tagdata")
     update_properties(new_tagdata: HTMLTagDataBase, old_tagdata: HTMLTagDataBase) {
@@ -58,7 +59,7 @@ export default class HTMLTagPropertyView extends Vue {
             this.properties.push(property)
         })
 
-        if ((!old_tagdata && new_tagdata || new_tagdata.tagid != old_tagdata.tagid) && html_tagdata.focus_property_name) {
+        if (this.auto_focus_tag_property_view && (!old_tagdata && new_tagdata || new_tagdata.tagid != old_tagdata.tagid) && html_tagdata.focus_property_name) {
             let propertyTemp = new Property()
             propertyTemp.name = new_tagdata.focus_property_name
             this.$nextTick(() => {

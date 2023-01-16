@@ -57,6 +57,7 @@
                         <v-col cols="auto">
                             <!--プロパティビュー-->
                             <HTMLTagPropertyView class="component property_view" ref="property_view"
+                                :auto_focus_tag_property_view="auto_focus_tag_property_view"
                                 @updated_html_tag_property="updated_html_tag_property" />
                         </v-col>
                     </v-row>
@@ -196,10 +197,14 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
             <v-row>
                 <v-col cols="auto">
+                    <v-checkbox class="checkbox" v-model="auto_focus_tag_property_view" :label="'プロパティビューオートフォーカス'" />
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="auto">
                     <v-checkbox class="checkbox" v-model="auto_scroll_tag_struct_view" :label="'構造ビュー自動スクロール'" />
                 </v-col>
             </v-row>
-
             <v-row>
                 <v-col cols="auto">
                     <v-text>HTML要素一覧の表示</v-text>
@@ -281,6 +286,7 @@ class Settings {
     auto_scroll_tag_struct_view: boolean
     tag_list_view_mode: TagListViewMode
     use_undo: boolean
+    auto_focus_tag_property_view: boolean
 }
 
 @Options({
@@ -327,6 +333,8 @@ export default class PutPullMockRootPage extends Vue {
 
     use_undo = true
 
+    auto_focus_tag_property_view = false
+
     @Watch('export_base64_image')
     @Watch('export_head')
     @Watch('export_position_css')
@@ -347,6 +355,7 @@ export default class PutPullMockRootPage extends Vue {
         settings.auto_scroll_tag_struct_view = this.auto_scroll_tag_struct_view
         settings.tag_list_view_mode = this.tag_list_view_mode
         settings.use_undo = this.use_undo
+        settings.auto_focus_tag_property_view = this.auto_focus_tag_property_view
         document.cookie = JSON.stringify(settings)
     }
 
@@ -389,6 +398,7 @@ export default class PutPullMockRootPage extends Vue {
         this.auto_scroll_tag_struct_view = settings.auto_scroll_tag_struct_view
         this.tag_list_view_mode = settings.tag_list_view_mode
         this.use_undo = settings.use_undo
+        this.auto_focus_tag_property_view = settings.auto_focus_tag_property_view
     }
 
     created(): void {
@@ -396,7 +406,7 @@ export default class PutPullMockRootPage extends Vue {
         window.addEventListener('keyup', (e: KeyboardEvent) => {
             let page_list_view: any = this.$refs['page_list_view']
             if (e.ctrlKey && e.code == "KeyZ") {
-                // if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
+                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
                 if (this.histories.index > 0) {
                     if (this.histories.index >= this.histories.histories.length) {
                         this.histories.index = this.histories.histories.length - 1
@@ -414,7 +424,7 @@ export default class PutPullMockRootPage extends Vue {
                 }
             }
             if (e.ctrlKey && e.code == "KeyY") {
-                // if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
+                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
                 let pagedatas: Array<PageData>
                 if (this.histories.histories.length > this.histories.index + 1) {
                     this.histories.index++
