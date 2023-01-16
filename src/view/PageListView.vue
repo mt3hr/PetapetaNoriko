@@ -33,7 +33,7 @@
 <script lang="ts">
 import PageData from '@/page/PageData';
 import PageListItem from '@/page/PageListItem.vue';
-import { Project } from '@/page/Project';
+import Project from '@/page/Project';
 import { deserialize } from '@/serializable/serializable';
 import { Options, Vue } from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
