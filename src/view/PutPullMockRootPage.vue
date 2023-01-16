@@ -493,11 +493,23 @@ export default class PutPullMockRootPage extends Vue {
                         walk_tagdatas(html_tagdatas, null, -1)
 
                         if (e.shiftKey) {
-                            parent_node.child_tagdatas.splice(index_at_parent_node, 0, copied_tagdata)
+                            if (!parent_node) {
+                                dropzone.html_tagdatas.unshift(copied_tagdata)
+                            } else {
+                                parent_node.child_tagdatas.splice(index_at_parent_node, 0, copied_tagdata)
+                            }
                         } else if (e.ctrlKey) {
-                            parent_node.child_tagdatas.splice(index_at_parent_node + 1, 0, copied_tagdata)
+                            if (!parent_node) {
+                                dropzone.html_tagdatas.push(copied_tagdata)
+                            } else {
+                                parent_node.child_tagdatas.splice(index_at_parent_node + 1, 0, copied_tagdata)
+                            }
                         } else {
-                            parent_node.child_tagdatas.splice(index_at_parent_node + 1, 0, copied_tagdata)
+                            if (!parent_node) {
+                                dropzone.html_tagdatas.push(copied_tagdata)
+                            } else {
+                                parent_node.child_tagdatas.splice(index_at_parent_node + 1, 0, copied_tagdata)
+                            }
                         }
                         dropzone.updated_tagdata(parent_node)
                     } else {

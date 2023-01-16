@@ -4,8 +4,8 @@
             {{ style_user_edited_fixed }}
         </component>
         <h2>ドロップゾーン</h2>
-        <div id="dropzone" class="dropzone" @click="onclick" @drop.stop="on_drop" @dragover.prevent="on_dragover"
-            :style="dropzone_style" @contextmenu="show_contextmenu">
+        <div id="dropzone" class="dropzone" @click="onclick" @drop.stop.prevent="on_drop"
+            @dragover.prevent="on_dragover" :style="dropzone_style" @contextmenu="show_contextmenu">
 
             <body id="dropzone_body" class="page" :style="dropzone_style">
                 <div v-if="!html_tagdatas"
@@ -322,12 +322,12 @@ export default class DropZone extends Vue {
             let move_tagdata: HTMLTagDataBase
 
             let move_in_root = false
-            for (let i = 0; i < html_tagdatas_root.length; i++) {
+            let dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
+            let dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
+            for (let i = 0; i < html_tagdatas_root.length && move_in_root; i++) {
                 if (html_tagdatas_root[i].tagid == tagid) {
                     move_tagdata = html_tagdatas_root[i]
                     move_tagdata.position_style = PositionStyle.Absolute
-                    let dropzone_x = document.getElementById("dropzone").getBoundingClientRect().left
-                    let dropzone_y = document.getElementById("dropzone").getBoundingClientRect().top
                     move_tagdata.position_x = e.pageX - dropzone_x
                     move_tagdata.position_y = e.pageY - dropzone_y
                     move_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
@@ -336,12 +336,11 @@ export default class DropZone extends Vue {
                 }
                 this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
                 e.stopPropagation()
-                // this.$nextTick(() => {
                 this.$nextTick(() => {
                     this.onclick_tag(move_tagdata)
                 })
-                // })
             }
+            console.log(move_in_root)
             if (move_in_root) return
 
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
