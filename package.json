@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "rimraf src/app/ppmk/dist && vue-cli-service --mode development build && move dist src/app/ppmk/",
+    "build": "rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed && cpx -C models/PutPullMokModel.sql src/app/ppmk/embed",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -30,6 +30,7 @@
     "@vue/cli-plugin-typescript": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "@vue/eslint-config-typescript": "^9.1.0",
+    "cpx": "^1.5.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "rimraf": "^3.0.2",

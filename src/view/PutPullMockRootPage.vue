@@ -2,13 +2,13 @@
     <v-container>
         <v-row class="ppmk_row">
             <v-col cols="auto">
-                <h1>PutPullMock</h1>
+                <h1><a @click="to_toppage" :style="title_style">PutPullMock</a></h1>
             </v-col>
             <v-spacer />
             <v-col cols="auto">
-                <v-checkbox class="checkbox mx-3" v-model="show_border" :label="'境界を表示'" />
+                <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
             </v-col>
-            <v-btn icon @click="show_options_dialog">
+            <v-btn icon v-if="editor_mode" @click="show_options_dialog">
                 <v-icon>mdi-cog</v-icon>
             </v-btn>
             <v-col cols="auto">
@@ -21,8 +21,8 @@
                 <v-container>
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
-                        <PageListView class="component page_list_view" ref="page_list_view"
-                            @updated_htmltagdatas="updated_htmltagdatas"
+                        <PageListView class="component page_list_view" ref="page_list_view" :editor_mode="editor_mode"
+                            :project_name="project_name" @updated_htmltagdatas="updated_htmltagdatas"
                             :auto_save_pagedatas_to_localstorage="auto_save_pagedatas_to_localstorage"
                             @delete_page="delete_page"
                             @update_auto_save_pagedatas_to_localstorage="update_auto_save_pagedatas_to_localstorage"
@@ -30,7 +30,8 @@
                     </v-row>
                     <v-row>
                         <!--タグリストビュー。ここからタグをドラッグしてドロップゾーンに貼り付ける-->
-                        <TagListView :mode="tag_list_view_mode" class="component html_tag_list_view" />
+                        <TagListView v-show="editor_mode" :mode="tag_list_view_mode"
+                            class="component html_tag_list_view" />
                     </v-row>
                 </v-container>
             </v-col>
@@ -38,18 +39,20 @@
             <!--ドロップゾーン-->
             <v-col cols="auto" class="dropzone_wrap">
                 <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
-                    :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_htmltagdatas"
-                    @add_page="add_page" @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata"
-                    @copy_tag="copy_tag" @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
+                    :editor_mode="editor_mode" :clicked_tagdata="clicked_tagdata"
+                    @updated_tagdatas_root="updated_htmltagdatas" @add_page="add_page"
+                    @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata" @copy_tag="copy_tag"
+                    @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
             </v-col>
 
             <!--プロパティビュー-->
-            <v-col cols="auto" class="propertyview">
+            <v-col cols="auto" class="propertyview" v-show="editor_mode">
                 <v-container>
                     <v-row>
                         <v-col cols="auto">
                             <!--ページプロパティビュー-->
                             <PagePropertyView class="component page_property_view" ref="page_property_view"
+                                :project_name="project_name" @updated_project_name="update_project_name"
                                 @updated_page_property="updated_page_property" />
                         </v-col>
                     </v-row>
@@ -74,7 +77,7 @@
                 </v-container>
             </v-col>
         </v-row>
-        <v-row class="ppmk_row">
+        <v-row class="ppmk_row" v-if="editor_mode">
             <v-col cols="auto">
                 <v-btn @click="is_show_css_dialog = true">CSS</v-btn>
                 <v-btn @click="is_show_webfont_dialog = true">WebFont</v-btn>
@@ -259,6 +262,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 
 <script lang="ts">
 //TODO グローバルナビゲーション 横並びリスト
+//TODO プロジェクト名を追加したいな
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView, { TagListViewMode } from '@/view/TagListView.vue'
@@ -335,6 +339,14 @@ export default class PutPullMockRootPage extends Vue {
 
     auto_focus_tag_property_view = false
 
+    editor_mode = true
+
+    project_name = ""
+
+    update_project_name(project_name: string) {
+        this.project_name = project_name
+    }
+
     @Watch('export_base64_image')
     @Watch('export_head')
     @Watch('export_position_css')
@@ -361,6 +373,20 @@ export default class PutPullMockRootPage extends Vue {
 
     load_settings_from_cookie() {
         let settings: Settings
+        if (!this.editor_mode) {
+            settings = new Settings()
+            settings.export_base64_image = false
+            settings.export_head = false
+            settings.export_position_css = false
+            settings.show_border = false
+            settings.transparent_page_css_view = false
+            settings.auto_save_pagedatas_to_localstorage = false
+            settings.auto_scroll_tag_struct_view = false
+            settings.tag_list_view_mode = TagListViewMode.Text
+            settings.use_undo = false
+            settings.auto_focus_tag_property_view = false
+            return settings
+        }
         try {
             settings = JSON.parse(document.cookie, deserialize)
         } catch (e) {
@@ -381,7 +407,7 @@ export default class PutPullMockRootPage extends Vue {
             this.$nextTick(() => {
                 let page_list_view: any = this.$refs['page_list_view']
 
-                page_list_view.pagedatas = pagedatas
+                page_list_view.project.pagedatas = pagedatas
                 this.updated_htmltagdatas(about_ppmk_pagedata.html_tagdatas, null, false)
                 this.$nextTick(() => {
                     page_list_view.clicked_page(about_ppmk_pagedata)
@@ -417,10 +443,10 @@ export default class PutPullMockRootPage extends Vue {
                 this.histories.index--
                 let pagedatas: Array<PageData> = this.histories.histories[this.histories.index]
                 if (pagedatas) {
-                    page_list_view.pagedatas = pagedatas
+                    page_list_view.project.pagedatas = pagedatas
                     page_list_view.selected_index = this.histories.page_index[this.histories.index]
                     this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
-                    this.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
+                    this.clicked_page(page_list_view.project.pagedatas[page_list_view.selected_index])
                 }
             }
             if (e.ctrlKey && e.code == "KeyY") {
@@ -431,10 +457,10 @@ export default class PutPullMockRootPage extends Vue {
                     pagedatas = this.histories.histories[this.histories.index]
                 }
                 if (pagedatas) {
-                    page_list_view.pagedatas = pagedatas
+                    page_list_view.project.pagedatas = pagedatas
                     page_list_view.selected_index = this.histories.page_index[this.histories.index]
                     this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
-                    this.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
+                    this.clicked_page(page_list_view.project.pagedatas[page_list_view.selected_index])
                 }
             }
         })
@@ -558,41 +584,42 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     read_ppmk_project(e) {
+        let file: File = e.target.files[0]
         let page_list_view: any = this.$refs['page_list_view']
         let reader = new FileReader()
         reader.addEventListener('load', (e) => {
             let pagedatas = JSON.parse(e.target.result.toString(), deserialize)
-            page_list_view.pagedatas = pagedatas
-            page_list_view.clicked_page(page_list_view.pagedatas[0])
+            page_list_view.project.pagedatas = pagedatas
+            page_list_view.clicked_page(page_list_view.project.pagedatas[0])
             this.append_history()
             this.is_show_readin_dialog = false
+            this.update_project_name(file.name.replace('.ppmk.json', ''))
+            page_list_view.save_pagedatas_to_localstorage()
         })
-        reader.readAsText(e.target.files[0])
-        page_list_view.save_pagedatas_to_localstorage()
+        reader.readAsText(file)
     }
 
     save_ppmk_project() {
         this.clicked_tagdata = new HTMLTagDataBase()
         let page_list_view: any = this.$refs['page_list_view']
-        let ppmk_data = JSON.stringify(page_list_view.pagedatas)
+        let ppmk_data = JSON.stringify(page_list_view.project.pagedatas)
         let ppmk_data_blob = new Blob([ppmk_data])
         let url = URL.createObjectURL(ppmk_data_blob)
 
         const a = document.createElement("a");
         document.body.appendChild(a);
-        a.download = 'ppmk_project.json';
+        a.download = page_list_view.project.project_name + '.ppmk.json';
         a.href = url;
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
     }
 
-
     save_ppmk_html_css_this_page() {
         this.clicked_tagdata = new HTMLTagDataBase()
         let page_list_view: any = this.$refs['page_list_view']
         let page_index = page_list_view.selected_index
-        let pagedata = page_list_view.pagedatas[page_index]
+        let pagedata = page_list_view.project.pagedatas[page_index]
         let export_options = new GenerateHTMLOptions()
         export_options.export_base64_image = this.export_base64_image
         export_options.export_head = this.export_head
@@ -628,7 +655,7 @@ export default class PutPullMockRootPage extends Vue {
     save_ppmk_html_css_all_pages() {
         this.clicked_tagdata = new HTMLTagDataBase()
         let page_list_view: any = this.$refs['page_list_view']
-        page_list_view.pagedatas.forEach((pagedata: PageData) => {
+        page_list_view.project.pagedatas.forEach((pagedata: PageData) => {
             let export_options = new GenerateHTMLOptions()
             export_options.export_base64_image = this.export_base64_image
             export_options.export_head = this.export_head
@@ -678,7 +705,7 @@ export default class PutPullMockRootPage extends Vue {
     update_page_html() {
         let page_list_view: any = this.$refs["page_list_view"]
         let page_index = page_list_view.selected_index
-        let pagedata: PageData = page_list_view.pagedatas[page_index]
+        let pagedata: PageData = page_list_view.project.pagedatas[page_index]
         let export_options = new GenerateHTMLOptions()
         export_options.export_base64_image = this.export_base64_image
         export_options.export_head = this.export_head
@@ -692,10 +719,10 @@ export default class PutPullMockRootPage extends Vue {
         if (history_mode) this.append_history()
         let page_list_view: any = this.$refs["page_list_view"]
 
-        page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = html_tagdatas
+        page_list_view.project.pagedatas[page_list_view.selected_index].html_tagdatas = html_tagdatas
 
-        page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
-        this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
+        page_list_view.clicked_page(page_list_view.project.pagedatas[page_list_view.selected_index])
+        this.update_struct_view(page_list_view.project.pagedatas[page_list_view.selected_index].html_tagdatas)
         page_list_view.save_pagedatas_to_localstorage()
         if (history_mode) this.append_history()
     }
@@ -722,14 +749,15 @@ export default class PutPullMockRootPage extends Vue {
         this.onclick_tag(null)
 
         let page_list_view: any = this.$refs["page_list_view"]
-        this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
-        this.css = page_list_view.pagedatas[page_list_view.selected_index].css
-        this.page_webfont = page_list_view.pagedatas[page_list_view.selected_index].webfonts.join("\n")
+        this.update_struct_view(page_list_view.project.pagedatas[page_list_view.selected_index].html_tagdatas)
+        this.css = page_list_view.project.pagedatas[page_list_view.selected_index].css
+        this.page_webfont = page_list_view.project.pagedatas[page_list_view.selected_index].webfonts.join("\n")
         this.update_page_webfont()
         page_list_view.save_pagedatas_to_localstorage()
     }
 
     onclick_tag(tagdata: HTMLTagDataBase) {
+        if (!this.editor_mode) return
         let property_view: any = this.$refs["property_view"]
         property_view.html_tagdata = new HTMLTagDataBase()
         property_view.html_tagdata = tagdata
@@ -739,7 +767,7 @@ export default class PutPullMockRootPage extends Vue {
     updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
         let page_list_view: any = this.$refs["page_list_view"]
         let property_view: any = this.$refs["property_view"]
-        let tagdatas: Array<HTMLTagDataBase> = page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas
+        let tagdatas: Array<HTMLTagDataBase> = page_list_view.project.pagedatas[page_list_view.selected_index].html_tagdatas
 
         let updated_tagdata: HTMLTagDataBase
 
@@ -758,20 +786,20 @@ export default class PutPullMockRootPage extends Vue {
             return false
         }
         walk_tagdatas(tagdatas)
-        this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
+        this.update_struct_view(page_list_view.project.pagedatas[page_list_view.selected_index].html_tagdatas)
         property_view.html_tagdata = updated_tagdata
         page_list_view.save_pagedatas_to_localstorage()
     }
     updated_page_property(page_data: PageData) {
         let page_list_view: any = this.$refs["page_list_view"]
-        for (let i = 0; i < page_list_view.pagedatas.length; i++) {
-            if (page_list_view.pagedatas[i].pageid == page_data.pageid) {
-                page_list_view.pagedatas.splice(i, 1, page_data)
+        for (let i = 0; i < page_list_view.project.pagedatas.length; i++) {
+            if (page_list_view.project.pagedatas[i].pageid == page_data.pageid) {
+                page_list_view.project.pagedatas.splice(i, 1, page_data)
                 break
             }
         }
-        page_list_view.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
-        this.update_struct_view(page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas)
+        page_list_view.clicked_page(page_list_view.project.pagedatas[page_list_view.selected_index])
+        this.update_struct_view(page_list_view.project.pagedatas[page_list_view.selected_index].html_tagdatas)
         page_list_view.save_pagedatas_to_localstorage()
     }
 
@@ -806,14 +834,24 @@ export default class PutPullMockRootPage extends Vue {
         }
 
         let page_list_view: any = this.$refs["page_list_view"]
-        page_list_view.pagedatas[page_list_view.selected_index].css = this.css
+        page_list_view.project.pagedatas[page_list_view.selected_index].css = this.css
         let dropzone: any = this.$refs["dropzone"]
         dropzone.style_user_edited = this.css
     }
     @Watch('page_webfont')
     updated_page_webfont() {
         let page_list_view: any = this.$refs["page_list_view"]
-        page_list_view.pagedatas[page_list_view.selected_index].webfonts = this.page_webfont.split("\n")
+        let webfonts: Array<string> = new Array<string>()
+        if (this.page_webfont) {
+            webfonts = this.page_webfont.split("\n")
+        }
+        for (let i = 0; i < webfonts.length; i++) {
+            webfonts[i] = webfonts[i].trim()
+        }
+        webfonts = webfonts.filter((webfont, i, webfonts) => {
+            return webfont != ""
+        })
+        page_list_view.project.pagedatas[page_list_view.selected_index].webfonts = webfonts
         this.update_page_webfont()
         page_list_view.save_pagedatas_to_localstorage()
     }
@@ -821,8 +859,8 @@ export default class PutPullMockRootPage extends Vue {
     update_page_webfont() {
         let page_list_view: any = this.$refs["page_list_view"]
         let page_web_font_links = []
-        for (let i = 0; i < page_list_view.pagedatas[page_list_view.selected_index].webfonts.length; i++) {
-            let page_web_font = page_list_view.pagedatas[page_list_view.selected_index].webfonts[i]
+        for (let i = 0; i < page_list_view.project.pagedatas[page_list_view.selected_index].webfonts.length; i++) {
+            let page_web_font = page_list_view.project.pagedatas[page_list_view.selected_index].webfonts[i]
             page_web_font_links.push({
                 href: page_web_font,
                 rel: "stylesheet",
@@ -855,7 +893,7 @@ export default class PutPullMockRootPage extends Vue {
     delete_tagdata(tagdata: HTMLTagDataBase) {
         this.append_history()
         let page_list_view: any = this.$refs['page_list_view']
-        let tagdatas: Array<HTMLTagDataBase> = page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas
+        let tagdatas: Array<HTMLTagDataBase> = page_list_view.project.pagedatas[page_list_view.selected_index].html_tagdatas
 
         let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
         walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -870,29 +908,29 @@ export default class PutPullMockRootPage extends Vue {
             }
         }
         walk_tagdatas(tagdatas)
-        page_list_view.pagedatas[page_list_view.selected_index].html_tagdatas = tagdatas
-        this.clicked_page(page_list_view.pagedatas[page_list_view.selected_index])
+        page_list_view.project.pagedatas[page_list_view.selected_index].html_tagdatas = tagdatas
+        this.clicked_page(page_list_view.project.pagedatas[page_list_view.selected_index])
         page_list_view.save_pagedatas_to_localstorage()
     }
 
     append_history() {
-        if (!this.use_undo) {
+        if (!this.use_undo || !this.editor_mode) {
             return
         }
         let page_list_view: any = this.$refs['page_list_view']
-        if (!page_list_view.pagedatas) {
+        if (!page_list_view.project.pagedatas) {
             return
         }
         if (this.histories.histories[this.histories.index - 1]) {
-            if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(page_list_view.pagedatas)) {
+            if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(page_list_view.project.pagedatas)) {
                 return
             }
         }
 
         this.histories.histories.length = this.histories.index
         let page_datas = Array<PageData>()
-        if (page_list_view.pagedatas) {
-            page_list_view.pagedatas.forEach(pagedata => {
+        if (page_list_view.project.pagedatas) {
+            page_list_view.project.pagedatas.forEach(pagedata => {
                 page_datas.push(pagedata.clone())
             });
         }
@@ -915,7 +953,7 @@ export default class PutPullMockRootPage extends Vue {
         let dropzone: any = this.$refs["dropzone"]
         let page_property_view: any = this.$refs["page_property_view"]
         page_list_view.save_pagedatas_to_localstorage()
-        page_list_view.clicked_page(page_list_view.pagedatas[0])
+        page_list_view.clicked_page(page_list_view.project.pagedatas[0])
         page_property_view.page_data = null
         dropzone.html_tagdatas = null
         dropzone.html_tagdatas_root = null
@@ -934,6 +972,17 @@ export default class PutPullMockRootPage extends Vue {
     updated_tagdata(tagdata: HTMLTagDataBase) {
         let dropzone: any = this.$refs["dropzone"]
         dropzone.updated_tagdata(tagdata)
+    }
+    to_toppage() {
+        if (this.editor_mode) return
+        this.$router.push("/")
+    }
+    get title_style(): any {
+        if (this.editor_mode) {
+            return { 'color': 'black', 'text-decoration': 'none', 'cursor': 'pointer' }
+        } else {
+            return { 'color': 'black', 'text-decoration': 'none' }
+        }
     }
 }
 </script>

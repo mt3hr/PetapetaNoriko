@@ -3,7 +3,8 @@
         <component :is="'style'">
             {{ style_user_edited_fixed }}
         </component>
-        <h2>ドロップゾーン</h2>
+        <h2 v-if="editor_mode">ドロップゾーン</h2>
+        <h2 v-else>画面</h2>
         <div id="dropzone" class="dropzone" @click="onclick" @drop.stop.prevent="on_drop"
             @dragover.prevent="on_dragover" :style="dropzone_style" @contextmenu="show_contextmenu">
 
@@ -14,9 +15,10 @@
                         :style="{ 'margin': 'auto', 'position': 'rerative', 'top': '45%' }">ページを追加</v-btn>
                 </div>
                 <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas"
-                    :clicked_tagdata="clicked_tagdata" :show_border="show_border" :tagdata="tagdata"
-                    :copied_tagdata="copied_tagdata" @updated_tagdatas_root="updated_tagdatas_root" @copy_tag="copy_tag"
-                    @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag" @delete_tagdata="delete_tagdata" />
+                    :editor_mode="editor_mode" :clicked_tagdata="clicked_tagdata" :show_border="show_border"
+                    :tagdata="tagdata" :copied_tagdata="copied_tagdata" @updated_tagdatas_root="updated_tagdatas_root"
+                    @copy_tag="copy_tag" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
+                    @delete_tagdata="delete_tagdata" />
             </body>
         </div>
         <v-menu v-if="is_show_contextmenu" v-model="is_show_contextmenu" :style="contextmenu_style">
@@ -168,6 +170,7 @@ export default class DropZone extends Vue {
     @Prop() dropzone_style: any
     @Prop() clicked_tagdata: HTMLTagDataBase
     @Prop() copied_tagdata: HTMLTagDataBase
+    @Prop() editor_mode: boolean
 
     is_show_contextmenu = false
     x_contextmenu = 0
@@ -254,6 +257,10 @@ export default class DropZone extends Vue {
     }
 
     on_dragover(e: DragEvent) {
+        if (!this.editor_mode) {
+            e.dataTransfer.dropEffect = 'none'
+            return
+        }
         if (!this.html_tagdatas) {
             e.dataTransfer.dropEffect = 'none'
             return

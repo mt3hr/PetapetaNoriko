@@ -27,7 +27,7 @@ func init() {
 }
 
 var (
-	//go:embed dist
+	//go:embed embed
 	htmlFS embed.FS // htmlファイル郡
 
 	port  = uint16(51520)
@@ -177,7 +177,7 @@ func openbrowser(url string) error {
 func launchServer() error {
 	router := mux.NewRouter()
 
-	html, err := fs.Sub(htmlFS, "dist")
+	html, err := fs.Sub(htmlFS, "embed/dist")
 	if err != nil {
 		return err
 	}

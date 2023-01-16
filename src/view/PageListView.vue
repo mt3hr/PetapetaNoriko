@@ -1,16 +1,16 @@
 <template>
-    <div>
+    <div :style="style">
         <h2>
             ページ一覧
-            <v-btn @click="add_page">+</v-btn>
+            <v-btn v-if="editor_mode" @click="add_page">+</v-btn>
         </h2>
         <ul>
-            <PageListItem v-for="(pagedata, index) in pagedatas" :pagedata="pagedata" :key="index"
-                @copy_page="(pagedata) => copy_page(pagedata, index)" :style="generate_style(index)"
-                @move_pagedata="(e, pagedata) => move_pagedata(e, pagedata, index)" @clicked_page="clicked_page"
-                :selected="selected_index == index" @delete_page="delete_page" />
+            <PageListItem v-for="(pagedata, index) in this.project.pagedatas" :pagedata="pagedata" :key="index"
+                :editor_mode="editor_mode" @copy_page="(pagedata) => copy_page(pagedata, index)"
+                :style="generate_style(index)" @move_pagedata="(e, pagedata) => move_pagedata(e, pagedata, index)"
+                @clicked_page="clicked_page" :selected="selected_index == index" @delete_page="delete_page" />
         </ul>
-        <v-dialog v-model="is_show_oversize_localstorage_dialog">
+        <v-dialog v-if="editor_mode" v-model="is_show_oversize_localstorage_dialog">
             <v-card class="pa-5">
                 <v-card-title>
                     自動保存容量超過
@@ -33,6 +33,7 @@
 <script lang="ts">
 import PageData from '@/page/PageData';
 import PageListItem from '@/page/PageListItem.vue';
+import { Project } from '@/page/Project';
 import { deserialize } from '@/serializable/serializable';
 import { Options, Vue } from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
@@ -44,14 +45,21 @@ import { Prop, Watch } from 'vue-property-decorator';
 })
 export default class Page extends Vue {
     selected_index = 0
-    pagedatas: Array<PageData> = new Array<PageData>()
+    project: Project = new Project()
     @Prop() auto_save_pagedatas_to_localstorage: boolean
+    @Prop() editor_mode: boolean
+    @Prop() project_name: string
 
     is_show_oversize_localstorage_dialog = false
 
+    @Watch('project_name')
+    update_project_name() {
+        this.project.project_name = this.project_name
+    }
+
     @Watch('pagedatas')
     save_pagedatas_to_localstorage() {
-        let pagedata = JSON.stringify(this.pagedatas)
+        let pagedata = JSON.stringify(this.project.pagedatas)
         if (this.auto_save_pagedatas_to_localstorage) {
             try {
                 window.localStorage.setItem("ppmk_pagedatas", pagedata)
@@ -71,8 +79,8 @@ export default class Page extends Vue {
     }
 
     clicked_page(pagedata: PageData) {
-        for (let i = 0; i < this.pagedatas.length; i++) {
-            if (pagedata.pageid == this.pagedatas[i].pageid) {
+        for (let i = 0; i < this.project.pagedatas.length; i++) {
+            if (pagedata.pageid == this.project.pagedatas[i].pageid) {
                 this.selected_index = i
                 break
             }
@@ -84,14 +92,14 @@ export default class Page extends Vue {
 
     delete_page(pagedata: PageData) {
         let deleteindex = -1
-        for (let i = 0; i < this.pagedatas.length; i++) {
-            if (pagedata.pageid == this.pagedatas[i].pageid) {
+        for (let i = 0; i < this.project.pagedatas.length; i++) {
+            if (pagedata.pageid == this.project.pagedatas[i].pageid) {
                 deleteindex = i
                 break
             }
         }
         if (deleteindex != -1) {
-            this.pagedatas.splice(deleteindex, 1)
+            this.project.pagedatas.splice(deleteindex, 1)
             this.$emit('delete_page', pagedata)
         }
     }
@@ -99,9 +107,9 @@ export default class Page extends Vue {
     created(): void {
         if (this.auto_save_pagedatas_to_localstorage) {
             try {
-                this.pagedatas = JSON.parse(window.localStorage.getItem("ppmk_pagedatas"), deserialize)
-                if (this.pagedatas && this.pagedatas.length > 0) {
-                    this.clicked_page(this.pagedatas[0])
+                this.project.pagedatas = JSON.parse(window.localStorage.getItem("ppmk_pagedatas"), deserialize)
+                if (this.project.pagedatas && this.project.pagedatas.length > 0) {
+                    this.clicked_page(this.project.pagedatas[0])
                 } else {
                     this.clicked_page(null)
                 }
@@ -124,12 +132,12 @@ export default class Page extends Vue {
 
     add_page() {
         let pagedata = new PageData()
-        this.pagedatas.push(pagedata)
+        this.project.pagedatas.push(pagedata)
         this.clicked_page(pagedata)
     }
 
     copy_page(pagedata: any, index: number) {
-        this.pagedatas.splice(index + 1, 0, pagedata)
+        this.project.pagedatas.splice(index + 1, 0, pagedata)
         this.clicked_page(pagedata)
     }
 
@@ -139,7 +147,7 @@ export default class Page extends Vue {
         }
 
         let pagedatas = new Array<PageData>()
-        this.pagedatas.forEach((child_tagdata) => { pagedatas.push(child_tagdata.clone()) })
+        this.project.pagedatas.forEach((child_tagdata) => { pagedatas.push(child_tagdata.clone()) })
 
         let move_pagedata: PageData
         for (let i = 0; i < pagedatas.length; i++) {
@@ -151,9 +159,18 @@ export default class Page extends Vue {
         }
 
         pagedatas.splice(index, 0, move_pagedata)
-        this.pagedatas = pagedatas
+        this.project.pagedatas = pagedatas
         this.selected_index = index
-        this.clicked_page(this.pagedatas[index])
+        this.clicked_page(this.project.pagedatas[index])
+    }
+    get style(): any {
+        if (this.editor_mode) {
+            return {}
+        } else {
+            return {
+                'height': window.innerHeight - 104 + "px !important"
+            }
+        }
     }
 }
 </script>

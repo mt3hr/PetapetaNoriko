@@ -19,6 +19,7 @@ export default class HTMLTagViewBase extends Vue {
     @Prop({ require: true }) clicked_tagdata: HTMLTagDataBase
     @Prop() show_border: boolean
     @Prop() copied_tagdata: HTMLTagDataBase
+    @Prop() editor_mode: boolean
     position_css: string
     selected_this_tag = false
 
