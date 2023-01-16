@@ -340,7 +340,6 @@ export default class DropZone extends Vue {
                     this.onclick_tag(move_tagdata)
                 })
             }
-            console.log(move_in_root)
             if (move_in_root) return
 
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
