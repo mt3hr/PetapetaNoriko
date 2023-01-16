@@ -51,7 +51,7 @@ export default class SearchTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): SearchTagData { return this.tagdata as SearchTagData }
+    override get tagdata_typed(): SearchTagData { return this.tagdata as SearchTagData }
 
     @Watch('tagdata')
     update_view() {

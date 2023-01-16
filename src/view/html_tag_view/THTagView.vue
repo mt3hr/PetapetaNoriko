@@ -170,7 +170,7 @@ export default class THTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): THTagData { return this.tagdata as THTagData }
+    override get tagdata_typed(): THTagData { return this.tagdata as THTagData }
 
     @Watch('tagdata')
     update_view() {

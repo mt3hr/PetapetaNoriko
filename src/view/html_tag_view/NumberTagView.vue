@@ -49,7 +49,7 @@ export default class NumberTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): NumberTagData { return this.tagdata as NumberTagData }
+    override get tagdata_typed(): NumberTagData { return this.tagdata as NumberTagData }
 
     @Watch('tagdata')
     update_view() {

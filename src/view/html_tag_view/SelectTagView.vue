@@ -176,7 +176,7 @@ export default class SelectTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): SelectTagData { return this.tagdata as SelectTagData }
+    override get tagdata_typed(): SelectTagData { return this.tagdata as SelectTagData }
 
     @Watch('tagdata')
     update_view() {

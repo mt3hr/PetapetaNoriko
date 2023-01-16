@@ -54,7 +54,7 @@ export default class TextAreaTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): TextAreaTagData { return this.tagdata as TextAreaTagData }
+    override get tagdata_typed(): TextAreaTagData { return this.tagdata as TextAreaTagData }
 
     @Watch('tagdata')
     update_view() {

@@ -32,7 +32,7 @@ export default class RadioTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): RadioTagData { return this.tagdata as RadioTagData }
+    override get tagdata_typed(): RadioTagData { return this.tagdata as RadioTagData }
 
     @Watch('tagdata')
     update_view() {

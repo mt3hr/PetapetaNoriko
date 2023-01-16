@@ -47,7 +47,7 @@ export default class WeekTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): WeekTagData { return this.tagdata as WeekTagData }
+    override get tagdata_typed(): WeekTagData { return this.tagdata as WeekTagData }
 
     @Watch('tagdata')
     update_view() {

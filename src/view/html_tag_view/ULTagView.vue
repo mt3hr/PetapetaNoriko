@@ -160,7 +160,7 @@ export default class ULTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): ULTagData { return this.tagdata as ULTagData }
+    override get tagdata_typed(): ULTagData { return this.tagdata as ULTagData }
 
     @Watch('tagdata')
     update_view() {

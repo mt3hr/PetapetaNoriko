@@ -44,7 +44,7 @@ export default class TimeTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): TimeTagData { return this.tagdata as TimeTagData }
+    override get tagdata_typed(): TimeTagData { return this.tagdata as TimeTagData }
 
     @Watch('tagdata')
     update_view() {

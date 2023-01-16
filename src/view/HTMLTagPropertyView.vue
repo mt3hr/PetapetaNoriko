@@ -38,11 +38,11 @@ export default class HTMLTagPropertyView extends Vue {
     @Watch("html_tagdata")
     update_properties(new_tagdata: HTMLTagDataBase, old_tagdata: HTMLTagDataBase) {
         this.properties.splice(0)
-        if (!this.html_tagdata) {
+        if (!new_tagdata) {
             return
         }
         // 型変換しんどいので一度JSONにまるめてしまおう
-        let json = JSON.stringify(this.html_tagdata)
+        let json = JSON.stringify(new_tagdata)
         let html_tagdata = JSON.parse(json, deserialize)
         Object.keys(html_tagdata).forEach((key) => {
             let property: Property = new Property()
@@ -60,7 +60,7 @@ export default class HTMLTagPropertyView extends Vue {
 
         if ((!old_tagdata && new_tagdata || new_tagdata.tagid != old_tagdata.tagid) && html_tagdata.focus_property_name) {
             let propertyTemp = new Property()
-            propertyTemp.name = this.html_tagdata.focus_property_name
+            propertyTemp.name = new_tagdata.focus_property_name
             this.$nextTick(() => {
                 this.$nextTick(() => {
                     if ((this.$refs["input_" + html_tagdata.focus_property_name] as any).focus) {

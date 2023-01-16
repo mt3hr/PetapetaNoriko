@@ -51,7 +51,7 @@ export default class EmailTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): EmailTagData { return this.tagdata as EmailTagData }
+    override get tagdata_typed(): EmailTagData { return this.tagdata as EmailTagData }
 
     @Watch('tagdata')
     update_view() {

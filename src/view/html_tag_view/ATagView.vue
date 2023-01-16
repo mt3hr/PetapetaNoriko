@@ -58,7 +58,7 @@ export default class ATagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): ATagData { return this.tagdata as ATagData }
+    override get tagdata_typed(): ATagData { return this.tagdata as ATagData }
 
     @Watch('tagdata')
     update_view() {

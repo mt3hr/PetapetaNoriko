@@ -29,7 +29,7 @@ export default class ColorTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): ColorTagData { return this.tagdata as ColorTagData }
+    override get tagdata_typed(): ColorTagData { return this.tagdata as ColorTagData }
 
     @Watch('tagdata')
     update_view() {

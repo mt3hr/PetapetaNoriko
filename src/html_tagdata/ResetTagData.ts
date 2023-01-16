@@ -7,6 +7,7 @@ export default class ResetTagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "reset"
+        this.focus_property_name = "value"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

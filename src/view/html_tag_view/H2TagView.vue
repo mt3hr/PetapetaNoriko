@@ -22,7 +22,7 @@ export default class H2TagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): H2TagData { return this.tagdata as H2TagData }
+    override get tagdata_typed(): H2TagData { return this.tagdata as H2TagData }
     @Watch('tagdata')
     update_view() {
         this.tagclass = this.tagdata_typed.tagclass

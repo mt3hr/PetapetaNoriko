@@ -160,7 +160,7 @@ export default class SpanTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): SpanTagData { return this.tagdata as SpanTagData }
+    override get tagdata_typed(): SpanTagData { return this.tagdata as SpanTagData }
 
     @Watch('tagdata')
     update_view() {

@@ -13,6 +13,7 @@ export default class SubmitTagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "submit"
+        this.focus_property_name = "value"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

@@ -26,7 +26,7 @@ export default class ButtonTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): ButtonTagData { return this.tagdata as ButtonTagData }
+    override get tagdata_typed(): ButtonTagData { return this.tagdata as ButtonTagData }
 
     @Watch('tagdata')
     update_view() {

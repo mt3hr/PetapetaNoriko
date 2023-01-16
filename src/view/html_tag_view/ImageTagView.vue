@@ -53,7 +53,7 @@ export default class TagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): ImageTagData { return this.tagdata as ImageTagData }
+    override get tagdata_typed(): ImageTagData { return this.tagdata as ImageTagData }
 
     @Watch('tagdata')
     update_view() {

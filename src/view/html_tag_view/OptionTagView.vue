@@ -32,7 +32,7 @@ export default class OptionTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): OptionTagData { return this.tagdata as OptionTagData }
+    override get tagdata_typed(): OptionTagData { return this.tagdata as OptionTagData }
 
     @Watch('tagdata')
     update_view() {

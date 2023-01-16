@@ -51,7 +51,7 @@ export default class URLTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): URLTagData { return this.tagdata as URLTagData }
+    override get tagdata_typed(): URLTagData { return this.tagdata as URLTagData }
 
     @Watch('tagdata')
     update_view() {

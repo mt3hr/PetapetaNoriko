@@ -22,7 +22,7 @@ export default class PTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): PTagData { return this.tagdata as PTagData }
+    override get tagdata_typed(): PTagData { return this.tagdata as PTagData }
 
     @Watch('tagdata')
     update_view() {

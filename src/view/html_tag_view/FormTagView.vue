@@ -184,7 +184,7 @@ export default class FormTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): FormTagData { return this.tagdata as FormTagData }
+    override get tagdata_typed(): FormTagData { return this.tagdata as FormTagData }
 
     @Watch('tagdata')
     update_view() {

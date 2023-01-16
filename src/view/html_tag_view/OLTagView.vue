@@ -160,7 +160,7 @@ export default class TextTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): OLTagData { return this.tagdata as OLTagData }
+    override get tagdata_typed(): OLTagData { return this.tagdata as OLTagData }
 
     @Watch('tagdata')
     update_view() {

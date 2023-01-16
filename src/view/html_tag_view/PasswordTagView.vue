@@ -48,7 +48,7 @@ export default class PasswordTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): PasswordTagData { return this.tagdata as PasswordTagData }
+    override get tagdata_typed(): PasswordTagData { return this.tagdata as PasswordTagData }
 
     @Watch('tagdata')
     update_view() {

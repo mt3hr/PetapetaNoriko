@@ -51,7 +51,7 @@ export default class TelTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): TelTagData { return this.tagdata as TelTagData }
+    override get tagdata_typed(): TelTagData { return this.tagdata as TelTagData }
 
     @Watch('tagdata')
     update_view() {

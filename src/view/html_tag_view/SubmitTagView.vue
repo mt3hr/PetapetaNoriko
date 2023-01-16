@@ -42,7 +42,7 @@ export default class SubmitTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): SubmitTagData { return this.tagdata as SubmitTagData }
+    override get tagdata_typed(): SubmitTagData { return this.tagdata as SubmitTagData }
 
     @Watch('tagdata')
     update_view() {

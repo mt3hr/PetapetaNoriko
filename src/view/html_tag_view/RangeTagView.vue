@@ -41,7 +41,7 @@ export default class RangeTagView extends HTMLTagViewBase {
         this.$emit("updated_tagdata", tagdata)
     }
 
-    get tagdata_typed(): RangeTagData { return this.tagdata as RangeTagData }
+    override get tagdata_typed(): RangeTagData { return this.tagdata as RangeTagData }
 
     @Watch('tagdata')
     update_view() {
