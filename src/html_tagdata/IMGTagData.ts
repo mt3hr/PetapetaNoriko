@@ -12,6 +12,7 @@ export default class IMGTagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "img"
+        this.focus_property_name = "src"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

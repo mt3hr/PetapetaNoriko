@@ -7,6 +7,7 @@ export default class PTagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "p"
+        this.focus_property_name = "text"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

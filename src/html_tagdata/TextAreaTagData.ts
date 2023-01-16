@@ -17,6 +17,7 @@ export default class TextAreaTagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "textarea"
+        this.focus_property_name = "placeholder"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

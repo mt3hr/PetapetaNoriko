@@ -7,6 +7,7 @@ export default class H6TagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "h6"
+        this.focus_property_name = "text"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

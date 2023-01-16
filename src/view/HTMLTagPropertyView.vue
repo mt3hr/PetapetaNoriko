@@ -5,13 +5,14 @@
             <tr v-for="property, index in properties" :key="index" :style="generate_style(property)">
                 <td>{{ get_property_name_jp(property.name) }}:</td>
                 <td>
-                    <input v-if="use_checkbox(property)" type="checkbox" v-model="property.value"
-                        :disabled="is_editable_property(property)"
+                    <input :ref="'input_' + property.name" v-if="use_checkbox(property)" type="checkbox"
+                        v-model="property.value" :disabled="is_editable_property(property)"
                         @change="(e) => updated_property_value(e, property)" />
-                    <textarea v-else-if="use_textarea(property)" v-model="property.value"
-                        :disabled="is_editable_property(property)"
+                    <textarea v-else-if="use_textarea(property)" :ref="'input_' + property.name"
+                        v-model="property.value" :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)"></textarea>
-                    <input v-else type="text" v-model="property.value" :disabled="is_editable_property(property)"
+                    <input v-else type="text" :ref="'input_' + property.name" v-model="property.value"
+                        :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)" />
                 </td>
             </tr>
@@ -35,7 +36,7 @@ export default class HTMLTagPropertyView extends Vue {
     properties: Array<Property> = new Array<Property>()
 
     @Watch("html_tagdata")
-    update_properties() {
+    update_properties(new_tagdata: HTMLTagDataBase, old_tagdata: HTMLTagDataBase) {
         this.properties.splice(0)
         if (!this.html_tagdata) {
             return
@@ -56,6 +57,22 @@ export default class HTMLTagPropertyView extends Vue {
             }
             this.properties.push(property)
         })
+
+        if ((!old_tagdata && new_tagdata || new_tagdata.tagid != old_tagdata.tagid) && html_tagdata.focus_property_name) {
+            let propertyTemp = new Property()
+            propertyTemp.name = this.html_tagdata.focus_property_name
+            this.$nextTick(() => {
+                this.$nextTick(() => {
+                    if ((this.$refs["input_" + html_tagdata.focus_property_name] as any).focus) {
+                        (this.$refs["input_" + html_tagdata.focus_property_name] as any).focus()
+                    } else {
+                        (this.$refs["input_" + html_tagdata.focus_property_name] as any).forEach(element => {
+                            element.focus()
+                        });
+                    }
+                })
+            })
+        }
     }
 
     updated_property_value(payload: any, property: Property) {
@@ -84,6 +101,7 @@ export default class HTMLTagPropertyView extends Vue {
             case "selected_this_tag":
             case "position_style":
             case "scale":
+            case "focus_property_name":
                 return {
                     "display": "none"
                 }

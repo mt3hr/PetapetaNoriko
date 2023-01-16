@@ -18,6 +18,7 @@ export default class ATagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "a"
+        this.focus_property_name = "href"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

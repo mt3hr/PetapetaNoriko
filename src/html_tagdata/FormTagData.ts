@@ -15,6 +15,7 @@ export default class FormTagData extends HTMLTagDataBase {
         super()
         this.tagname = "form"
         this.has_child_tag = true
+        this.focus_property_name = "method"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

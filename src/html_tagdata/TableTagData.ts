@@ -4,9 +4,9 @@ import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
 @serializable
 export default class TableTagData extends HTMLTagDataBase {
     disabled = false
-    label = "テーブル"
+    label = ""
     selected = false
-    value = "テーブル"
+    value = ""
     constructor() {
         super()
         this.tagname = "table"

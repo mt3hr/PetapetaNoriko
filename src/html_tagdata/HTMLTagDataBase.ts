@@ -25,6 +25,7 @@ export default class HTMLTagDataBase {
     scale: number
     position_style: PositionStyle = PositionStyle.Absolute
     selected_this_tag = false
+    focus_property_name: string
 
     generate_html(options: GenerateHTMLOptions, indent: string): string {
         return ""

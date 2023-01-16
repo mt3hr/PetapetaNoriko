@@ -7,6 +7,7 @@ export default class H3TagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "h3"
+        this.focus_property_name = "text"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

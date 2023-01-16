@@ -16,6 +16,7 @@ export default class TelTagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "tel"
+        this.focus_property_name = "placeholder"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

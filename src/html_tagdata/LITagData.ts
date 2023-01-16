@@ -9,6 +9,7 @@ export default class LITagData extends HTMLTagDataBase {
         super()
         this.tagname = "li"
         this.has_child_tag = true
+        this.focus_property_name = "text"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""

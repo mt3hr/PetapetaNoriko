@@ -10,6 +10,7 @@ export default class RadioTagData extends HTMLTagDataBase {
     constructor() {
         super()
         this.tagname = "radio"
+        this.focus_property_name = "checked"
     }
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
