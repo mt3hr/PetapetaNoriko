@@ -4,7 +4,7 @@ import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
 @serializable
 export default class SubmitTagData extends HTMLTagDataBase {
     name = ""
-    value = ""
+    value = "送信"
     formaction = ""
     formenctype = ""
     formmethod = ""

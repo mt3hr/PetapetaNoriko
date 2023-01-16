@@ -3,7 +3,7 @@ import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
 
 @serializable
 export default class ResetTagData extends HTMLTagDataBase {
-    value = ""
+    value = "リセット"
     constructor() {
         super()
         this.tagname = "reset"
