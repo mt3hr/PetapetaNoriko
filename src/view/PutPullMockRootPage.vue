@@ -396,7 +396,7 @@ export default class PutPullMockRootPage extends Vue {
         window.addEventListener('keyup', (e: KeyboardEvent) => {
             let page_list_view: any = this.$refs['page_list_view']
             if (e.ctrlKey && e.code == "KeyZ") {
-                if ((e as any).target.nodeName == "INPUT") return
+                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
                 if (this.histories.index > 0) {
                     if (this.histories.index >= this.histories.histories.length) {
                         this.histories.index = this.histories.histories.length - 1
@@ -414,7 +414,7 @@ export default class PutPullMockRootPage extends Vue {
                 }
             }
             if (e.ctrlKey && e.code == "KeyY") {
-                if ((e as any).target.nodeName == "INPUT") return
+                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
                 let pagedatas: Array<PageData>
                 if (this.histories.histories.length > this.histories.index + 1) {
                     this.histories.index++
@@ -432,11 +432,11 @@ export default class PutPullMockRootPage extends Vue {
 
         window.addEventListener('keydown', (e: KeyboardEvent) => {
             if (e.ctrlKey && e.code == "KeyC") {
-                if ((e as any).target.nodeName == "INPUT") return
+                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
                 this.copy_tag(this.clicked_tagdata)
             }
             if (e.ctrlKey && e.code == "KeyV" && this.copied_tagdata.tagname != "tagbase") {
-                if ((e as any).target.nodeName == "INPUT") return
+                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
                 if (!this.clicked_tagdata) {
                     let dropzone: any = this.$refs["dropzone"]
                     dropzone.paste_tag()
@@ -508,14 +508,14 @@ export default class PutPullMockRootPage extends Vue {
                 }
             }
             if (e.ctrlKey && e.code == "KeyX" && this.clicked_tagdata) {
-                if ((e as any).target.nodeName == "INPUT") return
+                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
                 this.copy_tag(this.clicked_tagdata)
                 let dropzone: any = this.$refs["dropzone"]
                 dropzone.delete_tagdata(this.clicked_tagdata)
                 this.clicked_tagdata = null
             }
             if (e.code == "Delete" && this.clicked_tagdata) {
-                if ((e as any).target.nodeName == "INPUT") return
+                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
                 let dropzone: any = this.$refs["dropzone"]
                 dropzone.delete_tagdata(this.clicked_tagdata)
             }
