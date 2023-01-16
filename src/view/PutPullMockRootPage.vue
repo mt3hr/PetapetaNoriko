@@ -396,7 +396,7 @@ export default class PutPullMockRootPage extends Vue {
         window.addEventListener('keyup', (e: KeyboardEvent) => {
             let page_list_view: any = this.$refs['page_list_view']
             if (e.ctrlKey && e.code == "KeyZ") {
-                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
+                // if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
                 if (this.histories.index > 0) {
                     if (this.histories.index >= this.histories.histories.length) {
                         this.histories.index = this.histories.histories.length - 1
@@ -414,7 +414,7 @@ export default class PutPullMockRootPage extends Vue {
                 }
             }
             if (e.ctrlKey && e.code == "KeyY") {
-                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
+                // if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
                 let pagedatas: Array<PageData>
                 if (this.histories.histories.length > this.histories.index + 1) {
                     this.histories.index++
