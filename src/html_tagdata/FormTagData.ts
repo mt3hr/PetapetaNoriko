@@ -43,4 +43,28 @@ export default class FormTagData extends HTMLTagDataBase {
     override to_string(): string {
         return this.name
     }
+    override clone(): FormTagData {
+        const c = new FormTagData()
+        c.child_tagdatas = new Array<HTMLTagDataBase>()
+        this.child_tagdatas.forEach((child_tagdata) => { c.child_tagdatas.push(child_tagdata.clone()) })
+        c.has_child_tag = this.has_child_tag
+        c.tagname = this.tagname
+        c.tagid = this.tagid
+        c.tagclass = this.tagclass
+        c.position_x = this.position_x
+        c.position_y = this.position_y
+        c.scale = this.scale
+        c.position_style = this.position_style
+        c.selected_this_tag = this.selected_this_tag
+        c.focus_property_name = this.focus_property_name
+        c.acceptcharset = this.acceptcharset
+        c.action = this.action
+        c.autocomplete = this.autocomplete
+        c.enctype = this.enctype
+        c.method = this.method
+        c.name = this.name
+        c.novalidate = this.novalidate
+        c.target = this.target
+        return c
+    }
 }

@@ -32,9 +32,8 @@ export default class PagePropertyView extends Vue {
             return
         }
         // 型変換しんどいので一度JSONにまるめてしまおう
-        let json = JSON.stringify(this.page_data)
-        let html_tagdata = JSON.parse(json, deserialize)
-        Object.keys(html_tagdata).forEach((key) => {
+        let pagedata = this.page_data.clone()
+        Object.keys(pagedata).forEach((key) => {
             switch (key) {
                 case "pageid":
                 case "html_tagdatas":
@@ -44,7 +43,7 @@ export default class PagePropertyView extends Vue {
             }
             let property: Property = new Property()
             property.name = key
-            property.value = html_tagdata[key]
+            property.value = pagedata[key]
             this.properties.push(property)
         })
     }
@@ -53,8 +52,7 @@ export default class PagePropertyView extends Vue {
         let value = payload.target.value
 
         // cloneだるいから一度JSONにまるめてしまおう
-        let json = JSON.stringify(this.page_data)
-        let page_data = JSON.parse(json, deserialize)
+        let page_data = this.page_data.clone()
         page_data[property_name] = value
 
         this.$emit('updated_page_property', page_data)

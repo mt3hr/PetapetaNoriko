@@ -451,7 +451,7 @@ export default class PutPullMockRootPage extends Vue {
                     let dropzone: any = this.$refs["dropzone"]
                     dropzone.paste_tag()
                 } else {
-                    const copied_tagdata: HTMLTagDataBase = JSON.parse(JSON.stringify(this.copied_tagdata), deserialize)
+                    const copied_tagdata = this.copied_tagdata.clone()
                     copied_tagdata.tagid = "id_" + generateUUID()
                     copied_tagdata.position_style = PositionStyle.None
                     copied_tagdata.position_x = undefined
@@ -468,10 +468,10 @@ export default class PutPullMockRootPage extends Vue {
                     walk_tagdatas(copied_tagdata.child_tagdatas)
 
                     let dropzone: any = this.$refs["dropzone"]
-                    let json = JSON.stringify(dropzone.html_tagdatas)
-                    const html_tagdatas: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
-                    json = JSON.stringify(this.clicked_tagdata)
-                    const clicked_tagdata: HTMLTagDataBase = JSON.parse(json, deserialize)
+
+                    const html_tagdatas = new Array<HTMLTagDataBase>()
+                    dropzone.html_tagdatas.forEach((child_tagdata) => { html_tagdatas.push(child_tagdata.clone()) })
+                    const clicked_tagdata = this.clicked_tagdata.clone()
 
                     if (e.altKey || !clicked_tagdata.has_child_tag) {
                         let parent_node: HTMLTagDataBase
@@ -878,7 +878,13 @@ export default class PutPullMockRootPage extends Vue {
         }
 
         this.histories.histories.length = this.histories.index
-        this.histories.histories[this.histories.index] = JSON.parse(JSON.stringify(page_list_view.pagedatas), deserialize)
+        let page_datas = Array<PageData>()
+        if (page_list_view.pagedatas) {
+            page_list_view.pagedatas.forEach(pagedata => {
+                page_datas.push(pagedata.clone())
+            });
+        }
+        this.histories.histories[this.histories.index] = page_datas
         this.histories.page_index.length = this.histories.index + 1
         this.histories.page_index[this.histories.index] = page_list_view.selected_index
         this.histories.index++

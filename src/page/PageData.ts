@@ -53,4 +53,16 @@ export default class PageData {
         }
         return css
     }
+    clone(): PageData {
+        const c = new PageData()
+        c.pageid = this.pageid
+        c.pagename = this.pagename
+        c.width = this.width
+        c.height = this.height
+        c.html_tagdatas = new Array<HTMLTagDataBase>()
+        this.html_tagdatas.forEach((child_tagdata) => { c.html_tagdatas.push(child_tagdata.clone()) })
+        c.css = this.css
+        c.webfonts = this.webfonts
+        return c
+    }
 }

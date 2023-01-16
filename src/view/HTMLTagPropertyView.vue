@@ -43,8 +43,8 @@ export default class HTMLTagPropertyView extends Vue {
             return
         }
         // 型変換しんどいので一度JSONにまるめてしまおう
-        let json = JSON.stringify(new_tagdata)
-        let html_tagdata = JSON.parse(json, deserialize)
+        let html_tagdata = new_tagdata.clone()
+
         Object.keys(html_tagdata).forEach((key) => {
             let property: Property = new Property()
             property.name = key
@@ -78,8 +78,7 @@ export default class HTMLTagPropertyView extends Vue {
 
     updated_property_value(payload: any, property: Property) {
         // cloneだるいから一度JSONにまるめてしまおう
-        let json = JSON.stringify(this.html_tagdata)
-        let html_tagdata = JSON.parse(json, deserialize)
+        let html_tagdata = this.html_tagdata.clone()
         html_tagdata[property.name] = property.value
 
         this.$emit('updated_html_tag_property', html_tagdata)

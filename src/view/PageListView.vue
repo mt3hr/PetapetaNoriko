@@ -138,8 +138,8 @@ export default class Page extends Vue {
             return
         }
 
-        let json = JSON.stringify(this.pagedatas)
-        let pagedatas: Array<PageData> = JSON.parse(json, deserialize)
+        let pagedatas = new Array<PageData>()
+        this.pagedatas.forEach((child_tagdata) => { pagedatas.push(child_tagdata.clone()) })
 
         let move_pagedata: PageData
         for (let i = 0; i < pagedatas.length; i++) {

@@ -49,4 +49,31 @@ export default class ImageTagData extends HTMLTagDataBase {
     override to_string(): string {
         return this.name
     }
+    override clone(): ImageTagData {
+        const c = new ImageTagData()
+        c.child_tagdatas = new Array<HTMLTagDataBase>()
+        this.child_tagdatas.forEach((child_tagdata) => { c.child_tagdatas.push(child_tagdata.clone()) })
+        c.has_child_tag = this.has_child_tag
+        c.tagname = this.tagname
+        c.tagid = this.tagid
+        c.tagclass = this.tagclass
+        c.position_x = this.position_x
+        c.position_y = this.position_y
+        c.scale = this.scale
+        c.position_style = this.position_style
+        c.selected_this_tag = this.selected_this_tag
+        c.focus_property_name = this.focus_property_name
+        c.name = this.name
+        c.value = this.value
+        c.src = this.src
+        c.alt = this.alt
+        c.height = this.height
+        c.width = this.width
+        c.formaciton = this.formaciton
+        c.formenctype = this.formenctype
+        c.formmethod = this.formmethod
+        c.formnovalidate = this.formnovalidate
+        c.formtarget = this.formtarget
+        return c
+    }
 }

@@ -192,7 +192,7 @@ export default class DropZone extends Vue {
 
     paste_tag() {
         if (this.copied_tagdata.tagname != 'tagbase') {
-            let copied_tagdata: HTMLTagDataBase = JSON.parse(JSON.stringify(this.copied_tagdata), deserialize)
+            let copied_tagdata = this.copied_tagdata.clone()
             copied_tagdata.tagid = "id_" + generateUUID()
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
                 // 後で代入する
@@ -277,7 +277,9 @@ export default class DropZone extends Vue {
             tag_data.position_x = e.offsetX
             tag_data.position_y = e.offsetY
 
-            let html_tagdatas: Array<HTMLTagDataBase> = JSON.parse(JSON.stringify(this.html_tagdatas), deserialize)
+
+            let html_tagdatas = new Array<HTMLTagDataBase>()
+            this.html_tagdatas.forEach((child_tagdata) => { html_tagdatas.push(child_tagdata.clone()) })
             html_tagdatas.push(tag_data)
             this.$emit('updated_htmltagdatas', html_tagdatas, null, true)
             this.$nextTick(() => {
@@ -315,8 +317,8 @@ export default class DropZone extends Vue {
             }
         } else if (tagid) {
             // すでに配置されたコンポーネントの移動
-            let json = JSON.stringify(this.html_tagdatas)
-            let html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
+            let html_tagdatas_root = new Array<HTMLTagDataBase>()
+            this.html_tagdatas.forEach((child_tagdata) => { html_tagdatas_root.push(child_tagdata.clone()) })
             let move_tagdata: HTMLTagDataBase
 
             let move_in_root = false
@@ -396,8 +398,8 @@ export default class DropZone extends Vue {
     }
 
     updated_tagdata(tagdata: HTMLTagDataBase) {
-        let json = JSON.stringify(this.html_tagdatas)
-        let html_tagdatas_root = JSON.parse(json, deserialize)
+        let html_tagdatas_root = new Array<HTMLTagDataBase>()
+        this.html_tagdatas.forEach((child_tagdata) => { html_tagdatas_root.push(child_tagdata.clone()) })
 
         let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
         walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -418,8 +420,8 @@ export default class DropZone extends Vue {
     }
 
     delete_tagdata(tagdata: HTMLTagDataBase) {
-        let json = JSON.stringify(this.html_tagdatas)
-        let html_tagdatas_root = JSON.parse(json, deserialize)
+        let html_tagdatas_root = new Array<HTMLTagDataBase>()
+        this.html_tagdatas.forEach((child_tagdata) => { html_tagdatas_root.push(child_tagdata.clone()) })
 
         let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
         walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {

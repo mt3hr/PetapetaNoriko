@@ -53,17 +53,14 @@ export default class PageListItem extends Vue {
     }
 
     copy_page(): void {
-        let json = JSON.stringify(this.pagedata)
-        let page_copy: PageData = JSON.parse(json, deserialize)
+        let page_copy = this.pagedata.clone()
         page_copy.pageid = generateUUID()
         page_copy.pagename += "_copy"
         this.$emit("copy_page", page_copy)
     }
 
     drop(e: DragEvent) {
-        let json = JSON.stringify(this.pagedata)
-        let pagedata: Array<PageData> = JSON.parse(json, deserialize)
-        this.$emit("move_pagedata", e, pagedata)
+        this.$emit("move_pagedata", e, this.pagedata.clone())
     }
 
     dragover(e: DragEvent) {

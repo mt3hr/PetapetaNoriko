@@ -227,8 +227,8 @@ export default class HTMLTagPropertyView extends Vue {
         if (e.dataTransfer.getData("ppmk/struct_li_id")) tagid = e.dataTransfer.getData("ppmk/struct_li_id")
         if (e.dataTransfer.getData("ppmk/move_tag_id")) tagid = e.dataTransfer.getData("ppmk/move_tag_id")
 
-        const json = JSON.stringify(this.html_tagdatas_root)
-        const html_tagdatas_root: Array<HTMLTagDataBase> = JSON.parse(json, deserialize)
+        let html_tagdatas_root = new Array<HTMLTagDataBase>()
+        this.html_tagdatas_root.forEach((child_tagdata) => { html_tagdatas_root.push(child_tagdata.clone()) })
 
         if (e.dataTransfer.getData("ppmk/htmltag")) {
             const tagname = e.dataTransfer.getData("ppmk/htmltag")
@@ -528,7 +528,7 @@ export default class HTMLTagPropertyView extends Vue {
 
     paste_tag_to_child(e) {
         if (this.copied_tagdata.tagname != 'tagbase') {
-            const copied_tagdata: HTMLTagDataBase = JSON.parse(JSON.stringify(this.copied_tagdata), deserialize)
+            const copied_tagdata = this.copied_tagdata.clone()
             copied_tagdata.tagid = "id_" + generateUUID()
             copied_tagdata.position_style = PositionStyle.None
             copied_tagdata.position_x = undefined
@@ -543,7 +543,7 @@ export default class HTMLTagPropertyView extends Vue {
                 }
             }
             walk_tagdatas(copied_tagdata.child_tagdatas)
-            const tagdata_typed: HTMLTagDataBase = JSON.parse(JSON.stringify(this.tagdata), deserialize)
+            const tagdata_typed = this.tagdata.clone()
 
             if (e.shiftKey) {
                 tagdata_typed.child_tagdatas.unshift(copied_tagdata)
@@ -583,7 +583,7 @@ export default class HTMLTagPropertyView extends Vue {
 
     paste_tag() {
         if (this.copied_tagdata.tagname != 'tagbase') {
-            const copied_tagdata: HTMLTagDataBase = JSON.parse(JSON.stringify(this.copied_tagdata), deserialize)
+            const copied_tagdata = this.copied_tagdata.clone()
             copied_tagdata.tagid = "id_" + generateUUID()
             copied_tagdata.position_style = PositionStyle.None
             copied_tagdata.position_x = undefined
@@ -598,7 +598,7 @@ export default class HTMLTagPropertyView extends Vue {
                 }
             }
             walk_tagdatas(copied_tagdata.child_tagdatas)
-            const tagdata_typed = JSON.parse(JSON.stringify(this.tagdata), deserialize)
+            const tagdata_typed = this.tagdata.clone()
             tagdata_typed.child_tagdatas.push(copied_tagdata)
             this.updated_child_tagdata(tagdata_typed)
         }
@@ -674,8 +674,7 @@ export default class HTMLTagPropertyView extends Vue {
     }
 
     updated_child_tagdata(tagdata: HTMLTagDataBase) {
-        const json = JSON.stringify(this.tagdata)
-        const tagdata_typed: any = JSON.parse(json, deserialize)
+        const tagdata_typed = this.tagdata.clone()
         for (let i = 0; i < tagdata_typed.child_tagdatas.length; i++) {
             if (tagdata.tagid == tagdata_typed.child_tagdatas[i].tagid) {
                 tagdata_typed.child_tagdatas[i] = tagdata
@@ -686,8 +685,7 @@ export default class HTMLTagPropertyView extends Vue {
     }
 
     delete_child_tagdata(html_tagdata: HTMLTagDataBase) {
-        const json = JSON.stringify(this.tagdata)
-        const tagdata_typed = JSON.parse(json, deserialize)
+        const tagdata_typed = this.tagdata.clone()
         let index = -1
         for (let i = 0; i < tagdata_typed.child_tagdatas.length; i++) {
             if (html_tagdata.tagid == tagdata_typed.child_tagdatas[i].tagid) {

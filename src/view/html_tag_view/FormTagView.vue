@@ -204,8 +204,7 @@ export default class FormTagView extends HTMLTagViewBase {
     }
 
     updated_child_tagdata(tagdata: HTMLTagDataBase) {
-        let json = JSON.stringify(this.tagdata_typed)
-        let tagdata_typed: FormTagData = JSON.parse(json, deserialize)
+        let tagdata_typed = this.tagdata_typed.clone()
         for (let i = 0; i < tagdata_typed.child_tagdatas.length; i++) {
             if (tagdata.tagid == tagdata_typed.child_tagdatas[i].tagid) {
                 tagdata_typed.child_tagdatas[i] = tagdata
@@ -216,8 +215,7 @@ export default class FormTagView extends HTMLTagViewBase {
     }
 
     delete_child_tagdata(html_tagdata: HTMLTagDataBase) {
-        let json = JSON.stringify(this.tagdata_typed)
-        let tagdata_typed: FormTagData = JSON.parse(json, deserialize)
+        let tagdata_typed = this.tagdata_typed.clone()
         let index = -1
         for (let i = 0; i < tagdata_typed.child_tagdatas.length; i++) {
             if (html_tagdata.tagid == tagdata_typed.child_tagdatas[i].tagid) {

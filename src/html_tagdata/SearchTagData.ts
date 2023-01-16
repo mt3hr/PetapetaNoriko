@@ -40,4 +40,30 @@ export default class SearchTagData extends HTMLTagDataBase {
     override to_string(): string {
         return this.name
     }
+    override clone(): SearchTagData {
+        const c = new SearchTagData()
+        c.child_tagdatas = new Array<HTMLTagDataBase>()
+        this.child_tagdatas.forEach((child_tagdata) => { c.child_tagdatas.push(child_tagdata.clone()) })
+        c.has_child_tag = this.has_child_tag
+        c.tagname = this.tagname
+        c.tagid = this.tagid
+        c.tagclass = this.tagclass
+        c.position_x = this.position_x
+        c.position_y = this.position_y
+        c.scale = this.scale
+        c.position_style = this.position_style
+        c.selected_this_tag = this.selected_this_tag
+        c.focus_property_name = this.focus_property_name
+        c.name = this.name
+        c.value = this.value
+        c.size = this.size
+        c.maxlength = this.maxlength
+        c.autocomplete = this.autocomplete
+        c.pattern = this.pattern
+        c.placeholder = this.placeholder
+        c.readonly = this.readonly
+        c.required = this.required
+        c.list = this.list
+        return c
+    }
 }

@@ -34,4 +34,25 @@ export default class TableTagData extends HTMLTagDataBase {
     override to_string(): string {
         return "table"
     }
+    override clone(): TableTagData {
+        const c = new TableTagData()
+        c.child_tagdatas = new Array<HTMLTagDataBase>()
+        this.child_tagdatas.forEach((child_tagdata) => { c.child_tagdatas.push(child_tagdata.clone()) })
+        c.has_child_tag = this.has_child_tag
+        c.tagname = this.tagname
+        c.tagid = this.tagid
+        c.tagclass = this.tagclass
+        c.position_x = this.position_x
+        c.position_y = this.position_y
+        c.scale = this.scale
+        c.position_style = this.position_style
+        c.selected_this_tag = this.selected_this_tag
+        c.focus_property_name = this.focus_property_name
+        c.disabled = this.disabled
+        c.label = this.label
+        c.selected = this.selected
+        c.value = this.value
+        return c
+    }
+
 }

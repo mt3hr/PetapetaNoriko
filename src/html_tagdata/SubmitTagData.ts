@@ -31,6 +31,30 @@ export default class SubmitTagData extends HTMLTagDataBase {
         html += ">"
         return html
     }
-override to_string(): string {
+    override to_string(): string {
         return this.value
-    }}
+    }
+    override clone(): SubmitTagData {
+        const c = new SubmitTagData()
+        c.child_tagdatas = new Array<HTMLTagDataBase>()
+        this.child_tagdatas.forEach((child_tagdata) => { c.child_tagdatas.push(child_tagdata.clone()) })
+        c.has_child_tag = this.has_child_tag
+        c.tagname = this.tagname
+        c.tagid = this.tagid
+        c.tagclass = this.tagclass
+        c.position_x = this.position_x
+        c.position_y = this.position_y
+        c.scale = this.scale
+        c.position_style = this.position_style
+        c.selected_this_tag = this.selected_this_tag
+        c.focus_property_name = this.focus_property_name
+        c.name = this.name
+        c.value = this.value
+        c.formaction = this.formaction
+        c.formenctype = this.formenctype
+        c.formmethod = this.formmethod
+        c.formnovalidate = this.formnovalidate
+        c.formtarget = this.formtarget
+        return c
+    }
+}
