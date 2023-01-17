@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"strconv"
 	"sync"
 	"time"
 
@@ -16,12 +17,24 @@ import (
 const TimeLayout = time.RFC3339
 
 type ppmkDB interface {
-	//TODO projectdataの追加
-	//TODO projectdataの削除
-	GetUser(ctx context.Context, userid string) (*User, error)
 	GetUsers(ctx context.Context) ([]*User, error)
-	GetProjectDatasSummary(ctx context.Context, userID string) ([]*ProjectData, error) // とりあえず見るために。projectdataは取得しません。GetProjectDataから取得して。
-	GetProjectDatas(ctx context.Context, userID string, projectID string) ([]*ProjectData, error)
+	GetUser(ctx context.Context, userid string) (*User, error)
+	AddUser(ctx context.Context, user *User) error
+	DeleteUser(ctx context.Context, userID string) error
+	UpdateUser(ctx context.Context, user *User) error
+
+	GetProjects(ctx context.Context, userID string) ([]*PPMKProject, error)
+	GetProject(ctx context.Context, projectID string) (*PPMKProject, error)
+	AddProject(ctx context.Context, project *PPMKProject) error
+	DeleteProject(ctx context.Context, projectID string) error
+	UpdateProject(ctx context.Context, project *PPMKProject) error
+
+	GetProjectDatas(ctx context.Context, userID string, projectID string) ([]*PPMKProjectData, error)
+	GetProjectData(ctx context.Context, projectDataID string) (*PPMKProjectData, error)
+	AddProjectData(ctx context.Context, projectData *PPMKProjectData) error
+	DeleteProjectData(ctx context.Context, projectDataID string) error
+	UpdateProjectData(ctx context.Context, projectData *PPMKProjectData) error
+
 	GetUserIDFromSessionID(ctx context.Context, sessionID string) (string, error)
 	Login(ctx context.Context, userID string, passwordHashMD5 string) (sessionID string, err error)
 	Logout(ctx context.Context, sessionID string) error
@@ -29,8 +42,9 @@ type ppmkDB interface {
 
 type User struct {
 	UserID          string
-	UserName        string
+	Email           string
 	PasswordHashMD5 string
+	UserName        string
 	ResetPasswordID string
 }
 
@@ -39,32 +53,31 @@ type LoginSession struct {
 	SessionID string
 }
 
-type ProjectData struct {
+type PPMKProject struct {
 	ProjectID   string
-	SavedTime   time.Time
-	UserID      string
+	OwnerUserID string
 	ProjectName string
-	ProjectData string
 	IsShared    bool
+}
+
+type PPMKProjectData struct {
+	ProjectDataID string
+	ProjectID     string
+	SavedTime     time.Time
+	ProjectData   string
+	Author        string
+}
+
+type ProjectShare struct {
+	ProjectID string
+	UserID    string
+	Writable  bool
 }
 
 type ppmkDBImpl struct {
 	filename string
 	db       *sql.DB
 	m        *sync.Mutex
-}
-
-func (p *ppmkDBImpl) GetUser(ctx context.Context, userid string) (*User, error) {
-	statement := `SELECT UserID, UserName, PasswordHashMD5, ResetPasswordID FROM "User" WHERE UserID='` + userid + `';`
-	row := p.db.QueryRowContext(ctx, statement)
-
-	user := &User{}
-	err := row.Scan(&user.UserID, user.UserName, &user.PasswordHashMD5, &user.ResetPasswordID)
-	if err != nil {
-		err = fmt.Errorf("error at scan row from %s: %w", p.filename, err)
-		return nil, err
-	}
-	return user, nil
 }
 
 func (p *ppmkDBImpl) GetUsers(ctx context.Context) ([]*User, error) {
@@ -94,8 +107,33 @@ func (p *ppmkDBImpl) GetUsers(ctx context.Context) ([]*User, error) {
 	return users, nil
 }
 
-func (p *ppmkDBImpl) GetProjectDatasSummary(ctx context.Context, userID string) ([]*ProjectData, error) {
-	statement := `SELECT ProjectID, SavedTime, UserID, ProjectName, IsShared FROM "PPMKProjectData";`
+func (p *ppmkDBImpl) GetUser(ctx context.Context, userid string) (*User, error) {
+	statement := `SELECT UserID, UserName, PasswordHashMD5, ResetPasswordID FROM "User" WHERE UserID='` + userid + `';`
+	row := p.db.QueryRowContext(ctx, statement)
+
+	user := &User{}
+	err := row.Scan(&user.UserID, user.UserName, &user.PasswordHashMD5, &user.ResetPasswordID)
+	if err != nil {
+		err = fmt.Errorf("error at scan row from %s: %w", p.filename, err)
+		return nil, err
+	}
+	return user, nil
+}
+
+func (p *ppmkDBImpl) AddUser(ctx context.Context, user *User) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (p *ppmkDBImpl) DeleteUser(ctx context.Context, userID string) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (p *ppmkDBImpl) UpdateUser(ctx context.Context, user *User) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (p *ppmkDBImpl) GetProjects(ctx context.Context, userID string) ([]*PPMKProject, error) {
+	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsShared FROM "PPMKProject";`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
@@ -103,68 +141,97 @@ func (p *ppmkDBImpl) GetProjectDatasSummary(ctx context.Context, userID string) 
 	}
 	defer rows.Close()
 
-	projects := []*ProjectData{}
+	projects := []*PPMKProject{}
 	for rows.Next() {
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		default:
-			project := &ProjectData{}
-			timestr := ""
-			err = rows.Scan(&project.ProjectID, &timestr, &project.UserID, &project.ProjectName, &project.IsShared)
+			project := &PPMKProject{}
+			isShared := ""
+			err = rows.Scan(&project.ProjectID, &project.OwnerUserID, &project.ProjectName, &isShared)
 			if err != nil {
 				err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
 				return nil, err
 			}
-			project.SavedTime, err = time.Parse(TimeLayout, timestr)
+			b, err := strconv.ParseBool(isShared)
 			if err != nil {
-				err = fmt.Errorf("error at parse time '%s' at %s %s: %w", timestr, project.ProjectID, p.filename, err)
 				return nil, err
 			}
-
+			project.IsShared = b
 			projects = append(projects, project)
 		}
 	}
 	return projects, nil
 }
 
-func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, userID string, projectID string) ([]*ProjectData, error) {
-
-	statement := `SELECT ProjectID, SavedTime, UserID, ProjectName, IsShared, ProjectData FROM "PPMKProjectData";`
-	rows, err := p.db.QueryContext(ctx, statement)
+func (p *ppmkDBImpl) GetProject(ctx context.Context, projectID string) (*PPMKProject, error) {
+	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsSharedView FROM "PPMKProjectData" WHERE ProjectID='` + projectID + `'`
+	row, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
-		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
 		return nil, err
 	}
-	defer rows.Close()
 
-	projects := []*ProjectData{}
-	for rows.Next() {
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		default:
-			project := &ProjectData{}
-			timestr := ""
-			err = rows.Scan(&project.ProjectID, &timestr, &project.UserID, &project.ProjectName, &project.IsShared, &project.ProjectData)
-			if err != nil {
-				err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
-				return nil, err
-			}
-			project.SavedTime, err = time.Parse(TimeLayout, timestr)
-			if err != nil {
-				err = fmt.Errorf("error at parse time '%s' at %s %s: %w", timestr, project.ProjectID, p.filename, err)
-				return nil, err
-			}
-
-			projects = append(projects, project)
-		}
+	project := &PPMKProject{}
+	isShared := ""
+	err = row.Scan(&project.ProjectID, &project.OwnerUserID, &project.ProjectName, &isShared)
+	if err != nil {
+		err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
+		return nil, err
 	}
-	return projects, nil
+	b, err := strconv.ParseBool(isShared)
+	if err != nil {
+		return nil, err
+	}
+	project.IsShared = b
+
+	return project, nil
+}
+
+func (p *ppmkDBImpl) AddProject(ctx context.Context, project *PPMKProject) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (p *ppmkDBImpl) DeleteProject(ctx context.Context, projectID string) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (p *ppmkDBImpl) UpdateProject(ctx context.Context, project *PPMKProject) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, userID string, projectID string) ([]*PPMKProjectData, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (p *ppmkDBImpl) GetProjectData(ctx context.Context, projectDataID string) (*PPMKProjectData, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (p *ppmkDBImpl) AddProjectData(ctx context.Context, projectData *PPMKProjectData) error {
+	statement := `INSERT INTO PPMKProjectData (ProjectDataID, ProjectID, SavedTime, ProjectData, Author) VALUES('` + projectData.ProjectDataID + `', '` + projectData.ProjectID + `', '` + projectData.SavedTime.Format(TimeLayout) + `', '` + projectData.ProjectData + `', '` + projectData.Author + `', )`
+	_, err := p.db.ExecContext(ctx, statement)
+	if err != nil {
+		err = fmt.Errorf("error at add projectdata %w", err)
+		return err
+	}
+	return nil
+}
+
+func (p *ppmkDBImpl) DeleteProjectData(ctx context.Context, projectDataID string) error {
+	statement := `DELETE FROM PPMKProjectData WHERE ProjectDataID='` + projectDataID + `'`
+	_, err := p.db.ExecContext(ctx, statement)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *ppmkDBImpl) UpdateProjectData(ctx context.Context, projectData *PPMKProjectData) error {
+	panic("not implemented") // TODO: Implement
 }
 
 func (p *ppmkDBImpl) GetUserIDFromSessionID(ctx context.Context, sessionID string) (string, error) {
-
 	statement := `SELECT UserID FROM LoginSession WHERE SessionID='` + sessionID + `' GROUP BY UserID`
 	row := p.db.QueryRowContext(ctx, statement)
 
@@ -175,7 +242,6 @@ func (p *ppmkDBImpl) GetUserIDFromSessionID(ctx context.Context, sessionID strin
 		return "", err
 	}
 	return userID, nil
-
 }
 
 func (p *ppmkDBImpl) Login(ctx context.Context, userID string, passwordHashMD5 string) (sessionID string, err error) {
