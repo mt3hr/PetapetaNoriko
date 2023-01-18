@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/fs"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -29,7 +30,7 @@ type ppmkDB interface {
 	DeleteProject(ctx context.Context, projectID string) error
 	UpdateProject(ctx context.Context, project *PPMKProject) error
 
-	GetProjectDatas(ctx context.Context, userID string, projectID string) ([]*PPMKProjectData, error)
+	GetProjectDatas(ctx context.Context, projectID string) ([]*PPMKProjectData, error)
 	GetProjectData(ctx context.Context, projectDataID string) (*PPMKProjectData, error)
 	AddProjectData(ctx context.Context, projectData *PPMKProjectData) error
 	DeleteProjectData(ctx context.Context, projectDataID string) error
@@ -121,15 +122,53 @@ func (p *ppmkDBImpl) GetUser(ctx context.Context, userid string) (*User, error) 
 }
 
 func (p *ppmkDBImpl) AddUser(ctx context.Context, user *User) error {
-	panic("not implemented") // TODO: Implement
+	statement := `INSERT INTO User (UserID, Emainl, PasswordHashMD5, UserName, ResetPasswordID) VALUES('` +
+		escapeSQLite(user.UserID) + `', '` +
+		escapeSQLite(user.Email) + `', '` +
+		escapeSQLite(user.PasswordHashMD5) + `', '` +
+		escapeSQLite(user.UserName) + `', '` +
+		escapeSQLite(user.ResetPasswordID) + `');`
+	_, err := p.db.ExecContext(ctx, statement)
+	if err != nil {
+		err = fmt.Errorf("error at add projectdata %w", err)
+		return err
+	}
+	return nil
 }
 
 func (p *ppmkDBImpl) DeleteUser(ctx context.Context, userID string) error {
-	panic("not implemented") // TODO: Implement
+	usersProjects, err := p.GetProjects(ctx, userID)
+	if err != nil {
+		return err
+	}
+	for _, usersProject := range usersProjects {
+		err := p.DeleteProject(ctx, usersProject.ProjectID)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	statement := `DELETE FROM User WHERE UserID='` + userID + `';`
+	_, err = p.db.ExecContext(ctx, statement)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *ppmkDBImpl) UpdateUser(ctx context.Context, user *User) error {
-	panic("not implemented") // TODO: Implement
+	statement := `UPDATE User SET Email='` +
+		escapeSQLite(user.Email) + `', PasswordHashMD5='` +
+		escapeSQLite(user.PasswordHashMD5) + `', UserName='` +
+		escapeSQLite(user.UserName) + `', ResetPasswordID='` +
+		escapeSQLite(user.ResetPasswordID) + `' WHERE UserID='` +
+		escapeSQLite(user.UserID) + `';`
+	_, err := p.db.ExecContext(ctx, statement)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *ppmkDBImpl) GetProjects(ctx context.Context, userID string) ([]*PPMKProject, error) {
@@ -166,7 +205,7 @@ func (p *ppmkDBImpl) GetProjects(ctx context.Context, userID string) ([]*PPMKPro
 }
 
 func (p *ppmkDBImpl) GetProject(ctx context.Context, projectID string) (*PPMKProject, error) {
-	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsSharedView FROM "PPMKProjectData" WHERE ProjectID='` + projectID + `'`
+	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsSharedView FROM "PPMKProjectData" WHERE ProjectID='` + projectID + `';`
 	row, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		return nil, err
@@ -189,27 +228,116 @@ func (p *ppmkDBImpl) GetProject(ctx context.Context, projectID string) (*PPMKPro
 }
 
 func (p *ppmkDBImpl) AddProject(ctx context.Context, project *PPMKProject) error {
-	panic("not implemented") // TODO: Implement
+	statement := `INSERT INTO PPMKProject (ProjectID, OwnerUserID, ProjectName, IsSharedView) VALUES('` +
+		escapeSQLite(project.ProjectID) + `', '` +
+		escapeSQLite(project.OwnerUserID) + `', '` +
+		escapeSQLite(project.ProjectName) + `', '` +
+		escapeSQLite(strconv.FormatBool(project.IsShared)) + `', );`
+	_, err := p.db.ExecContext(ctx, statement)
+	if err != nil {
+		err = fmt.Errorf("error at add projectdata %w", err)
+		return err
+	}
+	return nil
 }
 
 func (p *ppmkDBImpl) DeleteProject(ctx context.Context, projectID string) error {
-	panic("not implemented") // TODO: Implement
+	projectDatas, err := p.GetProjectDatas(ctx, projectID)
+	if err != nil {
+		return err
+	}
+	for _, projectData := range projectDatas {
+		err := p.DeleteProjectData(ctx, projectData.ProjectID)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	statement := `DELETE FROM Project WHERE ProjectID='` + projectID + `';`
+	_, err = p.db.ExecContext(ctx, statement)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *ppmkDBImpl) UpdateProject(ctx context.Context, project *PPMKProject) error {
-	panic("not implemented") // TODO: Implement
+	statement := `UPDATE Project SET  OwnerUserID='` +
+		escapeSQLite(project.OwnerUserID) + `', ProjectName='` +
+		escapeSQLite(project.ProjectName) + `', IsSharedView='` +
+		escapeSQLite(strconv.FormatBool(project.IsShared)) + `' WHERE ProjectID='` +
+		escapeSQLite(project.ProjectID) + `';`
+	_, err := p.db.ExecContext(ctx, statement)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, userID string, projectID string) ([]*PPMKProjectData, error) {
-	panic("not implemented") // TODO: Implement
+func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*PPMKProjectData, error) {
+	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Autho  FROM PPMKProjectData;`
+	rows, err := p.db.QueryContext(ctx, statement)
+	if err != nil {
+		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	projectDatas := []*PPMKProjectData{}
+	for rows.Next() {
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		default:
+			projectData := &PPMKProjectData{}
+			timestr := ""
+			err = rows.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.ProjectData, &projectData.Author)
+			if err != nil {
+				err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
+				return nil, err
+			}
+			t, err := time.Parse(TimeLayout, timestr)
+			if err != nil {
+				err = fmt.Errorf("error at parse time %s: %w", timestr, err)
+				return nil, err
+			}
+			projectData.SavedTime = t
+
+			projectDatas = append(projectDatas, projectData)
+		}
+	}
+	return projectDatas, nil
 }
 
 func (p *ppmkDBImpl) GetProjectData(ctx context.Context, projectDataID string) (*PPMKProjectData, error) {
-	panic("not implemented") // TODO: Implement
+	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Autho  FROM PPMKProjectData WHERE ProjectDataID='` + projectDataID + `';`
+	row := p.db.QueryRowContext(ctx, statement)
+
+	projectData := &PPMKProjectData{}
+	timestr := ""
+	err := row.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.ProjectData, &projectData.Author)
+	if err != nil {
+		err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
+		return nil, err
+	}
+	t, err := time.Parse(TimeLayout, timestr)
+	if err != nil {
+		err = fmt.Errorf("error at parse time %s: %w", timestr, err)
+		return nil, err
+	}
+	projectData.SavedTime = t
+
+	return projectData, nil
 }
 
 func (p *ppmkDBImpl) AddProjectData(ctx context.Context, projectData *PPMKProjectData) error {
-	statement := `INSERT INTO PPMKProjectData (ProjectDataID, ProjectID, SavedTime, ProjectData, Author) VALUES('` + projectData.ProjectDataID + `', '` + projectData.ProjectID + `', '` + projectData.SavedTime.Format(TimeLayout) + `', '` + projectData.ProjectData + `', '` + projectData.Author + `', )`
+	statement := `INSERT INTO PPMKProjectData (ProjectDataID, ProjectID, SavedTime, ProjectData, Author) VALUES('` +
+		escapeSQLite(projectData.ProjectDataID) + `', '` +
+		escapeSQLite(projectData.ProjectID) + `', '` +
+		escapeSQLite(projectData.SavedTime.Format(TimeLayout)) + `', '` +
+		escapeSQLite(projectData.ProjectData) + `', '` +
+		escapeSQLite(projectData.Author) + `');`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at add projectdata %w", err)
@@ -219,7 +347,7 @@ func (p *ppmkDBImpl) AddProjectData(ctx context.Context, projectData *PPMKProjec
 }
 
 func (p *ppmkDBImpl) DeleteProjectData(ctx context.Context, projectDataID string) error {
-	statement := `DELETE FROM PPMKProjectData WHERE ProjectDataID='` + projectDataID + `'`
+	statement := `DELETE FROM PPMKProjectData WHERE ProjectDataID='` + projectDataID + `';`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
 		return err
@@ -228,11 +356,20 @@ func (p *ppmkDBImpl) DeleteProjectData(ctx context.Context, projectDataID string
 }
 
 func (p *ppmkDBImpl) UpdateProjectData(ctx context.Context, projectData *PPMKProjectData) error {
-	panic("not implemented") // TODO: Implement
+	statement := `UPDATE PPMKProjectData SET SavedTime='` +
+		escapeSQLite(projectData.SavedTime.Format(TimeLayout)) + `', ProjectData='` +
+		escapeSQLite(projectData.ProjectData) + `', Author='` +
+		escapeSQLite(projectData.Author) + `' WHERE ProjectDataID='` +
+		escapeSQLite(projectData.ProjectDataID) + `';`
+	_, err := p.db.ExecContext(ctx, statement)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *ppmkDBImpl) GetUserIDFromSessionID(ctx context.Context, sessionID string) (string, error) {
-	statement := `SELECT UserID FROM LoginSession WHERE SessionID='` + sessionID + `' GROUP BY UserID`
+	statement := `SELECT UserID FROM LoginSession WHERE SessionID='` + sessionID + `' GROUP BY UserID;`
 	row := p.db.QueryRowContext(ctx, statement)
 
 	userID := ""
@@ -254,7 +391,7 @@ func (p *ppmkDBImpl) Login(ctx context.Context, userID string, passwordHashMD5 s
 		return "", err
 	}
 	sessionID = uuid.New().String()
-	statement := `INSERT INTO LoginSession (UserID, SessionID) VALUES('` + userID + `','` + sessionID + `')`
+	statement := `INSERT INTO LoginSession (UserID, SessionID) VALUES('` + userID + `','` + sessionID + `');`
 	_, err = p.db.ExecContext(ctx, statement)
 	if err != nil {
 		return "", err
@@ -263,7 +400,7 @@ func (p *ppmkDBImpl) Login(ctx context.Context, userID string, passwordHashMD5 s
 }
 
 func (p *ppmkDBImpl) Logout(ctx context.Context, sessionID string) error {
-	statement := `DELETE FROM LoginSession WHERE SessionID=` + sessionID + `')`
+	statement := `DELETE FROM LoginSession WHERE SessionID=` + sessionID + `');`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
 		return err
@@ -309,4 +446,8 @@ func newPPMKDB(dbFilename string) (ppmkDB, error) {
 		m:        &sync.Mutex{},
 	}, nil
 
+}
+
+func escapeSQLite(str string) string {
+	return strings.ReplaceAll(str, "'", "''")
 }
