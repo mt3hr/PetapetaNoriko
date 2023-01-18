@@ -9,6 +9,7 @@
             <p>パスワードリセットメールを送信しました</p><br />
             <a @click="$router.back()">戻る</a><br />
         </div>
+        <v-snackbar v-model="show_error_message_snackbar">{{ error_message }}</v-snackbar>
     </div>
 </template>
 
@@ -20,12 +21,16 @@ export default class ResetPassword extends Vue {
     email: string
     sent_reset_password_mail = false
 
+    error_message = ""
+    show_error_message_snackbar = false
+
     reset_password() {
         let api = new API()
         api.reset_password(this.email)
             .then((error) => {
                 if (error) {
-                    //TODO エラーがあった場合の処理
+                    this.error_message = error
+                    this.show_error_message_snackbar = true
                     return
                 } else {
                     this.sent_reset_password_mail = true

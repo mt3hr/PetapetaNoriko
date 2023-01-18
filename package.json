@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed && cpx -C models/PutPullMokModel.sql src/app/ppmk/embed",
+    "build": "rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -14,6 +14,7 @@
     "core-js": "^3.8.3",
     "md5": "^2.3.0",
     "roboto-fontface": "*",
+    "ts-md5": "^1.3.1",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",
     "vue-cli": "^2.9.6",

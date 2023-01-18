@@ -970,7 +970,7 @@ export default class PutPullMockRootPage extends Vue {
     }
     to_toppage() {
         if (this.editor_mode) return
-        this.$router.push("/")
+        this.$router.replace("/")
     }
     get title_style(): any {
         if (this.editor_mode) {
@@ -980,7 +980,7 @@ export default class PutPullMockRootPage extends Vue {
         }
     }
     login() {
-        this.$router.push('/login')
+        this.$router.replace('/login')
     }
     logout() {
         let api = new API()

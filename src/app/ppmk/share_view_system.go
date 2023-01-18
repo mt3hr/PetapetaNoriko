@@ -20,6 +20,7 @@ import (
 )
 
 //TODO ProjectData保存
+//TODO ユーザ登録
 
 type LoginRequest struct {
 	Email             string `json:"email"`
@@ -59,35 +60,38 @@ const (
 func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 	router.PathPrefix(loginAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
 		loginRequest := &LoginRequest{}
 		loginResponse := &LoginResponse{}
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&loginRequest)
 		if err != nil {
 			loginResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
-			fmt.Printf("err = %+v\n", err)
 			encoder := json.NewEncoder(w)
-			err = encoder.Encode(loginResponse)
-			if err != nil {
+			e := encoder.Encode(loginResponse)
+			if e != nil {
 				loginResponse.Error = fmt.Sprintf("サーバ内エラー")
-				fmt.Printf("err = %+v\n", err)
+				panic(e)
 				return
 			}
-
+			panic(err)
 			return
 		}
 		sessionID, err := ppmkDB.Login(r.Context(), loginRequest.Email, loginRequest.Password_hash_md5)
 		if err != nil {
 			loginResponse.Error = fmt.Sprintf("ログインに失敗しました")
-			fmt.Printf("err = %+v\n", err)
 			encoder := json.NewEncoder(w)
-			err = encoder.Encode(loginResponse)
-			if err != nil {
+			e := encoder.Encode(loginResponse)
+			if e != nil {
 				loginResponse.Error = fmt.Sprintf("サーバ内エラー")
-				fmt.Printf("err = %+v\n", err)
+				panic(e)
 				return
 			}
-
+			panic(err)
 			return
 		}
 		loginResponse.Session_id = sessionID
@@ -95,27 +99,37 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		err = encoder.Encode(loginResponse)
 		if err != nil {
 			loginResponse.Error = fmt.Sprintf("サーバ内エラー")
-			fmt.Printf("err = %+v\n", err)
+			panic(err)
 			return
 		}
 	}))
 	router.PathPrefix(logoutAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
 		logoutRequest := &LogoutRequest{}
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&logoutRequest)
 		if err != nil {
-			fmt.Printf("err = %+v\n", err)
+			panic(err)
 			return
 		}
 		err = ppmkDB.Logout(r.Context(), logoutRequest.Session_id)
 		if err != nil {
-			fmt.Printf("err = %+v\n", err)
+			panic(err)
 			return
 		}
 	}))
 	router.PathPrefix(resetPasswordAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
 		resetPasswordRequest := &ResetPasswordRequest{}
 		resetPasswordResponse := &ResetPasswordResponse{}
 
@@ -123,14 +137,14 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		err := decoder.Decode(&resetPasswordRequest)
 		if err != nil {
 			resetPasswordResponse.Error = "エラー" // リクエストデータがおかしい
-			fmt.Printf("err = %+v\n", err)
 			encoder := json.NewEncoder(w)
-			err = encoder.Encode(resetPasswordResponse)
-			if err != nil {
+			e := encoder.Encode(resetPasswordResponse)
+			if e != nil {
 				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
-				fmt.Printf("err = %+v\n", err)
+				panic(e)
 				return
 			}
+			panic(err)
 			return
 		}
 
@@ -141,14 +155,14 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		err = sendResetPasswordMail(resetPasswordRequest.Email, subject, body)
 		if err != nil {
 			resetPasswordResponse.Error = "メール送信エラー"
-			fmt.Printf("err = %+v\n", err)
 			encoder := json.NewEncoder(w)
-			err = encoder.Encode(resetPasswordResponse)
-			if err != nil {
+			e := encoder.Encode(resetPasswordResponse)
+			if e != nil {
 				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
-				fmt.Printf("err = %+v\n", err)
+				panic(e)
 				return
 			}
+			panic(err)
 			return
 		}
 	}))
@@ -169,6 +183,7 @@ func sendResetPasswordMail(email string, subject string, body string) error {
 type ppmkDB interface {
 	GetUsers(ctx context.Context) ([]*User, error)
 	GetUser(ctx context.Context, userid string) (*User, error)
+	GetUserFromEmail(ctx context.Context, email string) (*User, error)
 	AddUser(ctx context.Context, user *User) error
 	DeleteUser(ctx context.Context, userID string) error
 	UpdateUser(ctx context.Context, user *User) error
@@ -186,7 +201,7 @@ type ppmkDB interface {
 	UpdateProjectData(ctx context.Context, projectData *PPMKProjectData) error
 
 	GetUserIDFromSessionID(ctx context.Context, sessionID string) (string, error)
-	Login(ctx context.Context, userID string, passwordHashMD5 string) (sessionID string, err error)
+	Login(ctx context.Context, email string, passwordHashMD5 string) (sessionID string, err error)
 	Logout(ctx context.Context, sessionID string) error
 }
 
@@ -231,7 +246,7 @@ type ppmkDBImpl struct {
 }
 
 func (p *ppmkDBImpl) GetUsers(ctx context.Context) ([]*User, error) {
-	statement := `SELECT UserID, UserName, PasswordHashMD5, ResetPasswordID FROM "User";`
+	statement := `SELECT UserID, UserName, PasswordHashMD5, ResetPasswordID FROM User;`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
@@ -246,7 +261,7 @@ func (p *ppmkDBImpl) GetUsers(ctx context.Context) ([]*User, error) {
 			return nil, ctx.Err()
 		default:
 			user := &User{}
-			err = rows.Scan(&user.UserID, user.UserName, &user.PasswordHashMD5, &user.ResetPasswordID)
+			err = rows.Scan(&user.UserID, &user.UserName, &user.PasswordHashMD5, &user.ResetPasswordID)
 			if err != nil {
 				err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
 				return nil, err
@@ -258,11 +273,25 @@ func (p *ppmkDBImpl) GetUsers(ctx context.Context) ([]*User, error) {
 }
 
 func (p *ppmkDBImpl) GetUser(ctx context.Context, userid string) (*User, error) {
-	statement := `SELECT UserID, UserName, PasswordHashMD5, ResetPasswordID FROM "User" WHERE UserID='` + userid + `';`
+	statement := `SELECT UserID, Email, UserName, PasswordHashMD5, ResetPasswordID FROM User WHERE UserID='` + userid + `';`
 	row := p.db.QueryRowContext(ctx, statement)
 
 	user := &User{}
-	err := row.Scan(&user.UserID, user.UserName, &user.PasswordHashMD5, &user.ResetPasswordID)
+	err := row.Scan(&user.UserID, &user.Email, &user.UserName, &user.PasswordHashMD5, &user.ResetPasswordID)
+	if err != nil {
+		err = fmt.Errorf("error at scan row from %s: %w", p.filename, err)
+		return nil, err
+	}
+	return user, nil
+}
+
+func (p *ppmkDBImpl) GetUserFromEmail(ctx context.Context, email string) (*User, error) {
+	statement := `SELECT UserID, Email, UserName, PasswordHashMD5, ResetPasswordID FROM User WHERE Email='` +
+		escapeSQLite(email) + `';`
+	row := p.db.QueryRowContext(ctx, statement)
+
+	user := &User{}
+	err := row.Scan(&user.UserID, &user.Email, &user.UserName, &user.PasswordHashMD5, &user.ResetPasswordID)
 	if err != nil {
 		err = fmt.Errorf("error at scan row from %s: %w", p.filename, err)
 		return nil, err
@@ -321,7 +350,7 @@ func (p *ppmkDBImpl) UpdateUser(ctx context.Context, user *User) error {
 }
 
 func (p *ppmkDBImpl) GetProjects(ctx context.Context, userID string) ([]*PPMKProject, error) {
-	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsShared FROM "PPMKProject";`
+	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsShared FROM PPMKProject;`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
@@ -354,7 +383,7 @@ func (p *ppmkDBImpl) GetProjects(ctx context.Context, userID string) ([]*PPMKPro
 }
 
 func (p *ppmkDBImpl) GetProject(ctx context.Context, projectID string) (*PPMKProject, error) {
-	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsSharedView FROM "PPMKProjectData" WHERE ProjectID='` + projectID + `';`
+	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsSharedView FROM PPMKProjectData WHERE ProjectID='` + projectID + `';`
 	row, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		return nil, err
@@ -530,8 +559,8 @@ func (p *ppmkDBImpl) GetUserIDFromSessionID(ctx context.Context, sessionID strin
 	return userID, nil
 }
 
-func (p *ppmkDBImpl) Login(ctx context.Context, userID string, passwordHashMD5 string) (sessionID string, err error) {
-	user, err := p.GetUser(ctx, userID)
+func (p *ppmkDBImpl) Login(ctx context.Context, email string, passwordHashMD5 string) (sessionID string, err error) {
+	user, err := p.GetUserFromEmail(ctx, email)
 	if err != nil {
 		return "", err
 	}
@@ -539,8 +568,11 @@ func (p *ppmkDBImpl) Login(ctx context.Context, userID string, passwordHashMD5 s
 		err := fmt.Errorf("password does not match")
 		return "", err
 	}
+	userID := user.UserID
 	sessionID = uuid.New().String()
-	statement := `INSERT INTO LoginSession (UserID, SessionID) VALUES('` + userID + `','` + sessionID + `');`
+	statement := `INSERT INTO LoginSession (UserID, SessionID) VALUES('` +
+		escapeSQLite(userID) + `','` +
+		escapeSQLite(sessionID) + `');`
 	_, err = p.db.ExecContext(ctx, statement)
 	if err != nil {
 		return "", err
@@ -549,7 +581,7 @@ func (p *ppmkDBImpl) Login(ctx context.Context, userID string, passwordHashMD5 s
 }
 
 func (p *ppmkDBImpl) Logout(ctx context.Context, sessionID string) error {
-	statement := `DELETE FROM LoginSession WHERE SessionID=` + sessionID + `');`
+	statement := `DELETE FROM LoginSession WHERE SessionID='` + escapeSQLite(sessionID) + `';`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
 		return err
@@ -571,7 +603,6 @@ func createTableStatementSQL() (string, error) {
 }
 
 func newPPMKDB(dbFilename string) (ppmkDB, error) {
-	return nil, nil
 	db, err := sql.Open("sqlite3", dbFilename)
 	if err != nil {
 		err = fmt.Errorf("error at open database %s: %w", dbFilename, err)

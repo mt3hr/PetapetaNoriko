@@ -30,31 +30,27 @@ export default class API {
     private logout_address = "/ppmk_server/logout"
     private reset_password_address = "/ppmk_server/reset_password"
 
-    login(email: string, password: string): Promise<any> { //
+    async login(email: string, password: string): Promise<any> { //
         const login_request = new LoginRequest()
         login_request.email = email
         login_request.password_hash_md5 = md5(password)
 
-        return fetch(this.login_address, {
+        const res = await fetch(this.login_address, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(login_request),
-        }).then((res) => {
-            return res.json()
-        }).then((json) => {
-            const response: LoginResponse = JSON.parse(json)
-
-            if (response.error) {
-                return response.error
-            }
-
-            const settings = this.load_settings_from_cookie()
-            settings.session_id = response.session_id
-            this.save_settings_to_cookie(settings)
-            return
         })
+        const json = await res.json()
+        const response: LoginResponse = json
+        if (response.error) {
+            return response.error
+        }
+        const settings = this.load_settings_from_cookie()
+        settings.session_id = response.session_id
+        this.save_settings_to_cookie(settings)
+        return response
     }
 
     logout(): Promise<any> {
@@ -75,25 +71,23 @@ export default class API {
         })
     }
 
-    reset_password(email: string): Promise<any> {
+    async reset_password(email: string): Promise<any> {
         const reset_password_request = new ResetPasswordRequest()
         reset_password_request.email = email
 
-        return fetch(this.reset_password_address, {
+        const res = await fetch(this.reset_password_address, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(reset_password_request),
-        }).then((res) => {
-            return res.json()
-        }).then((json) => {
-            const response: ResetPasswordResponse = JSON.parse(json)
-            if (response.error) {
-                return response.error
-            }
-            return
         })
+        const json = await res.json()
+        const response: ResetPasswordResponse = json
+        if (response.error) {
+            return response.error
+        }
+        return response
     }
 
     save_settings_to_cookie(settings: Settings) {

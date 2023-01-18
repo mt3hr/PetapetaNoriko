@@ -193,7 +193,16 @@ func launchServer() error {
 
 		applyShareViewSystem(router, ppmkDB)
 	}
-	router.PathPrefix("/").Handler(http.FileServer(http.FS(html)))
+
+	hf := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		http.FileServer(http.FS(html)).ServeHTTP(w, r)
+	})
+
+	router.PathPrefix("/reset_password").Handler(http.StripPrefix("/reset_password", hf))
+	router.PathPrefix("/login").Handler(http.StripPrefix("/login", hf))
+	router.PathPrefix("/").Handler(hf)
 
 	var handler http.Handler = router
 	err = http.ListenAndServe(":"+fmt.Sprintf("%d", port), handler)
