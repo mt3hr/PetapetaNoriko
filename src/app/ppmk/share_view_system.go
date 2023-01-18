@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"net/http"
 	"net/smtp"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -21,6 +23,7 @@ import (
 
 //TODO ProjectData保存
 //TODO ユーザ登録
+//TODO メールサーバ立てて
 
 type LoginRequest struct {
 	Email             string `json:"email"`
@@ -50,12 +53,31 @@ const (
 	loginAddress         = "/ppmk_server/login"
 	logoutAddress        = "/ppmk_server/logout"
 	resetPasswordAddress = "/ppmk_server/reset_password"
-
-	emailhostname = "smtp.gmail.com"
-	emailport     = 587
-	emailusername = "21jy0216@gmail.com"
-	emailpassword = ""
 )
+
+var (
+	emailhostname string
+	emailport     uint16
+	emailusername string
+	emailpassword string
+)
+
+func init() {
+	emailhostname = os.Getenv("PPMK_EMAIL_HOSTNAME")
+	emailportUint64, err := strconv.ParseUint(os.Getenv("PPMK_EMAIL_PORT"), 10, 16)
+	if err != nil {
+		err = fmt.Errorf("PPMK_EMAIL_PORTの値を修正してください %s :%w", os.Getenv("PPMK_EMAIL_PORT"), err)
+		log.Fatal(err)
+	}
+	emailport = uint16(emailportUint64)
+	emailusername = os.Getenv("PPMK_EMAIL_USERNAME")
+	emailpassword = os.Getenv("PPMK_EMAIL_PASSWORD")
+
+	fmt.Printf("emailhostname = %+v\n", emailhostname)
+	fmt.Printf("emailport = %+v\n", emailport)
+	fmt.Printf("emailusername = %+v\n", emailusername)
+	fmt.Printf("emailpassword = %+v\n", emailpassword)
+}
 
 func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 	router.PathPrefix(loginAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

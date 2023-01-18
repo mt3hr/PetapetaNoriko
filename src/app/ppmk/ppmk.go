@@ -24,7 +24,13 @@ func init() {
 	cmd.AddCommand(serverCmd)
 	cmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", proxy, "proxy")
 	cmd.PersistentFlags().Uint16VarP(&port, "port", "p", port, "port")
-	cmd.PersistentFlags().BoolVarP(&shareViewSystem, "share_view_system", "s", shareViewSystem, "share_view_system")
+	cmd.PersistentFlags().BoolVarP(&shareViewSystem, "share_view_system", "s", shareViewSystem,
+		`share_view_system
+環境変数を設定して起動してください
+PPMK_EMAIL_HOSTNAME: パスワードリセット用メールのホスト名
+PPMK_EMAIL_PORT:     パスワードリセット用メールのポート番号
+PPMK_EMAIL_USERNAME: パスワードリセット用メールのユーザ名
+PPMK_EMAIL_PASSWORD: パスワードリセット用メールのパスワード`)
 	cmd.PersistentFlags().StringVarP(&dbfilename, "dbfilename", "d", dbfilename, "dbfilename")
 }
 
