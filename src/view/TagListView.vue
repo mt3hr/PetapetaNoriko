@@ -87,12 +87,8 @@
 <script lang="ts">
 import { Vue } from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
+import TagListViewMode from './TagListViewMode';
 
-export enum TagListViewMode {
-    Text,
-    Image,
-    TextAndImage,
-}
 
 export default class TagListView extends Vue {
     @Prop() mode: TagListViewMode

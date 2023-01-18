@@ -377,7 +377,7 @@ export default class HTMLTagView extends Vue {
     }
 
     onclick(e: MouseEvent) {
-        //TODO
+        return
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {

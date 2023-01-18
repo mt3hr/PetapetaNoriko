@@ -8,12 +8,13 @@
             <v-col cols="auto">
                 <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
             </v-col>
+            <v-col cols="auto">
+                <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
+                <v-btn v-else @click="logout">ログアウト</v-btn>
+            </v-col>
             <v-btn icon v-if="editor_mode" @click="show_options_dialog">
                 <v-icon>mdi-cog</v-icon>
             </v-btn>
-            <v-col cols="auto">
-                <v-btn :style="{ display: 'none' }">ログイン</v-btn>
-            </v-col>
         </v-row>
         <v-row class="ppmk_row ppmk_main_pane">
             <!--サイドバー-->
@@ -262,10 +263,9 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 
 <script lang="ts">
 //TODO グローバルナビゲーション 横並びリスト
-//TODO プロジェクト名を追加したいな
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
-import TagListView, { TagListViewMode } from '@/view/TagListView.vue'
+import TagListView from '@/view/TagListView.vue'
 import DropZone from '@/view/DropZone.vue'
 import HTMLTagPropertyView from '@/view/HTMLTagPropertyView.vue'
 import PagePropertyView from '@/view/PagePropertyView.vue'
@@ -278,20 +278,9 @@ import { head } from '@/main'
 import sample_project_json from '@/sample/ppmk_sample_project.json'
 import generateUUID from '@/uuid'
 import { Histories } from './History'
-
-@serializable
-class Settings {
-    export_base64_image: boolean
-    export_head: boolean
-    export_position_css: boolean
-    show_border: boolean
-    transparent_page_css_view: boolean
-    auto_save_pagedatas_to_localstorage: boolean
-    auto_scroll_tag_struct_view: boolean
-    tag_list_view_mode: TagListViewMode
-    use_undo: boolean
-    auto_focus_tag_property_view: boolean
-}
+import Settings from './Settings'
+import TagListViewMode from './TagListViewMode'
+import API from './share_view_system/api'
 
 @Options({
     components: {
@@ -343,6 +332,8 @@ export default class PutPullMockRootPage extends Vue {
 
     project_name = ""
 
+    session_id: string
+
     update_project_name(project_name: string) {
         this.project_name = project_name
     }
@@ -368,6 +359,7 @@ export default class PutPullMockRootPage extends Vue {
         settings.tag_list_view_mode = this.tag_list_view_mode
         settings.use_undo = this.use_undo
         settings.auto_focus_tag_property_view = this.auto_focus_tag_property_view
+        // settings.session_id = this.session_id
         document.cookie = JSON.stringify(settings)
     }
 
@@ -385,6 +377,7 @@ export default class PutPullMockRootPage extends Vue {
             settings.tag_list_view_mode = TagListViewMode.Text
             settings.use_undo = false
             settings.auto_focus_tag_property_view = false
+            // settings.session_id = undefined
             return settings
         }
         try {
@@ -425,6 +418,7 @@ export default class PutPullMockRootPage extends Vue {
         this.tag_list_view_mode = settings.tag_list_view_mode
         this.use_undo = settings.use_undo
         this.auto_focus_tag_property_view = settings.auto_focus_tag_property_view
+        this.session_id = settings.session_id
     }
 
     created(): void {
@@ -983,6 +977,15 @@ export default class PutPullMockRootPage extends Vue {
         } else {
             return { 'color': 'black', 'text-decoration': 'none' }
         }
+    }
+    login() {
+        this.$router.push('/login')
+    }
+    logout() {
+        let api = new API()
+        api.logout().then(() => {
+            location.reload()
+        })
     }
 }
 </script>
