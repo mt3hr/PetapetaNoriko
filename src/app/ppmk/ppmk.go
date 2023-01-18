@@ -24,14 +24,18 @@ func init() {
 	cmd.AddCommand(serverCmd)
 	cmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", proxy, "proxy")
 	cmd.PersistentFlags().Uint16VarP(&port, "port", "p", port, "port")
+	cmd.PersistentFlags().BoolVarP(&shareViewSystem, "share_view_system", "s", shareViewSystem, "share_view_system")
+	cmd.PersistentFlags().StringVarP(&dbfilename, "dbfilename", "d", dbfilename, "dbfilename")
 }
 
 var (
 	//go:embed embed
 	htmlFS embed.FS // htmlファイル郡
 
-	port  = uint16(51520)
-	proxy = ""
+	port            = uint16(51520)
+	proxy           = ""
+	shareViewSystem = true
+	dbfilename      = "ppmk.db"
 
 	serverCmd = &cobra.Command{
 		Use: "server",
@@ -180,6 +184,14 @@ func launchServer() error {
 	html, err := fs.Sub(htmlFS, "embed/dist")
 	if err != nil {
 		return err
+	}
+	if shareViewSystem {
+		ppmkDB, err := newPPMKDB(dbfilename)
+		if err != nil {
+			panic(err)
+		}
+
+		applyShareViewSystem(router, ppmkDB)
 	}
 	router.PathPrefix("/").Handler(http.FileServer(http.FS(html)))
 

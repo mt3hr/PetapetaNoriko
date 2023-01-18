@@ -263,6 +263,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 
 <script lang="ts">
 //TODO グローバルナビゲーション 横並びリスト
+//TODO ページデータじゃなくてプロジェクトを保存するようにしよう
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView from '@/view/TagListView.vue'

@@ -3,19 +3,168 @@ package ppmk
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/fs"
+	"net/http"
+	"net/smtp"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const TimeLayout = time.RFC3339
+//TODO ProjectData保存
+
+type LoginRequest struct {
+	Email             string `json:"email"`
+	Password_hash_md5 string `json:"password_hash_md5"`
+}
+
+type LoginResponse struct {
+	Session_id string `json:"session_id"`
+	Error      string `json:"error"`
+}
+
+type LogoutRequest struct {
+	Session_id string `json:"session_id"`
+}
+
+type ResetPasswordRequest struct {
+	Email string `json:"email"`
+}
+
+type ResetPasswordResponse struct {
+	Error string `json:"error"`
+}
+
+const (
+	TimeLayout = time.RFC3339
+
+	loginAddress         = "/ppmk_server/login"
+	logoutAddress        = "/ppmk_server/logout"
+	resetPasswordAddress = "/ppmk_server/reset_password"
+
+	emailhostname = "mail.ppmk.com"
+	emailport     = 587
+	emailusername = "resetpassword@ppmk.com"
+	emailpassword = "jecjecjec"
+)
+
+func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
+	router.PathPrefix(loginAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+		loginRequest := &LoginRequest{}
+		loginResponse := &LoginResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&loginRequest)
+		if err != nil {
+			loginResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			fmt.Printf("err = %+v\n", err)
+			encoder := json.NewEncoder(w)
+			err = encoder.Encode(loginResponse)
+			if err != nil {
+				loginResponse.Error = fmt.Sprintf("サーバ内エラー")
+				fmt.Printf("err = %+v\n", err)
+				return
+			}
+
+			return
+		}
+		sessionID, err := ppmkDB.Login(r.Context(), loginRequest.Email, loginRequest.Password_hash_md5)
+		if err != nil {
+			loginResponse.Error = fmt.Sprintf("ログインに失敗しました")
+			fmt.Printf("err = %+v\n", err)
+			encoder := json.NewEncoder(w)
+			err = encoder.Encode(loginResponse)
+			if err != nil {
+				loginResponse.Error = fmt.Sprintf("サーバ内エラー")
+				fmt.Printf("err = %+v\n", err)
+				return
+			}
+
+			return
+		}
+		loginResponse.Session_id = sessionID
+		encoder := json.NewEncoder(w)
+		err = encoder.Encode(loginResponse)
+		if err != nil {
+			loginResponse.Error = fmt.Sprintf("サーバ内エラー")
+			fmt.Printf("err = %+v\n", err)
+			return
+		}
+	}))
+	router.PathPrefix(logoutAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+		logoutRequest := &LogoutRequest{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&logoutRequest)
+		if err != nil {
+			fmt.Printf("err = %+v\n", err)
+			return
+		}
+		err = ppmkDB.Logout(r.Context(), logoutRequest.Session_id)
+		if err != nil {
+			fmt.Printf("err = %+v\n", err)
+			return
+		}
+	}))
+	router.PathPrefix(resetPasswordAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+		resetPasswordRequest := &ResetPasswordRequest{}
+		resetPasswordResponse := &ResetPasswordResponse{}
+
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&resetPasswordRequest)
+		if err != nil {
+			resetPasswordResponse.Error = "エラー" // リクエストデータがおかしい
+			fmt.Printf("err = %+v\n", err)
+			encoder := json.NewEncoder(w)
+			err = encoder.Encode(resetPasswordResponse)
+			if err != nil {
+				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+				fmt.Printf("err = %+v\n", err)
+				return
+			}
+			return
+		}
+
+		subject := "PPMK パスワードリセットメール"
+		//TODO
+		body := ""
+
+		err = sendResetPasswordMail(resetPasswordRequest.Email, subject, body)
+		if err != nil {
+			resetPasswordResponse.Error = "メール送信エラー"
+			fmt.Printf("err = %+v\n", err)
+			encoder := json.NewEncoder(w)
+			err = encoder.Encode(resetPasswordResponse)
+			if err != nil {
+				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+				fmt.Printf("err = %+v\n", err)
+				return
+			}
+			return
+		}
+	}))
+}
+
+func sendResetPasswordMail(email string, subject string, body string) error {
+	from := emailusername
+	recipients := []string{email}
+
+	auth := smtp.CRAMMD5Auth(emailusername, emailpassword)
+	msg := []byte(strings.ReplaceAll(fmt.Sprintf("To: %s\nSubject: %s\n\n%s", strings.Join(recipients, ","), subject, body), "\n", "\r\n"))
+	if err := smtp.SendMail(fmt.Sprintf("%s:%d", emailhostname, emailport), auth, from, recipients, msg); err != nil {
+		return err
+	}
+	return nil
+}
 
 type ppmkDB interface {
 	GetUsers(ctx context.Context) ([]*User, error)
