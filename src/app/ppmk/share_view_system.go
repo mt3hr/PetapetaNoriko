@@ -51,10 +51,10 @@ const (
 	logoutAddress        = "/ppmk_server/logout"
 	resetPasswordAddress = "/ppmk_server/reset_password"
 
-	emailhostname = "mail.ppmk.com"
+	emailhostname = "smtp.gmail.com"
 	emailport     = 587
-	emailusername = "resetpassword@ppmk.com"
-	emailpassword = "jecjecjec"
+	emailusername = "21jy0216@gmail.com"
+	emailpassword = ""
 )
 
 func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
@@ -150,7 +150,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 
 		subject := "PPMK パスワードリセットメール"
 		//TODO
-		body := ""
+		body := "送信テスト"
 
 		err = sendResetPasswordMail(resetPasswordRequest.Email, subject, body)
 		if err != nil {
@@ -169,12 +169,13 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 }
 
 func sendResetPasswordMail(email string, subject string, body string) error {
-	from := emailusername
-	recipients := []string{email}
-
-	auth := smtp.CRAMMD5Auth(emailusername, emailpassword)
-	msg := []byte(strings.ReplaceAll(fmt.Sprintf("To: %s\nSubject: %s\n\n%s", strings.Join(recipients, ","), subject, body), "\n", "\r\n"))
-	if err := smtp.SendMail(fmt.Sprintf("%s:%d", emailhostname, emailport), auth, from, recipients, msg); err != nil {
+	auth := smtp.PlainAuth("", emailusername, emailpassword, emailhostname)
+	msg := []byte(strings.ReplaceAll(fmt.Sprintf("To: %s\nSubject: %s\n\n%s", email, subject, body), "\n", "\r\n"))
+	if err := smtp.SendMail(fmt.Sprintf("%s:%d", emailhostname, emailport),
+		auth,
+		emailusername,
+		[]string{email},
+		msg); err != nil {
 		return err
 	}
 	return nil

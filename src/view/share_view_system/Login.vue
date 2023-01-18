@@ -3,7 +3,7 @@
         <input type="email" v-model="email" placeholder="メールアドレス" name="email"><br />
         <input type="password" v-model="password" placeholder="パスワード" name="password"><br />
         <v-btn @click.once="login">ログイン</v-btn><br />
-        <a @click="reset_password">パスワードリセット</a><br />
+        <a v-if="false" @click="reset_password">パスワードリセット</a><br />
         <a @click="$router.back()">戻る</a><br />
         <v-snackbar v-model="show_error_message_snackbar">{{ error_message }}</v-snackbar>
     </div>
