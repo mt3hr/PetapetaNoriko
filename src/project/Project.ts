@@ -2,7 +2,6 @@ import PageData from "@/page/PageData";
 import { serializable } from "@/serializable/serializable";
 import generateUUID from "@/uuid";
 
-@serializable
 export default class Project {
     ppmk_project = new PPMKProject()
     ppmk_project_data = new PPMKProjectData()

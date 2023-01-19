@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"net/http"
 	"net/smtp"
 	"os"
@@ -74,20 +73,23 @@ var (
 )
 
 func init() {
+	if !shareViewSystem {
+		return
+	}
 	emailhostname = os.Getenv("PPMK_EMAIL_HOSTNAME")
 	emailportUint64, err := strconv.ParseUint(os.Getenv("PPMK_EMAIL_PORT"), 10, 16)
 	if err != nil {
 		err = fmt.Errorf("PPMK_EMAIL_PORTの値を修正してください %s :%w", os.Getenv("PPMK_EMAIL_PORT"), err)
-		log.Fatal(err)
+		// log.Fatal(err)
 	}
 	emailport = uint16(emailportUint64)
 	emailusername = os.Getenv("PPMK_EMAIL_USERNAME")
 	emailpassword = os.Getenv("PPMK_EMAIL_PASSWORD")
 
-	fmt.Printf("emailhostname = %+v\n", emailhostname)
-	fmt.Printf("emailport = %+v\n", emailport)
-	fmt.Printf("emailusername = %+v\n", emailusername)
-	fmt.Printf("emailpassword = %+v\n", emailpassword)
+	fmt.Printf("PPMK_EMAIL_HOSTNAME = %+v\n", emailhostname)
+	fmt.Printf("PPMK_EMAIL_PORT = %+v\n", emailport)
+	fmt.Printf("PPMK_EMAIL_USERNAME = %+v\n", emailusername)
+	fmt.Printf("PPMK_EMAIL_PASSWORD = %+v\n", emailpassword)
 }
 
 func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
