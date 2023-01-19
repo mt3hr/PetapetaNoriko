@@ -9,8 +9,8 @@
                 <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
             </v-col>
             <v-col cols="auto">
-                <v-btn v-if="false" @click="login">ログイン</v-btn>
-                <v-btn v-if="false" @click="logout">ログアウト</v-btn>
+                <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
+                <v-btn v-else @click="logout">ログアウト</v-btn>
             </v-col>
             <v-btn icon v-if="editor_mode" @click="show_options_dialog">
                 <v-icon>mdi-cog</v-icon>
