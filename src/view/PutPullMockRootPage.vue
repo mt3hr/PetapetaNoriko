@@ -441,6 +441,16 @@ export default class PutPullMockRootPage extends Vue {
                 page_list_view.save_pagedatas_to_localstorage()
                 this.save_ppmk_project()
             }
+            if (e.code == "KeyP" && e.ctrlKey) {
+                e.preventDefault()
+                e.stopPropagation()
+                let page_list_view: any = this.$refs['page_list_view']
+                page_list_view.save_pagedatas_to_localstorage()
+                this.print_this_page()
+            }
+            if (e.code == "Escape") {
+                this.clicked_tagdata = null
+            }
         }
         this.load_settings_from_cookie()
         window.addEventListener('keyup', (e: KeyboardEvent) => {
