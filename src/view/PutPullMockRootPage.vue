@@ -993,7 +993,7 @@ export default class PutPullMockRootPage extends Vue {
         }
     }
     login() {
-        this.$router.replace('/login')
+        this.$router.push('/login')
     }
     logout() {
         let api = new API()

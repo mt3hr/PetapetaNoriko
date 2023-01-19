@@ -3,7 +3,7 @@
         <h2>ページプロパティ</h2>
         <table>
             <tr>
-                <td>プロジェクト名:</td>
+                <td><small>プロジェクト名:</small></td>
                 <td><input type="text" v-model="_project_name" @keyup="updated_project_name" /> </td>
             </tr>
 
