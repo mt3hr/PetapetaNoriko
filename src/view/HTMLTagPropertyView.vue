@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mainside">
         <h2>タグプロパティ</h2>
         <table>
             <tr v-for="property, index in properties" :key="index" :style="generate_style(property)">
@@ -8,10 +8,10 @@
                     <input v-if="use_checkbox(property)" type="checkbox" v-model="property.value"
                         :disabled="is_editable_property(property)"
                         @change="(e) => updated_property_value(e, property)" />
-                    <textarea v-else-if="use_textarea(property)" v-model="property.value"
+                    <textarea class="textbox" v-else-if="use_textarea(property)" v-model="property.value"
                         :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)"></textarea>
-                    <input v-else type="text" v-model="property.value" :disabled="is_editable_property(property)"
+                    <input v-else class="textbox" type="text" v-model="property.value" :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)" />
                 </td>
             </tr>
@@ -121,3 +121,21 @@ export default class HTMLTagPropertyView extends Vue {
     }
 }
 </script>
+
+<style>
+.mainside h2{
+    font-family: "Roboto", sans-serif;
+    font-size: 30px;
+    color: steelblue;  
+}
+.textbox{
+    background: whitesmoke;
+    transition: all 0.1s ease;
+}
+.textbox:hover{
+    opacity:0.6;
+}
+.textbox:focus{
+    outline: solid 2px steelblue;
+}
+</style>

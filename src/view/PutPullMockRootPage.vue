@@ -1,20 +1,23 @@
 <template>
+    <div class="main_page">
     <v-container>
-        <v-row class="ppmk_row">
-            <v-col cols="auto">
-                <h1>PutPullMock</h1>
-            </v-col>
-            <v-spacer />
-            <v-col cols="auto">
-                <v-checkbox class="checkbox mx-3" v-model="show_border" :label="'境界を表示'" />
-            </v-col>
-            <v-btn icon @click="show_options_dialog">
-                <v-icon>mdi-cog</v-icon>
-            </v-btn>
-            <v-col cols="auto">
-                <v-btn :style="{ display: 'none' }">ログイン</v-btn>
-            </v-col>
-        </v-row>
+        <div class="header_bar">
+            <v-row class="ppmk_row">
+                <v-col cols="auto">
+                    <h1>PutPullMock</h1>
+                </v-col>
+                <v-spacer />
+                <v-col cols="auto">
+                    <v-checkbox class="checkbox mx-3" v-model="show_border" :label="'境界を表示'" />
+                </v-col>
+                <v-btn icon @click="show_options_dialog">
+                    <v-icon>mdi-cog</v-icon>
+                </v-btn>
+                <v-col cols="auto">
+                    <v-btn :style="{ display: 'none' }">ログイン</v-btn>
+                </v-col>
+            </v-row>
+        </div>
         <v-row class="ppmk_row ppmk_main_pane">
             <!--サイドバー-->
             <v-col cols="auto" class="sidebar">
@@ -234,6 +237,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
         </v-card>
     </v-dialog>
+    </div>
 </template>
 
 <script lang="ts">
@@ -804,5 +808,37 @@ textarea {
 
 body {
     overflow: scroll !important;
+}
+</style>
+
+<style>
+.main_page {
+    margin: auto;
+    position: relative;
+    justify-content: center;
+    background: white;
+    font-family: "Roboto", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;      
+}
+
+::-webkit-scrollbar{
+   width: 10px;
+}
+::-webkit-scrollbar-track{
+   background-color: white;
+}
+::-webkit-scrollbar-thumb{
+   background-color: steelblue;
+   border-radius: 5px;
+}
+
+.header_bar{
+    background: aliceblue;
+}
+.header_bar h1{
+    font-family: "Roboto", sans-serif;
+    font-size: 50px;
+    color: steelblue;
 }
 </style>

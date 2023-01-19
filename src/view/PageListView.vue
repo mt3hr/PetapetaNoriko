@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mainside">
         <h2>
             ページ一覧
             <v-btn @click="add_page">+</v-btn>
@@ -159,3 +159,15 @@ export default class Page extends Vue {
     }
 }
 </script>
+<style>
+.mainside h2{
+    font-family: "Roboto", sans-serif;
+    font-size: 30px;
+    color: steelblue;  
+}
+.pageitem{
+}
+.pageitem:hover{
+}
+
+</style>
