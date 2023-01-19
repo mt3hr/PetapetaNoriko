@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mainside">
         <h2>HTML要素一覧</h2>
         <h3>基本</h3>
         <ul>
@@ -189,6 +189,22 @@ export default class TagListView extends Vue {
 <style scoped>
 li {
     margin-left: 20px;
+    transition: all 0.1s ease;
+    list-style: url('./img/same.png');
+}
+li:hover{
+    opacity:0.6;
+}
+
+.mainside h2{
+    font-family: "Roboto", sans-serif;
+    font-size: 30px;
+    color: steelblue;  
+}
+.mainside h3{
+    font-family: "Roboto", sans-serif;
+    font-size: 20px;
+    color: steelblue;  
 }
 
 td {

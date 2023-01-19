@@ -1,5 +1,5 @@
 <template>
-    <div dropzone="true" @drop.stop="drop" @dragover.prevent="dragover">
+    <div class="mainside" dropzone="true" @drop.stop="drop" @dragover.prevent="dragover">
         <h2>構造</h2>
         <div class="struct_view">
             <ul class="dropzone_wrap">
@@ -387,5 +387,11 @@ li {
 
 .struct_view {
     width: fit-content;
+}
+
+.mainside h2{
+    font-family: "Roboto", sans-serif;
+    font-size: 30px;
+    color: steelblue;  
 }
 </style>
