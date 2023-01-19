@@ -55,14 +55,15 @@ export default class Page extends Vue {
     @Watch('project_name')
     update_project_name() {
         this.project.ppmk_project.project_name = this.project_name
+        this.save_pagedatas_to_localstorage()
     }
 
     @Watch('pagedatas')
     save_pagedatas_to_localstorage() {
-        let pagedata = JSON.stringify(this.project.ppmk_project_data.project_data)
+        let project = JSON.stringify(this.project)
         if (this.auto_save_pagedatas_to_localstorage) {
             try {
-                window.localStorage.setItem("ppmk_pagedatas", pagedata)
+                window.localStorage.setItem("ppmk_project", project)
             } catch (e) {
                 this.is_show_oversize_localstorage_dialog = true
                 this.$emit("update_auto_save_pagedatas_to_localstorage", false)
@@ -74,7 +75,7 @@ export default class Page extends Vue {
     @Watch('auto_save_pagedatas_to_localstorage')
     clear_pagedatas_at_localstorage() {
         if (!this.auto_save_pagedatas_to_localstorage) {
-            window.localStorage.setItem("ppmk_pagedatas", "")
+            window.localStorage.setItem("ppmk_project", "")
         }
     }
 
@@ -107,7 +108,8 @@ export default class Page extends Vue {
     created(): void {
         if (this.auto_save_pagedatas_to_localstorage) {
             try {
-                this.project.ppmk_project_data.project_data = JSON.parse(window.localStorage.getItem("ppmk_pagedatas"), deserialize)
+                this.project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
+                this.$emit("updated_project_name", this.project.ppmk_project.project_name)
                 if (this.project.ppmk_project_data.project_data && this.project.ppmk_project_data.project_data.length > 0) {
                     this.clicked_page(this.project.ppmk_project_data.project_data[0])
                 } else {
@@ -163,6 +165,7 @@ export default class Page extends Vue {
         this.selected_index = index
         this.clicked_page(this.project.ppmk_project_data.project_data[index])
     }
+
     get style(): any {
         if (this.editor_mode) {
             return {}

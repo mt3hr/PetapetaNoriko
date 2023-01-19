@@ -3,7 +3,7 @@
         <h2>ページプロパティ</h2>
         <table>
             <tr>
-                <td><small>プロジェクト名:</small></td>
+                <td class="project_name">プロジェクト名:</td>
                 <td><input type="text" v-model="_project_name" @keyup="updated_project_name" /> </td>
             </tr>
 
@@ -34,7 +34,7 @@ export default class PagePropertyView extends Vue {
 
     @Watch('project_name')
     update_project_name() {
-        this._project_name =this.project_name 
+        this._project_name = this.project_name
     }
 
     @Watch("page_data")
@@ -84,5 +84,14 @@ export default class PagePropertyView extends Vue {
     updated_project_name() {
         this.$emit("updated_project_name", this._project_name)
     }
+
+    created(): void {
+        this.update_project_name()
+    }
 }
 </script>
+<style scoped>
+.project_name {
+    font-size: 75%;
+}
+</style>

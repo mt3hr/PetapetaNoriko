@@ -23,7 +23,8 @@
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
                         <PageListView class="component page_list_view" ref="page_list_view" :editor_mode="editor_mode"
-                            :project_name="project_name" @updated_htmltagdatas="updated_htmltagdatas"
+                            @updated_project_name="update_project_name" :project_name="project_name"
+                            @updated_htmltagdatas="updated_htmltagdatas"
                             :auto_save_pagedatas_to_localstorage="auto_save_pagedatas_to_localstorage"
                             @delete_page="delete_page"
                             @update_auto_save_pagedatas_to_localstorage="update_auto_save_pagedatas_to_localstorage"
@@ -432,6 +433,15 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     created(): void {
+        window.onkeydown = (e: KeyboardEvent) => {
+            if (e.code == "KeyS" && e.ctrlKey) {
+                e.preventDefault()
+                e.stopPropagation()
+                let page_list_view: any = this.$refs['page_list_view']
+                page_list_view.save_pagedatas_to_localstorage()
+                this.save_ppmk_project()
+            }
+        }
         this.load_settings_from_cookie()
         window.addEventListener('keyup', (e: KeyboardEvent) => {
             let page_list_view: any = this.$refs['page_list_view']
