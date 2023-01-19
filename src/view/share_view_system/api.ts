@@ -25,10 +25,21 @@ class ResetPasswordResponse {
     error: string
 }
 
+class RegisterRequest {
+    username: string
+    email: string
+    password_hash_md5: string
+}
+
+class RegisterResponse {
+    error: string
+}
+
 export default class API {
     private login_address = "/ppmk_server/login"
     private logout_address = "/ppmk_server/logout"
     private reset_password_address = "/ppmk_server/reset_password"
+    private register_address = "/ppmk_server/register"
 
     async login(email: string, password: string): Promise<any> { //
         const login_request = new LoginRequest()
@@ -116,5 +127,23 @@ export default class API {
             settings = JSON.parse(document.cookie, deserialize)
         }
         return settings
+    }
+
+    async register(email: string, password: string, username: string): Promise<any> {
+        const register_request = new RegisterRequest()
+        register_request.email = email
+        register_request.password_hash_md5 = md5(password)
+        register_request.username = username
+
+        const res = await fetch(this.register_address, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(register_request),
+        })
+        const json = await res.json()
+        const response: RegisterResponse = json
+        return response
     }
 }

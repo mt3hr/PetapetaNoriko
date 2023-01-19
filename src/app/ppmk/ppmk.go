@@ -208,6 +208,7 @@ func launchServer() error {
 
 	router.PathPrefix("/reset_password").Handler(http.StripPrefix("/reset_password", hf))
 	router.PathPrefix("/login").Handler(http.StripPrefix("/login", hf))
+	router.PathPrefix("/register").Handler(http.StripPrefix("/login", hf))
 	router.PathPrefix("/").Handler(hf)
 
 	var handler http.Handler = router

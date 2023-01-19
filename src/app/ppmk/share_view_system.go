@@ -26,17 +26,17 @@ import (
 //TODO メールサーバ立てて
 
 type LoginRequest struct {
-	Email             string `json:"email"`
-	Password_hash_md5 string `json:"password_hash_md5"`
+	Email           string `json:"email"`
+	PasswordHashMd5 string `json:"password_hash_md5"`
 }
 
 type LoginResponse struct {
-	Session_id string `json:"session_id"`
-	Error      string `json:"error"`
+	SessionId string `json:"session_id"`
+	Error     string `json:"error"`
 }
 
 type LogoutRequest struct {
-	Session_id string `json:"session_id"`
+	SessionId string `json:"session_id"`
 }
 
 type ResetPasswordRequest struct {
@@ -47,12 +47,23 @@ type ResetPasswordResponse struct {
 	Error string `json:"error"`
 }
 
+type RegisterRequest struct {
+	Email           string `json:"email"`
+	PasswordHashMd5 string `json:"password_hash_md5"`
+	UserName        string `json:"user_name"`
+}
+
+type RegisterResponse struct {
+	Error string `json:"error"`
+}
+
 const (
 	TimeLayout = time.RFC3339
 
 	loginAddress         = "/ppmk_server/login"
 	logoutAddress        = "/ppmk_server/logout"
 	resetPasswordAddress = "/ppmk_server/reset_password"
+	registerAddress      = "/ppmk_server/register"
 )
 
 var (
@@ -103,7 +114,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			panic(err)
 			return
 		}
-		sessionID, err := ppmkDB.Login(r.Context(), loginRequest.Email, loginRequest.Password_hash_md5)
+		sessionID, err := ppmkDB.Login(r.Context(), loginRequest.Email, loginRequest.PasswordHashMd5)
 		if err != nil {
 			loginResponse.Error = fmt.Sprintf("ログインに失敗しました")
 			encoder := json.NewEncoder(w)
@@ -116,7 +127,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			panic(err)
 			return
 		}
-		loginResponse.Session_id = sessionID
+		loginResponse.SessionId = sessionID
 		encoder := json.NewEncoder(w)
 		err = encoder.Encode(loginResponse)
 		if err != nil {
@@ -139,7 +150,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			panic(err)
 			return
 		}
-		err = ppmkDB.Logout(r.Context(), logoutRequest.Session_id)
+		err = ppmkDB.Logout(r.Context(), logoutRequest.SessionId)
 		if err != nil {
 			panic(err)
 			return
@@ -188,6 +199,60 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			return
 		}
 	}))
+	router.PathPrefix(registerAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		registerRequest := &RegisterRequest{}
+		registerResponse := &RegisterResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&registerRequest)
+		if err != nil {
+			registerResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(registerResponse)
+			if e != nil {
+				registerResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		user := &User{
+			UserID:          uuid.New().String(),
+			Email:           registerRequest.Email,
+			PasswordHashMD5: registerRequest.PasswordHashMd5,
+			UserName:        registerRequest.UserName,
+			ResetPasswordID: "",
+		}
+
+		err = ppmkDB.AddUser(r.Context(), user)
+		if err != nil {
+			registerResponse.Error = fmt.Sprintf("ログインに失敗しました")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(registerResponse)
+			if e != nil {
+				registerResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+		encoder := json.NewEncoder(w)
+		err = encoder.Encode(registerResponse)
+		if err != nil {
+			registerResponse.Error = fmt.Sprintf("サーバ内エラー")
+			panic(err)
+			return
+		}
+	}))
+
 }
 
 func sendResetPasswordMail(email string, subject string, body string) error {
@@ -323,7 +388,7 @@ func (p *ppmkDBImpl) GetUserFromEmail(ctx context.Context, email string) (*User,
 }
 
 func (p *ppmkDBImpl) AddUser(ctx context.Context, user *User) error {
-	statement := `INSERT INTO User (UserID, Emainl, PasswordHashMD5, UserName, ResetPasswordID) VALUES('` +
+	statement := `INSERT INTO User (UserID, Email, PasswordHashMD5, UserName, ResetPasswordID) VALUES('` +
 		escapeSQLite(user.UserID) + `', '` +
 		escapeSQLite(user.Email) + `', '` +
 		escapeSQLite(user.PasswordHashMD5) + `', '` +
@@ -331,7 +396,7 @@ func (p *ppmkDBImpl) AddUser(ctx context.Context, user *User) error {
 		escapeSQLite(user.ResetPasswordID) + `');`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
-		err = fmt.Errorf("error at add projectdata %w", err)
+		err = fmt.Errorf("error at add user: %w", err)
 		return err
 	}
 	return nil
