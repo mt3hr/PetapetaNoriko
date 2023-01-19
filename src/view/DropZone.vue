@@ -290,9 +290,7 @@ export default class DropZone extends Vue {
             html_tagdatas.push(tag_data)
             this.$emit('updated_htmltagdatas', html_tagdatas, null, true)
             this.$nextTick(() => {
-                this.$nextTick(() => {
-                    this.onclick_tag(tag_data)
-                })
+                this.onclick_tag(tag_data)
             })
 
             switch (tagname) {
@@ -342,10 +340,10 @@ export default class DropZone extends Vue {
                     move_in_root = true
                 }
                 this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
-                e.stopPropagation()
                 this.$nextTick(() => {
                     this.onclick_tag(move_tagdata)
                 })
+                e.stopPropagation()
             }
             if (move_in_root) return
 
@@ -381,6 +379,9 @@ export default class DropZone extends Vue {
             }
 
             this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
+            this.$nextTick(() => {
+                this.onclick_tag(move_tagdata)
+            })
             e.stopPropagation()
         } else if (e.dataTransfer.items.length != 0) {
             const reader = new FileReader()

@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS PPMKProjectData (
     SavedTime VARCHAR(30) NOT NULL,
     ProjectData VARCHAR(1) NOT NULL,
     Author VARCHAR(30) NOT NULL,
+    Memo VARCHAR(30) NOT NULL,
     FOREIGN KEY (ProjectID) REFERENCES PPMKProject(ProjectID)
 );
 

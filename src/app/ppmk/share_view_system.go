@@ -294,37 +294,39 @@ type ppmkDB interface {
 }
 
 type User struct {
-	UserID          string
-	Email           string
-	PasswordHashMD5 string
-	UserName        string
-	ResetPasswordID string
+	UserID          string `json:"user_id"`
+	Email           string `json:"email"`
+	PasswordHashMD5 string `json:"password_hash_md5"`
+	UserName        string `json:"user_name"`
+	ResetPasswordID string `json:"reset_password_id"`
 }
 
 type LoginSession struct {
-	UserID    string
-	SessionID string
+	UserID    string `json:"user_id"`
+	SessionID string `json:"session_id"`
 }
 
 type PPMKProject struct {
-	ProjectID   string
-	OwnerUserID string
-	ProjectName string
-	IsShared    bool
+	ProjectID   string `json:"project_id"`
+	OwnerUserID string `json:"owner_user_id"`
+	ProjectName string `json:"project_name"`
+	IsShared    bool   `json:"is_shared"`
 }
 
 type PPMKProjectData struct {
-	ProjectDataID string
-	ProjectID     string
-	SavedTime     time.Time
-	ProjectData   string
-	Author        string
+	ProjectDataID string    `json:"project_data_id"`
+	ProjectID     string    `json:"project_id"`
+	SavedTime     time.Time `json:"saved_time"`
+	ProjectData   string    `json:"project_data"`
+	Author        string    `json:"author"`
 }
 
 type ProjectShare struct {
-	ProjectID string
-	UserID    string
-	Writable  bool
+	ProjectID string `json:"project_id"`
+	UserID    string `json:"user_id"`
+	UserName  string `json:"user_name"`
+	UserEmail string `json:"user_email"`
+	Writable  bool   `json:"writable"`
 }
 
 type ppmkDBImpl struct {
