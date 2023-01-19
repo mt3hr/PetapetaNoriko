@@ -27,9 +27,9 @@ export default class ResetPassword extends Vue {
     reset_password() {
         let api = new API()
         api.reset_password(this.email)
-            .then((error) => {
-                if (error) {
-                    this.error_message = error
+            .then((res) => {
+                if (res) {
+                    this.error_message = res.error 
                     this.show_error_message_snackbar = true
                     return
                 } else {
