@@ -1,7 +1,14 @@
+import Project, { PPMKProject, PPMKProjectData } from "@/project/Project"
 import { deserialize } from "@/serializable/serializable"
 import md5 from "md5"
 import Settings from "../Settings"
 import TagListViewMode from "../TagListViewMode"
+
+
+export class PPMKProjectSummary {
+    ppmk_project: PPMKProject
+    ppmk_projectDatas: PPMKProjectData
+}
 
 class LoginRequest {
     email: string
@@ -35,11 +42,71 @@ class RegisterResponse {
     error: string
 }
 
+class ListProjectSummariesRequest {
+    SessionID: string
+}
+
+class ListProjectSummariesResponse {
+    project_summaries: Array<PPMKProjectSummary>
+    error: string
+}
+
+class SaveProjectDataRequest {
+    session_id: string
+    project: Project
+}
+
+class SaveProjectDataResponse {
+    error: string
+}
+
+class DeleteProjectDataRequest {
+    session_id: string
+    project: Project
+}
+
+class DeleteProjectDataResponse {
+    error: string
+}
+
+class UpdateProjectDataRequest {
+    session_id: string
+    project: Project
+}
+
+class UpdateProjectDataResponse {
+    error: string
+}
+
+class DeleteProjectRequest {
+    session_id: string
+    project: Project
+}
+
+class DeleteProjectResponse {
+    error: string
+}
+
+class UpdateProjectRequest {
+    session_id: string
+    project: Project
+}
+
+class UpdateProjectResponse {
+    error: string
+}
+
 export default class API {
     private login_address = "/ppmk_server/login"
     private logout_address = "/ppmk_server/logout"
     private reset_password_address = "/ppmk_server/reset_password"
     private register_address = "/ppmk_server/register"
+    private list_project_summaries_address = "/ppmk_server/list_project_summaries"
+    private save_project_data_address = "/ppmk_server/save_project_data"
+    private delete_project_data_address = "/ppmk_server/delete_project_data"
+    private update_project_data_address = "/ppmk_server/update_project_data"
+    private delete_project_address = "/ppmk_server/delete_project"
+    private update_project_address = "/ppmk_server/update_project"
 
     async login(email: string, password: string): Promise<any> { //
         const login_request = new LoginRequest()

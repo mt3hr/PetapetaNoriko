@@ -20,8 +20,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-//TODO ProjectData保存
-//TODO ユーザ登録
 //TODO メールサーバ立てて
 
 type LoginRequest struct {
@@ -56,13 +54,73 @@ type RegisterResponse struct {
 	Error string `json:"error"`
 }
 
+type ListProjectSummariesRequest struct {
+	SessionID string `json:"session_id"`
+}
+
+type ListProjectSummariesResponse struct {
+	ProjectSummaries []*PPMKProjectSummary `json:"project_summaries"`
+	Error            string                `json:"error"`
+}
+
+type SaveProjectDataRequest struct {
+	SessionID string   `json:"session_id"`
+	Project   *Project `json:"project"`
+}
+
+type SaveProjectDataResponse struct {
+	Error string `json:"error"`
+}
+
+type DeleteProjectDataRequest struct {
+	SessionID string   `json:"session_id"`
+	Project   *Project `json:"project"`
+}
+
+type DeleteProjectDataResponse struct {
+	Error string `json:"error"`
+}
+
+type UpdateProjectDataRequest struct {
+	SessionID string   `json:"session_id"`
+	Project   *Project `json:"project_data"`
+}
+
+type UpdateProjectDataResponse struct {
+	Error string `json:"error"`
+}
+
+type DeleteProjectRequest struct {
+	SessionID string   `json:"session_id"`
+	Project   *Project `json:"project"`
+}
+
+type DeleteProjectResponse struct {
+	Error string `json:"error"`
+}
+
+type UpdateProjectRequest struct {
+	SessionID string   `json:"session_id"`
+	Project   *Project `json:"project_data"`
+}
+
+type UpdateProjectResponse struct {
+	Error string `json:"error"`
+}
+
 const (
 	TimeLayout = time.RFC3339
 
-	loginAddress         = "/ppmk_server/login"
-	logoutAddress        = "/ppmk_server/logout"
-	resetPasswordAddress = "/ppmk_server/reset_password"
-	registerAddress      = "/ppmk_server/register"
+	loginAddress                = "/ppmk_server/login"
+	logoutAddress               = "/ppmk_server/logout"
+	resetPasswordAddress        = "/ppmk_server/reset_password"
+	registerAddress             = "/ppmk_server/register"
+	listProjectSummariesAddress = "/ppmk_server/list_project_summaries"
+	saveProjectDataAddress      = "/ppmk_server/save_project_data"
+	deleteProjectDataAddress    = "/ppmk_server/delete_project_data"
+	updateProjectDataAddress    = "/ppmk_server/update_project_data"
+	deleteProjectAddress        = "/ppmk_server/delete_project"
+	updateProjectAddress        = "/ppmk_server/update_project"
 )
 
 var (
@@ -255,6 +313,477 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		}
 	}))
 
+	router.PathPrefix(listProjectSummariesAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		listProjectSummariesRequest := &ListProjectSummariesRequest{}
+		listProjectSummariesResponse := &ListProjectSummariesResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&listProjectSummariesRequest)
+		if err != nil {
+			listProjectSummariesResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(listProjectSummariesResponse)
+			if e != nil {
+				listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), listProjectSummariesRequest.SessionID)
+		if err != nil {
+			listProjectSummariesResponse.Error = fmt.Sprintf("セッション有効期限切れです。再度ログインしてください。")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(listProjectSummariesResponse)
+			if e != nil {
+				listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		projectSummaries, err := ppmkDB.GetProjectSummaries(r.Context(), userID)
+		if err != nil {
+			listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(listProjectSummariesResponse)
+			if e != nil {
+				listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+		listProjectSummariesResponse.ProjectSummaries = projectSummaries
+		encoder := json.NewEncoder(w)
+		err = encoder.Encode(listProjectSummariesResponse)
+		if err != nil {
+			listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
+			panic(err)
+			return
+		}
+	}))
+
+	router.PathPrefix(saveProjectDataAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		saveProjectDataRequest := &SaveProjectDataRequest{}
+		saveProjectDataResponse := &SaveProjectDataResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&saveProjectDataRequest)
+		if err != nil {
+			saveProjectDataResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(saveProjectDataResponse)
+			if e != nil {
+				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), saveProjectDataRequest.SessionID)
+		if err != nil {
+			saveProjectDataResponse.Error = fmt.Sprintf("セッション有効期限切れです。再度ログインしてください。")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(saveProjectDataResponse)
+			if e != nil {
+				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		// プロジェクトがなかったら作成する
+		project, err := ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+		writable := false
+		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+			if userID == writableUserID {
+				writable = true
+				break
+			}
+		}
+		if !writable {
+			saveProjectDataResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(saveProjectDataResponse)
+			if e != nil {
+				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			return
+		}
+		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
+			e := ppmkDB.AddProject(r.Context(), saveProjectDataRequest.Project.PPMKProject)
+			if e != nil {
+				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
+				panic(e)
+				return
+			}
+		}
+
+		err = ppmkDB.AddProjectData(r.Context(), saveProjectDataRequest.Project.PPMKProjectData)
+		if err != nil {
+			saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの保存に失敗しました")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(saveProjectDataResponse)
+			if e != nil {
+				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+	}))
+
+	router.PathPrefix(deleteProjectDataAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		deleteProjectDataRequest := &DeleteProjectDataRequest{}
+		deleteProjectDataResponse := &DeleteProjectDataResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&deleteProjectDataRequest)
+		if err != nil {
+			deleteProjectDataResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(deleteProjectDataResponse)
+			if e != nil {
+				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), deleteProjectDataRequest.SessionID)
+		if err != nil {
+			deleteProjectDataResponse.Error = fmt.Sprintf("セッション有効期限切れです。再度ログインしてください。")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(deleteProjectDataResponse)
+			if e != nil {
+				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		// プロジェクトがなかったら作成する
+		project, err := ppmkDB.GetProject(r.Context(), deleteProjectDataRequest.Project.PPMKProject.ProjectID)
+		writable := false
+		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+			if userID == writableUserID {
+				writable = true
+				break
+			}
+		}
+		if !writable {
+			deleteProjectDataResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(deleteProjectDataResponse)
+			if e != nil {
+				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			return
+		}
+		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
+			e := ppmkDB.AddProject(r.Context(), deleteProjectDataRequest.Project.PPMKProject)
+			if e != nil {
+				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
+				panic(e)
+				return
+			}
+		}
+
+		err = ppmkDB.DeleteProjectData(r.Context(), deleteProjectDataRequest.Project.PPMKProjectData.ProjectDataID)
+		if err != nil {
+			deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの削除に失敗しました")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(deleteProjectDataResponse)
+			if e != nil {
+				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+	}))
+
+	router.PathPrefix(updateProjectDataAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		updateProjectDataRequest := &UpdateProjectDataRequest{}
+		updateProjectDataResponse := &UpdateProjectDataResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&updateProjectDataRequest)
+		if err != nil {
+			updateProjectDataResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(updateProjectDataResponse)
+			if e != nil {
+				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), updateProjectDataRequest.SessionID)
+		if err != nil {
+			updateProjectDataResponse.Error = fmt.Sprintf("セッション有効期限切れです。再度ログインしてください。")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(updateProjectDataResponse)
+			if e != nil {
+				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		// プロジェクトがなかったら作成する
+		project, err := ppmkDB.GetProject(r.Context(), updateProjectDataRequest.Project.PPMKProject.ProjectID)
+		writable := false
+		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+			if userID == writableUserID {
+				writable = true
+				break
+			}
+		}
+		if !writable {
+			updateProjectDataResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(updateProjectDataResponse)
+			if e != nil {
+				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			return
+		}
+		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
+			e := ppmkDB.AddProject(r.Context(), updateProjectDataRequest.Project.PPMKProject)
+			if e != nil {
+				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
+				panic(e)
+				return
+			}
+		}
+
+		err = ppmkDB.UpdateProjectData(r.Context(), updateProjectDataRequest.Project.PPMKProjectData)
+		if err != nil {
+			updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトデータの更新に失敗しました")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(updateProjectDataResponse)
+			if e != nil {
+				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+	}))
+
+	router.PathPrefix(deleteProjectAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		deleteProjectRequest := &DeleteProjectRequest{}
+		deleteProjectResponse := &DeleteProjectResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&deleteProjectRequest)
+		if err != nil {
+			deleteProjectResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(deleteProjectResponse)
+			if e != nil {
+				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), deleteProjectRequest.SessionID)
+		if err != nil {
+			deleteProjectResponse.Error = fmt.Sprintf("セッション有効期限切れです。再度ログインしてください。")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(deleteProjectResponse)
+			if e != nil {
+				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		// プロジェクトがなかったら作成する
+		project, err := ppmkDB.GetProject(r.Context(), deleteProjectRequest.Project.PPMKProject.ProjectID)
+		writable := false
+		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+			if userID == writableUserID {
+				writable = true
+				break
+			}
+		}
+		if !writable {
+			deleteProjectResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(deleteProjectResponse)
+			if e != nil {
+				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			return
+		}
+		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
+			e := ppmkDB.AddProject(r.Context(), deleteProjectRequest.Project.PPMKProject)
+			if e != nil {
+				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
+				panic(e)
+				return
+			}
+		}
+
+		err = ppmkDB.DeleteProject(r.Context(), deleteProjectRequest.Project.PPMKProject.ProjectID)
+		if err != nil {
+			deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの削除に失敗しました")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(deleteProjectResponse)
+			if e != nil {
+				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+	}))
+
+	router.PathPrefix(updateProjectAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		updateProjectRequest := &UpdateProjectRequest{}
+		updateProjectResponse := &UpdateProjectResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&updateProjectRequest)
+		if err != nil {
+			updateProjectResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(updateProjectResponse)
+			if e != nil {
+				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), updateProjectRequest.SessionID)
+		if err != nil {
+			updateProjectResponse.Error = fmt.Sprintf("セッション有効期限切れです。再度ログインしてください。")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(updateProjectResponse)
+			if e != nil {
+				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		// プロジェクトがなかったら作成する
+		project, err := ppmkDB.GetProject(r.Context(), updateProjectRequest.Project.PPMKProject.ProjectID)
+		writable := false
+		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+			if userID == writableUserID {
+				writable = true
+				break
+			}
+		}
+		if !writable {
+			updateProjectResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(updateProjectResponse)
+			if e != nil {
+				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			return
+		}
+		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
+			e := ppmkDB.AddProject(r.Context(), updateProjectRequest.Project.PPMKProject)
+			if e != nil {
+				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
+				panic(e)
+				return
+			}
+		}
+
+		err = ppmkDB.UpdateProject(r.Context(), updateProjectRequest.Project.PPMKProject)
+		if err != nil {
+			updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの更新に失敗しました")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(updateProjectResponse)
+			if e != nil {
+				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+	}))
+
 }
 
 func sendResetPasswordMail(email string, subject string, body string) error {
@@ -279,6 +808,7 @@ type ppmkDB interface {
 	UpdateUser(ctx context.Context, user *User) error
 
 	GetProjects(ctx context.Context, userID string) ([]*PPMKProject, error)
+	GetProjectSummaries(ctx context.Context, userID string) ([]*PPMKProjectSummary, error)
 	GetProject(ctx context.Context, projectID string) (*PPMKProject, error)
 	AddProject(ctx context.Context, project *PPMKProject) error
 	DeleteProject(ctx context.Context, projectID string) error
@@ -308,11 +838,22 @@ type LoginSession struct {
 	SessionID string `json:"session_id"`
 }
 
+type Project struct {
+	PPMKProject      *PPMKProject     `json:"ppmk_project"`
+	PPMKProjectData  *PPMKProjectData `json:"ppmk_project_data"`
+	PPMKProjectShare *ProjectShare    `json:"ppmk_project_share"`
+}
+
 type PPMKProject struct {
 	ProjectID   string `json:"project_id"`
 	OwnerUserID string `json:"owner_user_id"`
 	ProjectName string `json:"project_name"`
 	IsShared    bool   `json:"is_shared"`
+}
+
+type PPMKProjectSummary struct {
+	PPMKProject      *PPMKProject       `json:"ppmk_project"`
+	PPMKProjectDatas []*PPMKProjectData `json:"ppmk_project_datas"`
 }
 
 type PPMKProjectData struct {
@@ -474,8 +1015,64 @@ func (p *ppmkDBImpl) GetProjects(ctx context.Context, userID string) ([]*PPMKPro
 	return projects, nil
 }
 
+func (p *ppmkDBImpl) GetProjectSummaries(ctx context.Context, userID string) ([]*PPMKProjectSummary, error) {
+	projectSummaries := []*PPMKProjectSummary{}
+
+	projects, err := p.GetProjects(ctx, userID)
+	if err != nil {
+		err = fmt.Errorf("error at get projectsSummary: %w", err)
+		return nil, err
+	}
+	for _, project := range projects {
+		projectDatas, err := func() ([]*PPMKProjectData, error) {
+			statement := `SELECT ProjectDataID, ProjectID, SavedTime, Author FROM PPMKProjectData WHERE ProjectID='` + project.ProjectID + `';`
+			rows, err := p.db.QueryContext(ctx, statement)
+			if err != nil {
+				err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
+				return nil, err
+			}
+			defer rows.Close()
+
+			projectDatas := []*PPMKProjectData{}
+			for rows.Next() {
+				select {
+				case <-ctx.Done():
+					return nil, ctx.Err()
+				default:
+					projectData := &PPMKProjectData{}
+					timestr := ""
+					err = rows.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.Author)
+					if err != nil {
+						err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
+						return nil, err
+					}
+					t, err := time.Parse(TimeLayout, timestr)
+					if err != nil {
+						err = fmt.Errorf("error at parse time %s: %w", timestr, err)
+						return nil, err
+					}
+					projectData.SavedTime = t
+
+					projectDatas = append(projectDatas, projectData)
+				}
+			}
+			return projectDatas, nil
+		}()
+		if err != nil {
+			err = fmt.Errorf("error at select projectdata: %w", err)
+			return nil, err
+		}
+
+		projectSummary := &PPMKProjectSummary{}
+		projectSummary.PPMKProject = project
+		projectSummary.PPMKProjectDatas = projectDatas
+		projectSummaries = append(projectSummaries, projectSummary)
+	}
+	return projectSummaries, nil
+}
+
 func (p *ppmkDBImpl) GetProject(ctx context.Context, projectID string) (*PPMKProject, error) {
-	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsSharedView FROM PPMKProjectData WHERE ProjectID='` + projectID + `';`
+	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsSharedView FROM PPMKProject WHERE ProjectID='` + projectID + `';`
 	row, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		return nil, err
@@ -505,7 +1102,7 @@ func (p *ppmkDBImpl) AddProject(ctx context.Context, project *PPMKProject) error
 		escapeSQLite(strconv.FormatBool(project.IsShared)) + `', );`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
-		err = fmt.Errorf("error at add projectdata %w", err)
+		err = fmt.Errorf("error at add project: %w", err)
 		return err
 	}
 	return nil
@@ -546,7 +1143,7 @@ func (p *ppmkDBImpl) UpdateProject(ctx context.Context, project *PPMKProject) er
 }
 
 func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*PPMKProjectData, error) {
-	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Autho  FROM PPMKProjectData;`
+	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Author  FROM PPMKProjectData;`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
@@ -581,7 +1178,7 @@ func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*
 }
 
 func (p *ppmkDBImpl) GetProjectData(ctx context.Context, projectDataID string) (*PPMKProjectData, error) {
-	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Autho  FROM PPMKProjectData WHERE ProjectDataID='` + projectDataID + `';`
+	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Author  FROM PPMKProjectData WHERE ProjectDataID='` + projectDataID + `';`
 	row := p.db.QueryRowContext(ctx, statement)
 
 	projectData := &PPMKProjectData{}
