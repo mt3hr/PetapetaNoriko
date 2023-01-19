@@ -4,6 +4,16 @@ import md5 from "md5"
 import Settings from "../Settings"
 import TagListViewMode from "../TagListViewMode"
 
+const login_address = "/ppmk_server/login"
+const logout_address = "/ppmk_server/logout"
+const reset_password_address = "/ppmk_server/reset_password"
+const register_address = "/ppmk_server/register"
+const list_project_summaries_address = "/ppmk_server/list_project_summaries"
+const save_project_data_address = "/ppmk_server/save_project_data"
+const delete_project_data_address = "/ppmk_server/delete_project_data"
+const update_project_data_address = "/ppmk_server/update_project_data"
+const delete_project_address = "/ppmk_server/delete_project"
+const update_project_address = "/ppmk_server/update_project"
 
 export class PPMKProjectSummary {
     ppmk_project: PPMKProject
@@ -97,23 +107,12 @@ class UpdateProjectResponse {
 }
 
 export default class API {
-    private login_address = "/ppmk_server/login"
-    private logout_address = "/ppmk_server/logout"
-    private reset_password_address = "/ppmk_server/reset_password"
-    private register_address = "/ppmk_server/register"
-    private list_project_summaries_address = "/ppmk_server/list_project_summaries"
-    private save_project_data_address = "/ppmk_server/save_project_data"
-    private delete_project_data_address = "/ppmk_server/delete_project_data"
-    private update_project_data_address = "/ppmk_server/update_project_data"
-    private delete_project_address = "/ppmk_server/delete_project"
-    private update_project_address = "/ppmk_server/update_project"
-
-    async login(email: string, password: string): Promise<any> { //
+    async login(email: string, password: string): Promise<any> {
         const login_request = new LoginRequest()
         login_request.email = email
         login_request.password_hash_md5 = md5(password)
 
-        const res = await fetch(this.login_address, {
+        const res = await fetch(login_address, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
@@ -140,7 +139,7 @@ export default class API {
         const logout_request = new LogoutRequest()
         logout_request.session_id = session_id
 
-        return fetch(this.logout_address, {
+        return fetch(logout_address, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
@@ -153,7 +152,7 @@ export default class API {
         const reset_password_request = new ResetPasswordRequest()
         reset_password_request.email = email
 
-        const res = await fetch(this.reset_password_address, {
+        const res = await fetch(reset_password_address, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
@@ -202,7 +201,7 @@ export default class API {
         register_request.password_hash_md5 = md5(password)
         register_request.username = username
 
-        const res = await fetch(this.register_address, {
+        const res = await fetch(register_address, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'

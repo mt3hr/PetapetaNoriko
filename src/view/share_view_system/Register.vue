@@ -11,7 +11,7 @@
         </div>
         <div v-else>
             <p>登録完了</p>
-            <a @click="$router.replace('/login')">ログイン画面</a>
+            <a @click="$router.push('/login')">ログイン画面</a>
         </div>
     </div>
 </template>
@@ -52,7 +52,7 @@ export default class Login extends Vue {
     }
 
     reset_password() {
-        this.$router.replace('/reset_password')
+        this.$router.push('/reset_password')
     }
 }
 </script>

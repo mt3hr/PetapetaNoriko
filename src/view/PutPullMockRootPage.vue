@@ -983,7 +983,7 @@ export default class PutPullMockRootPage extends Vue {
     }
     to_toppage() {
         if (this.editor_mode) return
-        this.$router.replace("/")
+        this.$router.push("/")
     }
     get title_style(): any {
         if (this.editor_mode) {

@@ -30,17 +30,17 @@ export default class Login extends Vue {
                     this.show_error_message_snackbar = true
                     return
                 } else {
-                    this.$router.replace('/')
+                    this.$router.push('/')
                 }
             })
     }
 
     reset_password() {
-        this.$router.replace('/reset_password')
+        this.$router.push('/reset_password')
     }
 
     register() {
-        this.$router.replace('/register')
+        this.$router.push('/register')
     }
 }
 </script>
