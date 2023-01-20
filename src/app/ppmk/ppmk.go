@@ -203,7 +203,7 @@ func launchServer() error {
 		applyShareViewSystem(router, ppmkDB)
 	}
 
-	router.PathPrefix("/ppmk_server/status").HandlerFunc(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	router.PathPrefix(statusAddress).HandlerFunc(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		encoder := json.NewEncoder(w)
 		encoder.Encode(serverStatus)
 	}))
