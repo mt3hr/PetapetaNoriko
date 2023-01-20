@@ -122,6 +122,9 @@ const (
 	updateProjectDataAddress    = "/ppmk_server/update_project_data"
 	deleteProjectAddress        = "/ppmk_server/delete_project"
 	updateProjectAddress        = "/ppmk_server/update_project"
+	addProjectShareAddress      = "/ppmk_server/add_project_share"    //TODO
+	deleteProjectShareAddress   = "/ppmk_server/delete_project_share" //TODO
+	updateProjectShareAddress   = "/ppmk_server/update_project_share" //TODO
 )
 
 var (
@@ -826,9 +829,24 @@ type ppmkDB interface {
 	DeleteProjectData(ctx context.Context, projectDataID string) error
 	UpdateProjectData(ctx context.Context, projectData *PPMKProjectData) error
 
+	GetProjectShares(ctx context.Context, projectID string) ([]*PPMKProjectShare, error)
+	AddProjectShare(ctx context.Context, projectShare *PPMKProjectShare) error
+	DeleteProjectShare(ctx context.Context, projectShare *PPMKProjectShare) error
+	UpdateProjectShare(ctx context.Context, projectShare *PPMKProjectShare) error
+
 	GetUserIDFromSessionID(ctx context.Context, sessionID string) (string, error)
 	Login(ctx context.Context, email string, passwordHashMD5 string) (sessionID string, err error)
 	Logout(ctx context.Context, sessionID string) error
+}
+
+type Project struct {
+	PPMKProject     *PPMKProject     `json:"ppmk_project"`
+	PPMKProjectData *PPMKProjectData `json:"ppmk_project_data"`
+}
+
+type PPMKProjectSummary struct {
+	PPMKProject      *PPMKProject       `json:"ppmk_project"`
+	PPMKProjectDatas []*PPMKProjectData `json:"ppmk_project_datas"`
 }
 
 type User struct {
@@ -840,14 +858,8 @@ type User struct {
 }
 
 type LoginSession struct {
-	UserID    string `json:"user_id"`
 	SessionID string `json:"session_id"`
-}
-
-type Project struct {
-	PPMKProject      *PPMKProject     `json:"ppmk_project"`
-	PPMKProjectData  *PPMKProjectData `json:"ppmk_project_data"`
-	PPMKProjectShare *ProjectShare    `json:"ppmk_project_share"`
+	UserID    string `json:"user_id"`
 }
 
 type PPMKProject struct {
@@ -857,24 +869,18 @@ type PPMKProject struct {
 	IsShared    bool   `json:"is_shared"`
 }
 
-type PPMKProjectSummary struct {
-	PPMKProject      *PPMKProject       `json:"ppmk_project"`
-	PPMKProjectDatas []*PPMKProjectData `json:"ppmk_project_datas"`
-}
-
 type PPMKProjectData struct {
 	ProjectDataID string    `json:"project_data_id"`
 	ProjectID     string    `json:"project_id"`
 	SavedTime     time.Time `json:"saved_time"`
 	ProjectData   string    `json:"project_data"`
 	Author        string    `json:"author"`
+	Memo          string    `json:"memo"`
 }
 
-type ProjectShare struct {
+type PPMKProjectShare struct {
 	ProjectID string `json:"project_id"`
 	UserID    string `json:"user_id"`
-	UserName  string `json:"user_name"`
-	UserEmail string `json:"user_email"`
 	Writable  bool   `json:"writable"`
 }
 
@@ -1031,7 +1037,7 @@ func (p *ppmkDBImpl) GetProjectSummaries(ctx context.Context, userID string) ([]
 	}
 	for _, project := range projects {
 		projectDatas, err := func() ([]*PPMKProjectData, error) {
-			statement := `SELECT ProjectDataID, ProjectID, SavedTime, Author FROM PPMKProjectData WHERE ProjectID='` + project.ProjectID + `';`
+			statement := `SELECT ProjectDataID, ProjectID, SavedTime, Author FROM PPMKProjectData, Memo WHERE ProjectID='` + project.ProjectID + `';`
 			rows, err := p.db.QueryContext(ctx, statement)
 			if err != nil {
 				err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
@@ -1047,7 +1053,7 @@ func (p *ppmkDBImpl) GetProjectSummaries(ctx context.Context, userID string) ([]
 				default:
 					projectData := &PPMKProjectData{}
 					timestr := ""
-					err = rows.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.Author)
+					err = rows.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.Author, &projectData.Memo)
 					if err != nil {
 						err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
 						return nil, err
@@ -1149,7 +1155,7 @@ func (p *ppmkDBImpl) UpdateProject(ctx context.Context, project *PPMKProject) er
 }
 
 func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*PPMKProjectData, error) {
-	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Author  FROM PPMKProjectData;`
+	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Autho, Memo FROM PPMKProjectData;`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
@@ -1165,7 +1171,7 @@ func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*
 		default:
 			projectData := &PPMKProjectData{}
 			timestr := ""
-			err = rows.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.ProjectData, &projectData.Author)
+			err = rows.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.ProjectData, &projectData.Author, &projectData.Memo)
 			if err != nil {
 				err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
 				return nil, err
@@ -1184,12 +1190,12 @@ func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*
 }
 
 func (p *ppmkDBImpl) GetProjectData(ctx context.Context, projectDataID string) (*PPMKProjectData, error) {
-	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Author  FROM PPMKProjectData WHERE ProjectDataID='` + projectDataID + `';`
+	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Author, Memo FROM PPMKProjectData WHERE ProjectDataID='` + projectDataID + `';`
 	row := p.db.QueryRowContext(ctx, statement)
 
 	projectData := &PPMKProjectData{}
 	timestr := ""
-	err := row.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.ProjectData, &projectData.Author)
+	err := row.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.ProjectData, &projectData.Author, &projectData.Memo)
 	if err != nil {
 		err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
 		return nil, err
@@ -1234,6 +1240,74 @@ func (p *ppmkDBImpl) UpdateProjectData(ctx context.Context, projectData *PPMKPro
 		escapeSQLite(projectData.ProjectData) + `', Author='` +
 		escapeSQLite(projectData.Author) + `' WHERE ProjectDataID='` +
 		escapeSQLite(projectData.ProjectDataID) + `';`
+	_, err := p.db.ExecContext(ctx, statement)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *ppmkDBImpl) GetProjectShares(ctx context.Context, projectID string) ([]*PPMKProjectShare, error) {
+	statement := `SELECT ProjectID, UserID, Writable FROM ProjectShare;`
+	rows, err := p.db.QueryContext(ctx, statement)
+	if err != nil {
+		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	projectShares := []*PPMKProjectShare{}
+	for rows.Next() {
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		default:
+			projectShare := &PPMKProjectShare{}
+			isWritable := ""
+			err = rows.Scan(&projectShare.ProjectID, &projectShare.UserID, &isWritable)
+			if err != nil {
+				err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
+				return nil, err
+			}
+			b, err := strconv.ParseBool(isWritable)
+			if err != nil {
+				return nil, err
+			}
+			projectShare.Writable = b
+			projectShares = append(projectShares, projectShare)
+		}
+	}
+	return projectShares, nil
+}
+
+func (p *ppmkDBImpl) AddProjectShare(ctx context.Context, projectShare *PPMKProjectShare) error {
+	statement := `INSERT INTO ProjectShare (ProjectID, UserID, Writable) VALUES('` +
+		escapeSQLite(projectShare.ProjectID) + `', '` +
+		escapeSQLite(projectShare.UserID) + `', '` +
+		escapeSQLite(strconv.FormatBool(projectShare.Writable)) + `', );`
+	_, err := p.db.ExecContext(ctx, statement)
+	if err != nil {
+		err = fmt.Errorf("error at add project share: %w", err)
+		return err
+	}
+	return nil
+}
+
+func (p *ppmkDBImpl) DeleteProjectShare(ctx context.Context, projectShare *PPMKProjectShare) error {
+	statement := `DELETE FROM ProjectShare WHERE ProjectID='` + projectShare.ProjectID + `' AND UserID='` + projectShare.UserID + `';`
+	_, err := p.db.ExecContext(ctx, statement)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *ppmkDBImpl) UpdateProjectShare(ctx context.Context, projectShare *PPMKProjectShare) error {
+	statement := `UPDATE ProjectShare SET ProjectID='` +
+		escapeSQLite(projectShare.ProjectID) + `', UserID='` +
+		escapeSQLite(projectShare.UserID) + `', Writable='` +
+		escapeSQLite(strconv.FormatBool(projectShare.Writable)) + `' WHERE ProjectID='` +
+		escapeSQLite(projectShare.ProjectID) + `';`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
 		return err
