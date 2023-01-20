@@ -1,4 +1,4 @@
-import Project, { PPMKProject, PPMKProjectData } from "@/project/Project"
+import Project, { PPMKProject, PPMKProjectData, PPMKProjectShare } from "@/project/Project"
 import { deserialize } from "@/serializable/serializable"
 import md5 from "md5"
 import Settings from "../Settings"
@@ -15,6 +15,7 @@ export const delete_project_data_address = "/ppmk_server/delete_project_data"
 export const update_project_data_address = "/ppmk_server/update_project_data"
 export const delete_project_address = "/ppmk_server/delete_project"
 export const update_project_address = "/ppmk_server/update_project"
+export const get_project_address = "/ppmk_server/get_project_data"//TODO サーバサイド
 
 export class ServerStatus {
     share_view_system: boolean
@@ -22,7 +23,8 @@ export class ServerStatus {
 
 export class PPMKProjectSummary {
     ppmk_project: PPMKProject
-    ppmk_projectDatas: PPMKProjectData
+    ppmk_projectDatas: Array<PPMKProjectData>
+    ppmk_project_share: PPMKProjectShare
 }
 
 export class LoginRequest {
@@ -111,6 +113,16 @@ export class UpdateProjectResponse {
     error: string
 }
 
+export class GetProjectDataRequest {
+    session_id: string
+    project_data_id: string
+}
+
+export class GetProjectDataResponse {
+    error: string
+    project_data: PPMKProjectData
+}
+
 export default class API {
     save_settings_to_cookie(settings: Settings) {
         document.cookie = JSON.stringify(settings)
@@ -186,6 +198,10 @@ export default class API {
             },
             body: JSON.stringify(logout_request),
         })
+    }
+
+    get session_id(): string {
+        return this.load_settings_from_cookie().session_id
     }
 
     async reset_password(email: string): Promise<ResetPasswordResponse> {
@@ -323,6 +339,23 @@ export default class API {
         })
         const json = await res.json()
         const response: UpdateProjectResponse = json
+        return response
+    }
+
+    async get_project_data(session_id: string, project_data_id: string): Promise<GetProjectDataResponse> {
+        const get_project_request = new GetProjectDataRequest()
+        get_project_request.session_id = session_id
+        get_project_request.project_data_id = project_data_id
+
+        const res = await fetch(get_project_address, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(get_project_request),
+        })
+        const json = await res.json()
+        const response: GetProjectDataResponse = json
         return response
     }
 }

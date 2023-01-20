@@ -8,7 +8,7 @@
             <v-col cols="auto">
                 <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
             </v-col>
-            <v-col v-if="enable_login_button" cols="auto">
+            <v-col v-if="enable_system" cols="auto">
                 <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
                 <v-btn v-else @click="logout">ログアウト</v-btn>
             </v-col>
@@ -124,6 +124,11 @@
                     <v-btn @click="is_show_readin_dialog = false">閉じる</v-btn>
                 </v-col>
                 <v-spacer />
+            </v-row>
+            <v-row v-if="enable_system">
+                <v-col>
+                    <ProjectSummariesList @loaded_project="loaded_project" />
+                </v-col>
             </v-row>
         </v-card>
     </v-dialog>
@@ -282,8 +287,9 @@ import generateUUID from '@/uuid'
 import { Histories } from './History'
 import Settings from './Settings'
 import TagListViewMode from './TagListViewMode'
-import API, { login_address, ServerStatus } from './share_view_system/api'
-import Project from '@/project/Project'
+import API, { ServerStatus } from './share_view_system/api'
+import Project, { PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
+import ProjectSummariesList from '@/view/share_view_system/ProjectSummariesList.vue'
 
 @Options({
     components: {
@@ -293,6 +299,7 @@ import Project from '@/project/Project'
         HTMLTagPropertyView,
         PagePropertyView,
         HTMLTagStructView,
+        ProjectSummariesList,
     }
 })
 
@@ -339,7 +346,7 @@ export default class PutPullMockRootPage extends Vue {
 
     project: Project
 
-    enable_login_button = false
+    enable_system = false
 
     update_project_name(project_name: string) {
         this.project_name = project_name
@@ -456,9 +463,9 @@ export default class PutPullMockRootPage extends Vue {
         }
 
         new API().status().then((server_status: ServerStatus) => {
-            this.enable_login_button = server_status.share_view_system
+            this.enable_system = server_status.share_view_system
         }).catch((e) => {
-            this.enable_login_button = false
+            this.enable_system = false
         })
 
         this.load_settings_from_cookie()
@@ -1029,6 +1036,17 @@ export default class PutPullMockRootPage extends Vue {
         api.logout().then(() => {
             location.reload()
         })
+    }
+    loaded_project(ppmk_project: PPMKProject, project_data: PPMKProjectData, project_share: PPMKProjectShare) {
+        let page_list_view: any = this.$refs['page_list_view']
+        let project = new Project()
+
+        //TODO Projectを初期化する
+        project.ppmk_project = ppmk_project.clone()
+        project.ppmk_project_data = project_data.clone()
+        project.ppmk_project_share = project_share.clone()
+
+        page_list_view.project = project
     }
 }
 </script>
