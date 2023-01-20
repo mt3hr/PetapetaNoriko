@@ -187,7 +187,16 @@ func openbrowser(url string) error {
 }
 
 func launchServer() error {
+	if shareViewSystem {
+		initializeSystemVariable()
+	}
+
 	serverStatus.ShareViewSystem = shareViewSystem
+	serverStatus.EnableResetPassword = serverStatus.ShareViewSystem &&
+		(emailhostname != "" &&
+			emailport != 0 &&
+			emailusername != "" &&
+			emailpassword != "")
 	router := mux.NewRouter()
 
 	html, err := fs.Sub(htmlFS, "embed/dist")
@@ -229,5 +238,6 @@ func launchServer() error {
 }
 
 type ServerStatus struct {
-	ShareViewSystem bool `json:"share_view_system"`
+	ShareViewSystem     bool `json:"share_view_system"`
+	EnableResetPassword bool `json:"enable_reset_password"`
 }

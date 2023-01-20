@@ -19,6 +19,7 @@ export const get_project_address = "/ppmk_server/get_project_data"//TODO サー�
 
 export class ServerStatus {
     share_view_system: boolean
+    enable_reset_password: boolean
 }
 
 export class PPMKProjectSummary {
@@ -217,9 +218,6 @@ export default class API {
         })
         const json = await res.json()
         const response: ResetPasswordResponse = json
-        if (response.error) {
-            return response
-        }
         return response
     }
 

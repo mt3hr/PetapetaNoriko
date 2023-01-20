@@ -25,7 +25,7 @@ export class PPMKProject {
     is_shared_view: string
 
     clone(): PPMKProject {
-        let project = new PPMKProject()
+        const project = new PPMKProject()
         project.project_id = this.project_id
         project.owner_user_id = this.owner_user_id
         project.project_name = this.project_name
@@ -43,12 +43,12 @@ export class PPMKProjectData {
     memo: string
 
     clone(): PPMKProjectData {
-        let project_data = new PPMKProjectData()
+        const project_data = new PPMKProjectData()
         project_data.project_data_id = generateUUID()
         project_data.project_id = this.project_id
         project_data.saved_time = this.saved_time
 
-        let pagedatas = Array<PageData>()
+        const pagedatas = Array<PageData>()
         if (this.project_data) {
             this.project_data.forEach(pagedata => {
                 pagedatas.push(pagedata.clone())
@@ -70,7 +70,7 @@ export class PPMKProjectShare {
     writable: boolean
 
     clone(): PPMKProjectShare {
-        let project_share = new PPMKProjectShare()
+        const project_share = new PPMKProjectShare()
         project_share.project_id = this.project_id
         project_share.user_id = this.user_id
         project_share.user_name = this.user_name

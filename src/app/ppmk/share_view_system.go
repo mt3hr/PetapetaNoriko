@@ -132,13 +132,15 @@ var (
 	emailport     uint16
 	emailusername string
 	emailpassword string
+	emailaddress  string
 )
 
-func init() {
+func initializeSystemVariable() {
 	if !shareViewSystem {
 		return
 	}
 	emailhostname = os.Getenv("PPMK_EMAIL_HOSTNAME")
+	emailaddress = os.Getenv("PPMK_EMAIL_ADDRESS")
 	emailportUint64, err := strconv.ParseUint(os.Getenv("PPMK_EMAIL_PORT"), 10, 16)
 	if err != nil {
 		err = fmt.Errorf("PPMK_EMAIL_PORTの値を修正してください %s :%w", os.Getenv("PPMK_EMAIL_PORT"), err)
@@ -149,9 +151,10 @@ func init() {
 	emailpassword = os.Getenv("PPMK_EMAIL_PASSWORD")
 
 	fmt.Printf("PPMK_EMAIL_HOSTNAME = %+v\n", emailhostname)
+	fmt.Printf("PPMK_EMAIL_ADDRESS = %+v\n", emailaddress)
 	fmt.Printf("PPMK_EMAIL_PORT = %+v\n", emailport)
 	fmt.Printf("PPMK_EMAIL_USERNAME = %+v\n", emailusername)
-	fmt.Printf("PPMK_EMAIL_PASSWORD = %+v\n", emailpassword)
+	fmt.Printf("PPMK_EMAIL_PASSWORD = %+v\n", "**********")
 }
 
 func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
@@ -264,6 +267,14 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				panic(e)
 				return
 			}
+			panic(err)
+			return
+		}
+
+		encoder := json.NewEncoder(w)
+		err = encoder.Encode(resetPasswordResponse)
+		if err != nil {
+			resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
 			panic(err)
 			return
 		}
@@ -791,18 +802,26 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			panic(err)
 			return
 		}
+
+		encoder := json.NewEncoder(w)
+		err = encoder.Encode(updateProjectResponse)
+		if err != nil {
+			updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+			panic(err)
+			return
+		}
 	}))
 
 }
 
-func sendResetPasswordMail(email string, subject string, body string) error {
+func sendResetPasswordMail(address string, subject string, body string) error {
 	auth := smtp.PlainAuth("", emailusername, emailpassword, emailhostname)
-	msg := []byte(strings.ReplaceAll(fmt.Sprintf("To: %s\nSubject: %s\n\n%s", email, subject, body), "\n", "\r\n"))
-	if err := smtp.SendMail(fmt.Sprintf("%s:%d", emailhostname, emailport),
+	if err := smtp.SendMail(
+		fmt.Sprintf("%s:%d", emailhostname, emailport),
 		auth,
-		emailusername,
-		[]string{email},
-		msg); err != nil {
+		emailaddress,
+		[]string{address},
+		[]byte("To: "+address+"\r\n"+"Subject: "+subject+"\r\n\r\n"+body+"\r\n")); err != nil {
 		return err
 	}
 	return nil
