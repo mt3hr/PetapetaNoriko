@@ -18,8 +18,6 @@ ppmk
 <summary>開発者向け</summary>
 （powershellで実行してください）
 
-（powershellで実行してください）
-
 ### セットアップ
 1. [nodejs-v18.12.1](https://nodejs.org/download/release/v18.12.1/node-v18.12.1-x64.msi)をインストールする
 2. [golang-v1.19.4](https://go.dev/dl/go1.19.4.windows-amd64.msi)をインストールする
