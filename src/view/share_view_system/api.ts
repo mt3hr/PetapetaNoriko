@@ -141,7 +141,7 @@ export default class API {
     }
 
     async status(): Promise<ServerStatus> {
-        const res = await fetch(status_address, { body: "" })
+        const res = await fetch(status_address)
         const json = await res.json()
         const response: ServerStatus = json
         return response
