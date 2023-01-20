@@ -1041,7 +1041,6 @@ export default class PutPullMockRootPage extends Vue {
         let page_list_view: any = this.$refs['page_list_view']
         let project = new Project()
 
-        //TODO Projectを初期化する
         project.ppmk_project = ppmk_project.clone()
         project.ppmk_project_data = project_data.clone()
         project.ppmk_project_share = project_share.clone()

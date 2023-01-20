@@ -10,12 +10,15 @@ export const logout_address = "/ppmk_server/logout"
 export const reset_password_address = "/ppmk_server/reset_password"
 export const register_address = "/ppmk_server/register"
 export const list_project_summaries_address = "/ppmk_server/list_project_summaries"
+export const get_project_address = "/ppmk_server/get_project_data"
 export const save_project_data_address = "/ppmk_server/save_project_data"
 export const delete_project_data_address = "/ppmk_server/delete_project_data"
 export const update_project_data_address = "/ppmk_server/update_project_data"
 export const delete_project_address = "/ppmk_server/delete_project"
 export const update_project_address = "/ppmk_server/update_project"
-export const get_project_address = "/ppmk_server/get_project_data"//TODO サーバサイド
+export const addProjectShareAddress = "/ppmk_server/add_project_share"
+export const deleteProjectShareAddress = "/ppmk_server/delete_project_share"
+export const updateProjectShareAddress = "/ppmk_server/update_project_share"
 
 export class ServerStatus {
     share_view_system: boolean
@@ -122,6 +125,33 @@ export class GetProjectDataRequest {
 export class GetProjectDataResponse {
     error: string
     project_data: PPMKProjectData
+}
+
+export class AddProjectShareRequest {
+    session_id: string
+    project_share: PPMKProjectShare
+}
+
+export class AddProjectShareResponse {
+    error: string
+}
+
+export class DeleteProjectShareRequest {
+    session_id: string
+    project_share: PPMKProjectShare
+}
+
+export class DeleteProjectShareResponse {
+    error: string
+}
+
+export class UpdateProjectShareRequest {
+    session_id: string
+    project_share: PPMKProjectShare
+}
+
+export class UpdateProjectShareResponse {
+    error: string
 }
 
 export default class API {
@@ -354,6 +384,57 @@ export default class API {
         })
         const json = await res.json()
         const response: GetProjectDataResponse = json
+        return response
+    }
+
+    async add_project_share(session_id: string, project_share: PPMKProjectShare): Promise<AddProjectShareResponse> {
+        const add_project_share_request = new AddProjectShareRequest()
+        add_project_share_request.session_id = session_id
+        add_project_share_request.project_share = project_share
+
+        const res = await fetch(save_project_data_address, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(add_project_share_request),
+        })
+        const json = await res.json()
+        const response: AddProjectShareResponse = json
+        return response
+    }
+
+    async delete_project_share(session_id: string, project_share: PPMKProjectShare): Promise<DeleteProjectShareResponse> {
+        const delete_project_share_request = new DeleteProjectShareRequest()
+        delete_project_share_request.session_id = session_id
+        delete_project_share_request.project_share = project_share
+
+        const res = await fetch(delete_project_data_address, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(delete_project_share_request),
+        })
+        const json = await res.json()
+        const response: DeleteProjectShareResponse = json
+        return response
+    }
+
+    async update_project_share(session_id: string, project_share: PPMKProjectShare): Promise<UpdateProjectShareResponse> {
+        const update_project_share_request = new UpdateProjectShareRequest()
+        update_project_share_request.session_id = session_id
+        update_project_share_request.project_share = project_share
+
+        const res = await fetch(update_project_data_address, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(update_project_share_request),
+        })
+        const json = await res.json()
+        const response: UpdateProjectShareResponse = json
         return response
     }
 }
