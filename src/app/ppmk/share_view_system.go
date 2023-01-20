@@ -20,8 +20,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-//TODO メールサーバ立てて
-
 type LoginRequest struct {
 	Email           string `json:"email"`
 	PasswordHashMd5 string `json:"password_hash_md5"`
