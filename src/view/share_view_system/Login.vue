@@ -25,7 +25,7 @@ export default class Login extends Vue {
         let api = new API()
         api.login(this.email, this.password)
             .then((res) => {
-                if (!res.error) {
+                if (res.error) {
                     this.error_message = res.error
                     this.show_error_message_snackbar = true
                     return

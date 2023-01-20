@@ -2,6 +2,7 @@ package ppmk
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"log"
@@ -42,6 +43,7 @@ var (
 	proxy           = ""
 	shareViewSystem = false
 	dbfilename      = "ppmk.db"
+	serverStatus    = ServerStatus{}
 
 	serverCmd = &cobra.Command{
 		Use: "server",
@@ -185,6 +187,7 @@ func openbrowser(url string) error {
 }
 
 func launchServer() error {
+	serverStatus.ShareViewSystem = shareViewSystem
 	router := mux.NewRouter()
 
 	html, err := fs.Sub(htmlFS, "embed/dist")
@@ -199,6 +202,11 @@ func launchServer() error {
 
 		applyShareViewSystem(router, ppmkDB)
 	}
+
+	router.PathPrefix("/ppmk_server/status").HandlerFunc(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		encoder := json.NewEncoder(w)
+		encoder.Encode(serverStatus)
+	}))
 
 	hf := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -218,4 +226,8 @@ func launchServer() error {
 		return err
 	}
 	return nil
+}
+
+type ServerStatus struct {
+	ShareViewSystem bool `json:"share_view_system"`
 }

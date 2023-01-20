@@ -111,6 +111,7 @@ type UpdateProjectResponse struct {
 const (
 	TimeLayout = time.RFC3339
 
+	statusAddress               = "/ppmk_server/status"
 	loginAddress                = "/ppmk_server/login"
 	logoutAddress               = "/ppmk_server/logout"
 	resetPasswordAddress        = "/ppmk_server/reset_password"
@@ -172,6 +173,11 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				return
 			}
 			panic(err)
+			return
+		}
+		if loginResponse == nil {
+			w.Write([]byte(""))
+			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 		sessionID, err := ppmkDB.Login(r.Context(), loginRequest.Email, loginRequest.PasswordHashMd5)

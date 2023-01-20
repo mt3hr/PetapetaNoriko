@@ -4,16 +4,21 @@ import md5 from "md5"
 import Settings from "../Settings"
 import TagListViewMode from "../TagListViewMode"
 
-const login_address = "/ppmk_server/login"
-const logout_address = "/ppmk_server/logout"
-const reset_password_address = "/ppmk_server/reset_password"
-const register_address = "/ppmk_server/register"
-const list_project_summaries_address = "/ppmk_server/list_project_summaries"
-const save_project_data_address = "/ppmk_server/save_project_data"
-const delete_project_data_address = "/ppmk_server/delete_project_data"
-const update_project_data_address = "/ppmk_server/update_project_data"
-const delete_project_address = "/ppmk_server/delete_project"
-const update_project_address = "/ppmk_server/update_project"
+export const status_address = "/ppmk_server/status"
+export const login_address = "/ppmk_server/login"
+export const logout_address = "/ppmk_server/logout"
+export const reset_password_address = "/ppmk_server/reset_password"
+export const register_address = "/ppmk_server/register"
+export const list_project_summaries_address = "/ppmk_server/list_project_summaries"
+export const save_project_data_address = "/ppmk_server/save_project_data"
+export const delete_project_data_address = "/ppmk_server/delete_project_data"
+export const update_project_data_address = "/ppmk_server/update_project_data"
+export const delete_project_address = "/ppmk_server/delete_project"
+export const update_project_address = "/ppmk_server/update_project"
+
+export class ServerStatus {
+    share_view_system: boolean
+}
 
 export class PPMKProjectSummary {
     ppmk_project: PPMKProject
@@ -133,6 +138,13 @@ export default class API {
             settings = JSON.parse(document.cookie, deserialize)
         }
         return settings
+    }
+
+    async status(): Promise<ServerStatus> {
+        const res = await fetch(status_address, {})
+        const json = await res.json()
+        const response: ServerStatus = json
+        return response
     }
 
     async login(email: string, password: string): Promise<LoginResponse> {

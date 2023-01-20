@@ -8,7 +8,7 @@
             <v-col cols="auto">
                 <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
             </v-col>
-            <v-col cols="auto">
+            <v-col v-if="enable_login_button" cols="auto">
                 <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
                 <v-btn v-else @click="logout">ログアウト</v-btn>
             </v-col>
@@ -282,7 +282,7 @@ import generateUUID from '@/uuid'
 import { Histories } from './History'
 import Settings from './Settings'
 import TagListViewMode from './TagListViewMode'
-import API from './share_view_system/api'
+import API, { login_address, ServerStatus } from './share_view_system/api'
 import Project from '@/project/Project'
 
 @Options({
@@ -338,6 +338,8 @@ export default class PutPullMockRootPage extends Vue {
     session_id: string
 
     project: Project
+
+    enable_login_button = false
 
     update_project_name(project_name: string) {
         this.project_name = project_name
@@ -452,6 +454,13 @@ export default class PutPullMockRootPage extends Vue {
                 this.clicked_tagdata = null
             }
         }
+
+        new API().status().then((server_status: ServerStatus) => {
+            this.enable_login_button = server_status.share_view_system
+        }).catch((e) => {
+            this.enable_login_button = false
+        })
+
         this.load_settings_from_cookie()
         window.addEventListener('keyup', (e: KeyboardEvent) => {
             let page_list_view: any = this.$refs['page_list_view']
