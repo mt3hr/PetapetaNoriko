@@ -409,6 +409,18 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 
 		projectSummaries, err := ppmkDB.GetProjectSummaries(r.Context(), userID)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				listProjectSummariesResponse.ProjectSummaries = []*PPMKProjectSummary{}
+				encoder := json.NewEncoder(w)
+				e := encoder.Encode(listProjectSummariesResponse)
+				if e != nil {
+					listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
+					panic(e)
+					return
+				}
+				return
+			}
+
 			listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder := json.NewEncoder(w)
 			e := encoder.Encode(listProjectSummariesResponse)
@@ -561,6 +573,26 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 
 		// プロジェクトがなかったら作成する
 		project, err := ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない//嘘乙。//TODO
+			e := ppmkDB.AddProject(r.Context(), saveProjectDataRequest.Project.PPMKProject)
+			if e != nil {
+				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
+				panic(e)
+				return
+			}
+			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			if err != nil {
+				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				encoder := json.NewEncoder(w)
+				er := encoder.Encode(saveProjectDataResponse)
+				if er != nil {
+					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					panic(er)
+					return
+				}
+				panic(err)
+			}
+		}
 		writable := false
 		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
 			if userID == writableUserID {
@@ -578,14 +610,6 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				return
 			}
 			return
-		}
-		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
-			e := ppmkDB.AddProject(r.Context(), saveProjectDataRequest.Project.PPMKProject)
-			if e != nil {
-				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				panic(e)
-				return
-			}
 		}
 
 		err = ppmkDB.AddProjectData(r.Context(), saveProjectDataRequest.Project.PPMKProjectData)
@@ -1247,19 +1271,19 @@ type LoginSession struct {
 }
 
 type PPMKProject struct {
-	ProjectID   string `json:"project_id"`
-	OwnerUserID string `json:"owner_user_id"`
-	ProjectName string `json:"project_name"`
-	IsShared    bool   `json:"is_shared"`
+	ProjectID    string `json:"project_id"`
+	OwnerUserID  string `json:"owner_user_id"`
+	ProjectName  string `json:"project_name"`
+	IsSharedView bool   `json:"is_shared"`
 }
 
 type PPMKProjectData struct {
-	ProjectDataID string    `json:"project_data_id"`
-	ProjectID     string    `json:"project_id"`
-	SavedTime     time.Time `json:"saved_time"`
-	ProjectData   string    `json:"project_data"`
-	Author        string    `json:"author"`
-	Memo          string    `json:"memo"`
+	ProjectDataID string          `json:"project_data_id"`
+	ProjectID     string          `json:"project_id"`
+	SavedTime     time.Time       `json:"saved_time"`
+	ProjectData   json.RawMessage `json:"project_data"`
+	Author        string          `json:"author"`
+	Memo          string          `json:"memo"`
 }
 
 type PPMKProjectShare struct {
@@ -1329,6 +1353,8 @@ func (p *ppmkDBImpl) GetUserFromEmail(ctx context.Context, email string) (*User,
 }
 
 func (p *ppmkDBImpl) AddUser(ctx context.Context, user *User) error {
+	p.m.Lock()
+	defer p.m.Unlock()
 	statement := `INSERT INTO User (UserID, Email, PasswordHashMD5, UserName, ResetPasswordID) VALUES('` +
 		escapeSQLite(user.UserID) + `', '` +
 		escapeSQLite(user.Email) + `', '` +
@@ -1379,7 +1405,7 @@ func (p *ppmkDBImpl) UpdateUser(ctx context.Context, user *User) error {
 }
 
 func (p *ppmkDBImpl) GetProjects(ctx context.Context, userID string) ([]*PPMKProject, error) {
-	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsShared FROM PPMKProject;`
+	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsSharedView FROM PPMKProject;`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
@@ -1394,17 +1420,17 @@ func (p *ppmkDBImpl) GetProjects(ctx context.Context, userID string) ([]*PPMKPro
 			return nil, ctx.Err()
 		default:
 			project := &PPMKProject{}
-			isShared := ""
-			err = rows.Scan(&project.ProjectID, &project.OwnerUserID, &project.ProjectName, &isShared)
+			isSharedView := ""
+			err = rows.Scan(&project.ProjectID, &project.OwnerUserID, &project.ProjectName, &isSharedView)
 			if err != nil {
 				err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
 				return nil, err
 			}
-			b, err := strconv.ParseBool(isShared)
+			b, err := strconv.ParseBool(isSharedView)
 			if err != nil {
 				return nil, err
 			}
-			project.IsShared = b
+			project.IsSharedView = b
 			projects = append(projects, project)
 		}
 	}
@@ -1420,8 +1446,8 @@ func (p *ppmkDBImpl) GetProjectSummaries(ctx context.Context, userID string) ([]
 		return nil, err
 	}
 	for _, project := range projects {
-		projectDatas, err := func() ([]*PPMKProjectData, error) {
-			statement := `SELECT ProjectDataID, ProjectID, SavedTime, Author FROM PPMKProjectData, Memo WHERE ProjectID='` + project.ProjectID + `';`
+		projectDatas, err := func(project *PPMKProject) ([]*PPMKProjectData, error) {
+			statement := `SELECT ProjectDataID, ProjectID, SavedTime, Author, Memo FROM PPMKProjectData WHERE ProjectID='` + project.ProjectID + `';`
 			rows, err := p.db.QueryContext(ctx, statement)
 			if err != nil {
 				err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
@@ -1453,7 +1479,7 @@ func (p *ppmkDBImpl) GetProjectSummaries(ctx context.Context, userID string) ([]
 				}
 			}
 			return projectDatas, nil
-		}()
+		}(project)
 		if err != nil {
 			err = fmt.Errorf("error at select projectdata: %w", err)
 			return nil, err
@@ -1469,33 +1495,32 @@ func (p *ppmkDBImpl) GetProjectSummaries(ctx context.Context, userID string) ([]
 
 func (p *ppmkDBImpl) GetProject(ctx context.Context, projectID string) (*PPMKProject, error) {
 	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsSharedView FROM PPMKProject WHERE ProjectID='` + projectID + `';`
-	row, err := p.db.QueryContext(ctx, statement)
-	if err != nil {
-		return nil, err
-	}
+	row := p.db.QueryRowContext(ctx, statement)
 
 	project := &PPMKProject{}
-	isShared := ""
-	err = row.Scan(&project.ProjectID, &project.OwnerUserID, &project.ProjectName, &isShared)
+	isSharedView := ""
+	err := row.Scan(&project.ProjectID, &project.OwnerUserID, &project.ProjectName, &isSharedView)
 	if err != nil {
 		err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
 		return nil, err
 	}
-	b, err := strconv.ParseBool(isShared)
+	b, err := strconv.ParseBool(isSharedView)
 	if err != nil {
 		return nil, err
 	}
-	project.IsShared = b
+	project.IsSharedView = b
 
 	return project, nil
 }
 
 func (p *ppmkDBImpl) AddProject(ctx context.Context, project *PPMKProject) error {
+	p.m.Lock()
+	defer p.m.Unlock()
 	statement := `INSERT INTO PPMKProject (ProjectID, OwnerUserID, ProjectName, IsSharedView) VALUES('` +
 		escapeSQLite(project.ProjectID) + `', '` +
 		escapeSQLite(project.OwnerUserID) + `', '` +
 		escapeSQLite(project.ProjectName) + `', '` +
-		escapeSQLite(strconv.FormatBool(project.IsShared)) + `', );`
+		escapeSQLite(strconv.FormatBool(project.IsSharedView)) + `');`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at add project: %w", err)
@@ -1529,7 +1554,7 @@ func (p *ppmkDBImpl) UpdateProject(ctx context.Context, project *PPMKProject) er
 	statement := `UPDATE Project SET  OwnerUserID='` +
 		escapeSQLite(project.OwnerUserID) + `', ProjectName='` +
 		escapeSQLite(project.ProjectName) + `', IsSharedView='` +
-		escapeSQLite(strconv.FormatBool(project.IsShared)) + `' WHERE ProjectID='` +
+		escapeSQLite(strconv.FormatBool(project.IsSharedView)) + `' WHERE ProjectID='` +
 		escapeSQLite(project.ProjectID) + `';`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
@@ -1579,7 +1604,8 @@ func (p *ppmkDBImpl) GetProjectData(ctx context.Context, projectDataID string) (
 
 	projectData := &PPMKProjectData{}
 	timestr := ""
-	err := row.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.ProjectData, &projectData.Author, &projectData.Memo)
+	jsonProjectData := sql.NullString{}
+	err := row.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &jsonProjectData, &projectData.Author, &projectData.Memo)
 	if err != nil {
 		err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
 		return nil, err
@@ -1589,18 +1615,22 @@ func (p *ppmkDBImpl) GetProjectData(ctx context.Context, projectDataID string) (
 		err = fmt.Errorf("error at parse time %s: %w", timestr, err)
 		return nil, err
 	}
+	projectData.ProjectData = json.RawMessage(jsonProjectData.String)
 	projectData.SavedTime = t
 
 	return projectData, nil
 }
 
 func (p *ppmkDBImpl) AddProjectData(ctx context.Context, projectData *PPMKProjectData) error {
-	statement := `INSERT INTO PPMKProjectData (ProjectDataID, ProjectID, SavedTime, ProjectData, Author) VALUES('` +
+	p.m.Lock()
+	defer p.m.Unlock()
+	statement := `INSERT INTO PPMKProjectData (ProjectDataID, ProjectID, SavedTime, ProjectData, Author, Memo) VALUES('` +
 		escapeSQLite(projectData.ProjectDataID) + `', '` +
 		escapeSQLite(projectData.ProjectID) + `', '` +
 		escapeSQLite(projectData.SavedTime.Format(TimeLayout)) + `', '` +
-		escapeSQLite(projectData.ProjectData) + `', '` +
-		escapeSQLite(projectData.Author) + `');`
+		escapeSQLite(string(projectData.ProjectData)) + `', '` +
+		escapeSQLite(projectData.Author) + `', '` +
+		escapeSQLite(projectData.Memo) + `');`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at add projectdata %w", err)
@@ -1621,7 +1651,7 @@ func (p *ppmkDBImpl) DeleteProjectData(ctx context.Context, projectDataID string
 func (p *ppmkDBImpl) UpdateProjectData(ctx context.Context, projectData *PPMKProjectData) error {
 	statement := `UPDATE PPMKProjectData SET SavedTime='` +
 		escapeSQLite(projectData.SavedTime.Format(TimeLayout)) + `', ProjectData='` +
-		escapeSQLite(projectData.ProjectData) + `', Author='` +
+		escapeSQLite(string(projectData.ProjectData)) + `', Author='` +
 		escapeSQLite(projectData.Author) + `' WHERE ProjectDataID='` +
 		escapeSQLite(projectData.ProjectDataID) + `';`
 	_, err := p.db.ExecContext(ctx, statement)
@@ -1665,10 +1695,12 @@ func (p *ppmkDBImpl) GetProjectShares(ctx context.Context, projectID string) ([]
 }
 
 func (p *ppmkDBImpl) AddProjectShare(ctx context.Context, projectShare *PPMKProjectShare) error {
+	p.m.Lock()
+	defer p.m.Unlock()
 	statement := `INSERT INTO ProjectShare (ProjectID, UserID, Writable) VALUES('` +
 		escapeSQLite(projectShare.ProjectID) + `', '` +
 		escapeSQLite(projectShare.UserID) + `', '` +
-		escapeSQLite(strconv.FormatBool(projectShare.Writable)) + `', );`
+		escapeSQLite(strconv.FormatBool(projectShare.Writable)) + `');`
 	_, err := p.db.ExecContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at add project share: %w", err)
@@ -1723,6 +1755,8 @@ func (p *ppmkDBImpl) Login(ctx context.Context, email string, passwordHashMD5 st
 	}
 	userID := user.UserID
 	sessionID = uuid.New().String()
+	p.m.Lock()
+	defer p.m.Unlock()
 	statement := `INSERT INTO LoginSession (UserID, SessionID) VALUES('` +
 		escapeSQLite(userID) + `','` +
 		escapeSQLite(sessionID) + `');`

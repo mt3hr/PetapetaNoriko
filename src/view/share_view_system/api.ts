@@ -27,7 +27,7 @@ export class ServerStatus {
 
 export class PPMKProjectSummary {
     ppmk_project: PPMKProject
-    ppmk_projectDatas: Array<PPMKProjectData>
+    ppmk_project_datas: Array<PPMKProjectData>
     ppmk_project_share: PPMKProjectShare
 }
 
@@ -384,6 +384,7 @@ export default class API {
         })
         const json = await res.json()
         const response: GetProjectDataResponse = json
+        response.project_data = JSON.parse(JSON.stringify(json.project_data), deserialize)
         return response
     }
 

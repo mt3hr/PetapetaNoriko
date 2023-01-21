@@ -5,7 +5,7 @@
             <v-btn v-if="editor_mode" @click="add_page">+</v-btn>
         </h2>
         <ul>
-            <PageListItem v-for="(pagedata, index) in this.project.ppmk_project_data.project_data" :pagedata="pagedata" :key="index"
+            <PageListItem v-for="(pagedata, index) in project_data" :pagedata="pagedata" :key="pagedata.pageid"
                 :editor_mode="editor_mode" @copy_page="(pagedata) => copy_page(pagedata, index)"
                 :style="generate_style(index)" @move_pagedata="(e, pagedata) => move_pagedata(e, pagedata, index)"
                 @clicked_page="clicked_page" :selected="selected_index == index" @delete_page="delete_page" />
@@ -33,7 +33,7 @@
 <script lang="ts">
 import PageData from '@/page/PageData';
 import PageListItem from '@/page/PageListItem.vue';
-import Project from '@/project/Project';
+import Project, { PPMKProjectData } from '@/project/Project';
 import { deserialize } from '@/serializable/serializable';
 import { Options, Vue } from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
@@ -46,6 +46,7 @@ import { Prop, Watch } from 'vue-property-decorator';
 export default class Page extends Vue {
     selected_index = 0
     project: Project = new Project()
+    project_data = new Array<PageData>()
     @Prop() auto_save_pagedatas_to_localstorage: boolean
     @Prop() editor_mode: boolean
     @Prop() project_name: string
@@ -58,7 +59,7 @@ export default class Page extends Vue {
         this.save_pagedatas_to_localstorage()
     }
 
-    @Watch('pagedatas')
+    @Watch('project')
     save_pagedatas_to_localstorage() {
         let project = JSON.stringify(this.project)
         if (this.auto_save_pagedatas_to_localstorage) {
@@ -70,6 +71,7 @@ export default class Page extends Vue {
                 this.clear_pagedatas_at_localstorage()
             }
         }
+        this.project_data = this.project.ppmk_project_data.project_data
     }
 
     @Watch('auto_save_pagedatas_to_localstorage')
@@ -121,6 +123,7 @@ export default class Page extends Vue {
         } else {
             this.add_page()
         }
+        this.project_data = this.project.ppmk_project_data.project_data
     }
 
     generate_style(index: number): any {

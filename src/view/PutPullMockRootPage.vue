@@ -119,16 +119,16 @@
     <v-dialog v-model="is_show_readin_dialog">
         <v-card class="pa-5">
             <input type="file" @change="read_ppmk_project" />
+            <v-row v-if="enable_system">
+                <v-col>
+                    <ProjectSummariesList v-if="is_show_readin_dialog" @loaded_project="loaded_project" />
+                </v-col>
+            </v-row>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_readin_dialog = false">閉じる</v-btn>
                 </v-col>
                 <v-spacer />
-            </v-row>
-            <v-row v-if="enable_system">
-                <v-col>
-                    <ProjectSummariesList @loaded_project="loaded_project" />
-                </v-col>
             </v-row>
         </v-card>
     </v-dialog>
@@ -178,6 +178,9 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 </v-col>
                 <v-col cols="auto">
                     <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
+                </v-col>
+                <v-col v-if="enable_system" cols="auto">
+                    <v-btn @click="save_ppmk_project_to_server">プロジェクトをサーバに保存</v-btn>
                 </v-col>
             </v-row>
         </v-card>
@@ -1037,15 +1040,29 @@ export default class PutPullMockRootPage extends Vue {
             location.reload()
         })
     }
+
     loaded_project(ppmk_project: PPMKProject, project_data: PPMKProjectData, project_share: PPMKProjectShare) {
         let page_list_view: any = this.$refs['page_list_view']
         let project = new Project()
 
-        project.ppmk_project = ppmk_project.clone()
-        project.ppmk_project_data = project_data.clone()
-        project.ppmk_project_share = project_share.clone()
+        project.ppmk_project = ppmk_project
+        project.ppmk_project_data = project_data
+        project.ppmk_project_share = project_share
 
         page_list_view.project = project
+        page_list_view.clicked_page(page_list_view.project.ppmk_project_data.project_data[0])
+        this.is_show_readin_dialog = false
+    }
+
+    save_ppmk_project_to_server() {
+        let page_list_view: any = this.$refs['page_list_view']
+        let api = new API()
+        let project: Project = page_list_view.project
+        project.ppmk_project_data.project_data_id = generateUUID()
+        api.save_project_data(api.session_id, project)
+            .then((res) => {
+                //TODO
+            })
     }
 }
 </script>

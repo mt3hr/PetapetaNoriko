@@ -3,7 +3,7 @@
         <v-container>
             <v-row v-for="project_summary, index in project_summaries" :key="index">
                 <v-col>
-                    <ProjectSummary :project_summary="project_summary" />
+                    <ProjectSummary @loaded_project="loaded_project" :project_summary="project_summary" />
                 </v-col>
             </v-row>
         </v-container>
@@ -15,6 +15,7 @@
 import { Options, Vue } from 'vue-class-component';
 import ProjectSummary from '@/view/share_view_system/ProjectSummary.vue'
 import API, { PPMKProjectSummary } from './api';
+import { PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project';
 
 @Options({
     components: {
@@ -22,7 +23,7 @@ import API, { PPMKProjectSummary } from './api';
     }
 })
 export default class ProjectSummariesList extends Vue {
-    project_summaries: Array<PPMKProjectSummary>
+    project_summaries = new Array<PPMKProjectSummary>()
 
     error_message = ""
     show_error_message_snackbar = false
@@ -38,6 +39,10 @@ export default class ProjectSummariesList extends Vue {
                     this.project_summaries = res.project_summaries
                 }
             })
+    }
+
+    loaded_project(ppmk_project: PPMKProject, project_data: PPMKProjectData, ppmk_project_share: PPMKProjectShare) {
+        this.$emit("loaded_project", ppmk_project, project_data, ppmk_project_share)
     }
 }
 

@@ -1,11 +1,16 @@
 <template>
     <div>
         <details>
+            <!--
+            <summary @click="e => open_project_latest(e)">
+                {{ project_summary.ppmk_project.project_name }}
+            </summary>
+            -->
             <summary>
-                <p @click="e => open_project_latest(e)">{{ project_summary.ppmk_project.project_name }}</p>
+                {{ project_summary.ppmk_project.project_name }}
             </summary>
             <ul>
-                <li v-for="project_data, index in project_summary.ppmk_projectDatas" :key="index"
+                <li v-for="project_data, index in project_summary.ppmk_project_datas" :key="index"
                     @click="e => open_project(e, project_data)">
                     <time>
                         {{ project_data.saved_time }}
@@ -29,14 +34,14 @@ export default class ProjectSummary extends Vue {
     @Prop() project_summary: PPMKProjectSummary
 
     open_project_latest(e: MouseEvent) {
-        this.open_project(e, this.project_summary.ppmk_projectDatas[0])
+        this.open_project(e, this.project_summary.ppmk_project_datas[0])
     }
 
     open_project(e: MouseEvent, project_data: PPMKProjectData) {
         let api = new API()
         api.get_project_data(api.session_id, project_data.project_data_id)
             .then((res) => {
-                this.$emit("loaded_project", this.project_summary.ppmk_project.clone(), res.project_data.clone(), this.project_summary.ppmk_project_share.clone())
+                this.$emit("loaded_project", this.project_summary.ppmk_project, res.project_data, this.project_summary.ppmk_project_share)
             })
     }
 }
