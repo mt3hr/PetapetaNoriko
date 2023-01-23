@@ -97,9 +97,9 @@ export default class HTMLTagPropertyView extends Vue {
             case "tagclass":
                 return "クラス"
             case "position_x":
-                return "位置（x）"
+                return "位置(x)"
             case "position_y":
-                return "位置（y）"
+                return "位置(y)"
             case "scale":
                 return "大きさ"
             case "text":
@@ -129,13 +129,19 @@ export default class HTMLTagPropertyView extends Vue {
     color: steelblue;  
 }
 .textbox{
-    background: whitesmoke;
-    transition: all 0.1s ease;
+    background: white;
+    border-radius: 5px;
+    resize: none;
 }
 .textbox:hover{
-    opacity:0.6;
+    opacity:0.8;
 }
 .textbox:focus{
     outline: solid 2px steelblue;
+}
+textarea{
+    resize: none;
+    width: 184px;
+    height: 200px;
 }
 </style>

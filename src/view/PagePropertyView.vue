@@ -80,11 +80,12 @@ export default class PagePropertyView extends Vue {
     color: steelblue;  
 }
 .textbox{
-    background: whitesmoke;
-    transition: all 0.1s ease;
+    background: white;
+    border-radius: 5px;
+    resize: none;
 }
 .textbox:hover{
-    opacity:0.6;
+    opacity:0.8;
 }
 .textbox:focus{
     outline: solid 2px steelblue;

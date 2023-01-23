@@ -2,7 +2,7 @@
     <div class="mainside">
         <h2>
             ページ一覧
-            <v-btn @click="add_page">+</v-btn>
+            <v-btn class="button" @click="add_page">+</v-btn>
         </h2>
         <ul>
             <PageListItem v-for="(pagedata, index) in pagedatas" :pagedata="pagedata" :key="index"
@@ -165,9 +165,22 @@ export default class Page extends Vue {
     font-size: 30px;
     color: steelblue;  
 }
+.mainside{
+    background: #e6e6e6;
+}
 .pageitem{
 }
 .pageitem:hover{
 }
-
+.v-button{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: steelblue;
+    color: white;
+    border-radius: 10px;
+}
+.v-button:hover{
+    
+}
 </style>

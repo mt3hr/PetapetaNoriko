@@ -76,16 +76,22 @@ export default class TagListView extends Vue {
 li {
     margin-left: 20px;
     transition: all 0.1s ease;
-    list-style: url('./img/same.png');
+    list-style: none;
+}
+li:before{
+    content: '・';
+    color: steelblue;
 }
 li:hover{
-    opacity:0.6;
+    color: white;
+    background: steelblue;
+    border-radius: 30px;
 }
 
 .mainside h2{
     font-family: "Roboto", sans-serif;
     font-size: 30px;
-    color: steelblue;  
+    color: steelblue; 
 }
 .mainside h3{
     font-family: "Roboto", sans-serif;

@@ -728,7 +728,7 @@ export default class PutPullMockRootPage extends Vue {
 </script>
 <style scoped>
 .component {
-    border: 1px black solid;
+    //border: 1px black solid;
     overflow: hidden;
     width: 300px;
 }
@@ -826,7 +826,7 @@ body {
    width: 10px;
 }
 ::-webkit-scrollbar-track{
-   background-color: white;
+   background-color: #e6e6e6;
 }
 ::-webkit-scrollbar-thumb{
    background-color: steelblue;
@@ -834,11 +834,12 @@ body {
 }
 
 .header_bar{
-    background: aliceblue;
+    background: steelblue;
+    border-radius: 0 0 15px 15px;
 }
 .header_bar h1{
     font-family: "Roboto", sans-serif;
     font-size: 50px;
-    color: steelblue;
+    color: white;
 }
 </style>
