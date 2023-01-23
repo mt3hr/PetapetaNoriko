@@ -123,7 +123,7 @@
     <v-dialog v-model="is_show_readin_dialog">
         <v-card class="pa-5">
             <input type="file" @change="read_ppmk_project" />
-            <v-row v-if="enable_system">
+            <v-row v-if="enable_system && api.session_id">
                 <v-col>
                     <ProjectSummariesList v-if="is_show_readin_dialog" @loaded_project="loaded_project" />
                 </v-col>
@@ -332,6 +332,7 @@ import ProjectPropertyView from './ProjectPropertyView.vue'
 
 export default class PutPullMockRootPage extends Vue {
     TagListViewMode = TagListViewMode
+    api = new API()
     width_dropzone = window.innerWidth - 300 - 300 - 19
     height_dropzone = window.innerHeight - 159
 
@@ -894,7 +895,6 @@ export default class PutPullMockRootPage extends Vue {
         let dropzone: any = this.$refs["dropzone"]
         dropzone.html_tagdatas = this.project.ppmk_project_data.project_data
         dropzone.html_tagdatas_root = this.project.ppmk_project_data.project_data
-        console.log(JSON.parse(JSON.stringify(this.project.ppmk_project_data.project_data), deserialize))
     }
 
     @Watch('css')
@@ -1041,16 +1041,20 @@ export default class PutPullMockRootPage extends Vue {
 
         this.width_dropzone = window.innerWidth - 300 - 300 - 19
         this.height_dropzone = window.innerHeight - 159
+
+        this.save_project_to_localstorage()
     }
 
     add_page() {
         let page_list_view: any = this.$refs['page_list_view']
         page_list_view.add_page()
+        this.save_project_to_localstorage()
     }
 
     updated_tagdata(tagdata: HTMLTagDataBase) {
         let dropzone: any = this.$refs["dropzone"]
         dropzone.updated_tagdata(tagdata)
+        this.save_project_to_localstorage()
     }
     to_toppage() {
         if (this.editor_mode) return
@@ -1084,6 +1088,8 @@ export default class PutPullMockRootPage extends Vue {
         this.project = project
         page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
         this.is_show_readin_dialog = false
+
+        this.save_project_to_localstorage()
     }
 
     save_ppmk_project_to_server() {
@@ -1156,17 +1162,17 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .html_tag_list_view {
-    height: calc(100vh - 423px);
+    height: calc(100vh - 423px + 44px);
     overflow-y: scroll;
 }
 
 .page_property_view {
-    height: 170px;
+    height: 145px;
     overflow: scroll;
 }
 
 .project_view {
-    height: 170px;
+    height: 125px;
     overflow: scroll;
 }
 
@@ -1176,7 +1182,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .struct_view {
-    height: 300px;
+    height: 325px;
     overflow: scroll;
 }
 
