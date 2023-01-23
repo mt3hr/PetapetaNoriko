@@ -398,7 +398,8 @@ export default class HTMLTagViewBase extends Vue {
     }
 
     beforeCreate(): void {
-        (this as any).$options.components.HTMLTagView = HTMLTagView
+        this.$options.components = {}
+        this.$options.components.HTMLTagView = HTMLTagView
     }
 
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {

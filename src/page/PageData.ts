@@ -8,8 +8,8 @@ export default class PageData {
     pagename = "ページ"
     width = window.innerWidth - 300 - 300 - 19
     height = window.innerHeight - 159
-    html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
-    css: string
+    html_tagdatas = new Array<HTMLTagDataBase>()
+    css =  ""
     webfonts: Array<string> = new Array<string>()
 
     generate_html(options: GenerateHTMLOptions): string {
@@ -60,7 +60,9 @@ export default class PageData {
         c.width = this.width
         c.height = this.height
         c.html_tagdatas = new Array<HTMLTagDataBase>()
-        this.html_tagdatas.forEach((child_tagdata) => { c.html_tagdatas.push(child_tagdata.clone()) })
+        if (this.html_tagdatas != null) {
+            this.html_tagdatas.forEach((child_tagdata) => { c.html_tagdatas.push(child_tagdata.clone()) })
+        }
         c.css = this.css
         c.webfonts = this.webfonts
         return c

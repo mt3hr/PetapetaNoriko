@@ -2,11 +2,6 @@
     <div>
         <h2>ページプロパティ</h2>
         <table>
-            <tr>
-                <td class="project_name">プロジェクト名:</td>
-                <td><input type="text" v-model="_project_name" @keyup="updated_project_name" /> </td>
-            </tr>
-
             <tr v-for="property, index in properties" :key="index">
                 <td>{{ get_property_name_jp(property.name) }}:</td>
                 <td><input type="text" :value="property.value"
@@ -27,15 +22,8 @@ class Property {
 }
 
 export default class PagePropertyView extends Vue {
-    @Prop() project_name: string
-    _project_name = ""
     page_data: PageData = new PageData()
     properties: Array<Property> = new Array<Property>()
-
-    @Watch('project_name')
-    update_project_name() {
-        this._project_name = this.project_name
-    }
 
     @Watch("page_data")
     update_properties() {
@@ -81,17 +69,7 @@ export default class PagePropertyView extends Vue {
         }
         return name
     }
-    updated_project_name() {
-        this.$emit("updated_project_name", this._project_name)
-    }
-
-    created(): void {
-        this.update_project_name()
-    }
 }
 </script>
 <style scoped>
-.project_name {
-    font-size: 75%;
-}
 </style>

@@ -16,13 +16,21 @@ export default class Project {
     constructor() {
         this.project_id = this.ppmk_project.project_id
     }
+
+    clone(): Project {
+        const project = new Project()
+        project.ppmk_project = this.ppmk_project
+        project.ppmk_project_data = this.ppmk_project_data
+        project.ppmk_project_share = this.ppmk_project_share
+        return project
+    }
 }
 
 export class PPMKProject {
     project_id = generateUUID()
-    owner_user_id: string
+    owner_user_id = ""
     project_name = "プロジェクト"
-    is_shared_view: string
+    is_shared_view = false
 
     clone(): PPMKProject {
         const project = new PPMKProject()
@@ -36,11 +44,11 @@ export class PPMKProject {
 
 export class PPMKProjectData {
     project_data_id = generateUUID()
-    project_id: string
-    saved_time: string
-    project_data: Array<PageData>
-    author: string
-    memo: string
+    project_id = ""
+    saved_time = ""
+    project_data = new Array<PageData>()
+    author = ""
+    memo = ""
 
     clone(): PPMKProjectData {
         const project_data = new PPMKProjectData()
@@ -63,11 +71,11 @@ export class PPMKProjectData {
 }
 
 export class PPMKProjectShare {
-    project_id: string
-    user_id: string
-    user_name: string
-    user_email: string
-    writable: boolean
+    project_id = ""
+    user_id = ""
+    user_name = ""
+    user_email = ""
+    writable = false
 
     clone(): PPMKProjectShare {
         const project_share = new PPMKProjectShare()

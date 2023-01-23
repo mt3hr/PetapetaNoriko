@@ -385,7 +385,7 @@ export default class HTMLTagView extends Vue {
     }
 
     beforeCreate(): void {
-        (this as any).$options.components.HTMLTagView = HTMLTagView
+        this.$options.components.HTMLTagView = HTMLTagView
     }
 
     cut_tag(tagdata: HTMLTagDataBase) {
@@ -395,7 +395,7 @@ export default class HTMLTagView extends Vue {
 
     @Watch('clicked_tagdata')
     update_show_contextmenu_state() {
-        if (this.clicked_tagdata.tagid != this.tagdata.tagid) {
+        if (this.clicked_tagdata && this.clicked_tagdata.tagid != this.tagdata.tagid) {
             this.is_show_contextmenu = false
         }
     }

@@ -21,19 +21,24 @@
             <v-col cols="auto" class="sidebar">
                 <v-container>
                     <v-row>
+                        <v-col cols="auto">
+                            <ProjectPropertyView class="component project_view" ref="project_view" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
-                        <PageListView class="component page_list_view" ref="page_list_view" :editor_mode="editor_mode"
-                            @updated_project_name="update_project_name" :project_name="project_name"
-                            @updated_htmltagdatas="updated_htmltagdatas"
-                            :auto_save_pagedatas_to_localstorage="auto_save_pagedatas_to_localstorage"
-                            @delete_page="delete_page"
-                            @update_auto_save_pagedatas_to_localstorage="update_auto_save_pagedatas_to_localstorage"
-                            @clicked_page="clicked_page" />
+                        <v-col cols="auto">
+                            <PageListView class="component page_list_view" ref="page_list_view" :project="project"
+                                @updated_project_data="update_project_data" :editor_mode="editor_mode"
+                                @delete_page="delete_page" @clicked_page="clicked_page" />
+                        </v-col>
                     </v-row>
                     <v-row>
                         <!--タグリストビュー。ここからタグをドラッグしてドロップゾーンに貼り付ける-->
-                        <TagListView v-show="editor_mode" :mode="tag_list_view_mode"
-                            class="component html_tag_list_view" />
+                        <v-col cols="auto">
+                            <TagListView v-show="editor_mode" :mode="tag_list_view_mode"
+                                class="component html_tag_list_view" />
+                        </v-col>
                     </v-row>
                 </v-container>
             </v-col>
@@ -54,7 +59,6 @@
                         <v-col cols="auto">
                             <!--ページプロパティビュー-->
                             <PagePropertyView class="component page_property_view" ref="page_property_view"
-                                :project_name="project_name" @updated_project_name="update_project_name"
                                 @updated_page_property="updated_page_property" />
                         </v-col>
                     </v-row>
@@ -268,6 +272,24 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
         </v-card>
     </v-dialog>
+    <v-dialog v-if="editor_mode" v-model="is_show_oversize_localstorage_dialog">
+        <v-card class="pa-5">
+            <v-card-title>
+                自動保存容量超過
+            </v-card-title>
+            <v-card-text>
+                データが大きすぎるため自動保存できません。
+                自動保存機能を無効化します。
+                （書き出しはできます）
+            </v-card-text>
+
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_oversize_localstorage_dialog = false">閉じる</v-btn>
+                </v-col>
+            </v-row>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script lang="ts">
@@ -293,6 +315,7 @@ import TagListViewMode from './TagListViewMode'
 import API, { ServerStatus } from './share_view_system/api'
 import Project, { PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
 import ProjectSummariesList from '@/view/share_view_system/ProjectSummariesList.vue'
+import ProjectPropertyView from './ProjectPropertyView.vue'
 
 @Options({
     components: {
@@ -303,6 +326,7 @@ import ProjectSummariesList from '@/view/share_view_system/ProjectSummariesList.
         PagePropertyView,
         HTMLTagStructView,
         ProjectSummariesList,
+        ProjectPropertyView,
     }
 })
 
@@ -343,17 +367,11 @@ export default class PutPullMockRootPage extends Vue {
 
     editor_mode = true
 
-    project_name = ""
-
     session_id: string
 
-    project: Project
+    project = new Project()
 
     enable_system = false
-
-    update_project_name(project_name: string) {
-        this.project_name = project_name
-    }
 
     @Watch('export_base64_image')
     @Watch('export_head')
@@ -406,29 +424,15 @@ export default class PutPullMockRootPage extends Vue {
             let sample_project: Project = JSON.parse(JSON.stringify(sample_project_json), deserialize)
             let about_ppmk_pagedata: PageData
             for (let i = 0; i < sample_project.ppmk_project_data.project_data.length; i++) {
-                if (sample_project.ppmk_project_data.project_data[i].pageid == "d4c84155-99d0-4a95-bfea-66d3e2b173ca") {
-                    about_ppmk_pagedata = sample_project.ppmk_project_data.project_data[i]
+                if (sample_project.ppmk_project_data.project_data[i].pagename == "About Put Pull Mock") {
+                    about_ppmk_pagedata = sample_project.ppmk_project_data.project_data[i].clone()
                     break
                 }
             }
-            let pagedatas: Array<PageData> = new Array<PageData>()
-            pagedatas.push(about_ppmk_pagedata)
-
+            this.project.ppmk_project_data.project_data.push(about_ppmk_pagedata)
             this.$nextTick(() => {
                 let page_list_view: any = this.$refs['page_list_view']
-
-                let project = new Project()
-                project.project_id = "c5e5c106-0064-4ca6-93f9-5df811c7b049"
-                project.ppmk_project.project_name = ""
-                project.ppmk_project_data.project_data = pagedatas
-                this.update_project_name(project.ppmk_project.project_name)
-
-                page_list_view.project = project
-                this.updated_htmltagdatas(about_ppmk_pagedata.html_tagdatas, null, false)
-                this.$nextTick(() => {
-                    page_list_view.clicked_page(about_ppmk_pagedata)
-                })
-                this.append_history()
+                page_list_view.clicked_page(about_ppmk_pagedata)
             })
         }
         this.export_base64_image = settings.export_base64_image
@@ -445,26 +449,6 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     created(): void {
-        window.onkeydown = (e: KeyboardEvent) => {
-            if (e.code == "KeyS" && e.ctrlKey) {
-                e.preventDefault()
-                e.stopPropagation()
-                let page_list_view: any = this.$refs['page_list_view']
-                page_list_view.save_pagedatas_to_localstorage()
-                this.save_ppmk_project()
-            }
-            if (e.code == "KeyP" && e.ctrlKey) {
-                e.preventDefault()
-                e.stopPropagation()
-                let page_list_view: any = this.$refs['page_list_view']
-                page_list_view.save_pagedatas_to_localstorage()
-                this.print_this_page()
-            }
-            if (e.code == "Escape") {
-                this.clicked_tagdata = null
-            }
-        }
-
         new API().status().then((server_status: ServerStatus) => {
             this.enable_system = server_status.share_view_system
         }).catch((e) => {
@@ -472,6 +456,25 @@ export default class PutPullMockRootPage extends Vue {
         })
 
         this.load_settings_from_cookie()
+
+        window.onkeydown = (e: KeyboardEvent) => {
+            if (e.code == "KeyS" && e.ctrlKey) {
+                e.preventDefault()
+                e.stopPropagation()
+                this.save_project_to_localstorage()
+                this.save_ppmk_project()
+            }
+            if (e.code == "KeyP" && e.ctrlKey) {
+                e.preventDefault()
+                e.stopPropagation()
+                this.save_project_to_localstorage()
+                this.print_this_page()
+            }
+            if (e.code == "Escape") {
+                this.clicked_tagdata = null
+            }
+        }
+
         window.addEventListener('keyup', (e: KeyboardEvent) => {
             let page_list_view: any = this.$refs['page_list_view']
             if (e.ctrlKey && e.code == "KeyZ") {
@@ -486,10 +489,13 @@ export default class PutPullMockRootPage extends Vue {
                 this.histories.index--
                 let pagedatas: Array<PageData> = this.histories.histories[this.histories.index]
                 if (pagedatas) {
-                    page_list_view.project.ppmk_project_data.project_data = pagedatas
+                    this.project.ppmk_project_data.project_data = pagedatas
                     page_list_view.selected_index = this.histories.page_index[this.histories.index]
-                    this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
-                    this.clicked_page(page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index])
+                    this.$nextTick(() => {
+                        this.updated_htmltagdatas(pagedatas[0].html_tagdatas, null, false)
+                        let page_list_view: any = this.$refs['page_list_view']
+                        page_list_view.clicked_page(pagedatas[0].html_tagdatas)
+                    })
                 }
             }
             if (e.ctrlKey && e.code == "KeyY") {
@@ -500,14 +506,13 @@ export default class PutPullMockRootPage extends Vue {
                     pagedatas = this.histories.histories[this.histories.index]
                 }
                 if (pagedatas) {
-                    page_list_view.project.ppmk_project_data.project_data = pagedatas
+                    this.project.ppmk_project_data.project_data = pagedatas
                     page_list_view.selected_index = this.histories.page_index[this.histories.index]
                     this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
-                    this.clicked_page(page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index])
+                    page_list_view.clicked_page(this.project.ppmk_project_data.project_data[page_list_view.selected_index])
                 }
             }
         })
-
 
         window.addEventListener('keydown', (e: KeyboardEvent) => {
             if (e.ctrlKey && e.code == "KeyC") {
@@ -612,7 +617,24 @@ export default class PutPullMockRootPage extends Vue {
             }
         })
         this.$nextTick(() => {
-            this.append_history()
+            if (this.auto_save_pagedatas_to_localstorage) {
+                try {
+                    this.project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
+                    let page_list_view: any = this.$refs['page_list_view']
+                    if (this.project.ppmk_project_data.project_data && this.project.ppmk_project_data.project_data.length > 0) {
+                        this.clicked_page(this.project.ppmk_project_data.project_data[0])
+                        page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+                    } else {
+                        this.clicked_page(null)
+                        page_list_view.clicked_page(null)
+                    }
+                } catch (e) {
+                    return
+                }
+            }
+            this.$nextTick(() => {
+                this.append_history()
+            })
         })
     }
 
@@ -632,26 +654,24 @@ export default class PutPullMockRootPage extends Vue {
         let reader = new FileReader()
         reader.addEventListener('load', (e) => {
             let project: Project = JSON.parse(e.target.result.toString(), deserialize)
-            page_list_view.project = project
-            page_list_view.clicked_page(page_list_view.project.ppmk_project_data.project_data[0])
+            this.project = project
+            page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
             this.append_history()
             this.is_show_readin_dialog = false
-            this.update_project_name(project.ppmk_project.project_name)
-            page_list_view.save_pagedatas_to_localstorage()
+            this.save_project_to_localstorage()
         })
         reader.readAsText(file)
     }
 
     save_ppmk_project() {
         this.clicked_tagdata = new HTMLTagDataBase()
-        let page_list_view: any = this.$refs['page_list_view']
-        let project_data = JSON.stringify(page_list_view.project)
+        let project_data = JSON.stringify(this.project)
         let ppmk_data_blob = new Blob([project_data])
         let url = URL.createObjectURL(ppmk_data_blob)
 
         const a = document.createElement("a");
         document.body.appendChild(a);
-        a.download = page_list_view.project.ppmk_project.project_name + '.ppmk.json';
+        a.download = this.project.ppmk_project.project_name + '.ppmk.json';
         a.href = url;
         a.click();
         a.remove();
@@ -662,7 +682,7 @@ export default class PutPullMockRootPage extends Vue {
         this.clicked_tagdata = new HTMLTagDataBase()
         let page_list_view: any = this.$refs['page_list_view']
         let page_index = page_list_view.selected_index
-        let pagedata = page_list_view.project.ppmk_project_data.project_data[page_index]
+        let pagedata = this.project.ppmk_project_data.project_data[page_index]
         let export_options = new GenerateHTMLOptions()
         export_options.export_base64_image = this.export_base64_image
         export_options.export_head = this.export_head
@@ -697,8 +717,7 @@ export default class PutPullMockRootPage extends Vue {
 
     save_ppmk_html_css_all_pages() {
         this.clicked_tagdata = new HTMLTagDataBase()
-        let page_list_view: any = this.$refs['page_list_view']
-        page_list_view.project.ppmk_project_data.project_data.forEach((pagedata: PageData) => {
+        this.project.ppmk_project_data.project_data.forEach((pagedata: PageData) => {
             let export_options = new GenerateHTMLOptions()
             export_options.export_base64_image = this.export_base64_image
             export_options.export_head = this.export_head
@@ -748,7 +767,7 @@ export default class PutPullMockRootPage extends Vue {
     update_page_html() {
         let page_list_view: any = this.$refs["page_list_view"]
         let page_index = page_list_view.selected_index
-        let pagedata: PageData = page_list_view.project.ppmk_project_data.project_data[page_index]
+        let pagedata: PageData = this.project.ppmk_project_data.project_data[page_index]
         let export_options = new GenerateHTMLOptions()
         export_options.export_base64_image = this.export_base64_image
         export_options.export_head = this.export_head
@@ -759,14 +778,21 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase, history_mode: boolean) {
+        if (!html_tagdatas) return
         if (history_mode) this.append_history()
         let page_list_view: any = this.$refs["page_list_view"]
+        if (!page_list_view) {
+            this.$nextTick(() => {
+                this.updated_htmltagdatas(html_tagdatas, tagdata, history_mode)
+            })
+            return
+        }
 
-        page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas = html_tagdatas
+        this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas = html_tagdatas
 
-        page_list_view.clicked_page(page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index])
-        this.update_struct_view(page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
-        page_list_view.save_pagedatas_to_localstorage()
+        page_list_view.clicked_page(this.project.ppmk_project_data.project_data[page_list_view.selected_index])
+        this.update_struct_view(this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
+        this.save_project_to_localstorage()
         if (history_mode) this.append_history()
     }
 
@@ -792,11 +818,11 @@ export default class PutPullMockRootPage extends Vue {
         this.onclick_tag(null)
 
         let page_list_view: any = this.$refs["page_list_view"]
-        this.update_struct_view(page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
-        this.css = page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].css
-        this.page_webfont = page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts.join("\n")
+        this.update_struct_view(this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
+        this.css = this.project.ppmk_project_data.project_data[page_list_view.selected_index].css
+        this.page_webfont = this.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts.join("\n")
         this.update_page_webfont()
-        page_list_view.save_pagedatas_to_localstorage()
+        this.save_project_to_localstorage()
     }
 
     onclick_tag(tagdata: HTMLTagDataBase) {
@@ -814,7 +840,7 @@ export default class PutPullMockRootPage extends Vue {
     updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
         let page_list_view: any = this.$refs["page_list_view"]
         let property_view: any = this.$refs["property_view"]
-        let tagdatas: Array<HTMLTagDataBase> = page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas
+        let tagdatas: Array<HTMLTagDataBase> = this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas
 
         let updated_tagdata: HTMLTagDataBase
 
@@ -833,20 +859,20 @@ export default class PutPullMockRootPage extends Vue {
             return false
         }
         walk_tagdatas(tagdatas)
-        this.update_struct_view(page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
+        this.update_struct_view(this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
         property_view.html_tagdata = updated_tagdata
         page_list_view.save_pagedatas_to_localstorage()
     }
     updated_page_property(page_data: PageData) {
         let page_list_view: any = this.$refs["page_list_view"]
-        for (let i = 0; i < page_list_view.project.ppmk_project_data.project_data.length; i++) {
-            if (page_list_view.project.ppmk_project_data.project_data[i].pageid == page_data.pageid) {
-                page_list_view.project.ppmk_project_data.project_data.splice(i, 1, page_data)
+        for (let i = 0; i < this.project.ppmk_project_data.project_data.length; i++) {
+            if (this.project.ppmk_project_data.project_data[i].pageid == page_data.pageid) {
+                this.project.ppmk_project_data.project_data.splice(i, 1, page_data)
                 break
             }
         }
-        page_list_view.clicked_page(page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index])
-        this.update_struct_view(page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
+        page_list_view.clicked_page(this.project.ppmk_project_data.project_data[page_list_view.selected_index])
+        this.update_struct_view(this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
         page_list_view.save_pagedatas_to_localstorage()
     }
 
@@ -861,6 +887,14 @@ export default class PutPullMockRootPage extends Vue {
             "width": this.width_dropzone + "px",
             "height": this.height_dropzone + "px",
         }
+    }
+
+    @Watch('project')
+    updated_project() {
+        let dropzone: any = this.$refs["dropzone"]
+        dropzone.html_tagdatas = this.project.ppmk_project_data.project_data
+        dropzone.html_tagdatas_root = this.project.ppmk_project_data.project_data
+        console.log(JSON.parse(JSON.stringify(this.project.ppmk_project_data.project_data), deserialize))
     }
 
     @Watch('css')
@@ -881,7 +915,7 @@ export default class PutPullMockRootPage extends Vue {
         }
 
         let page_list_view: any = this.$refs["page_list_view"]
-        page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].css = this.css
+        this.project.ppmk_project_data.project_data[page_list_view.selected_index].css = this.css
         let dropzone: any = this.$refs["dropzone"]
         dropzone.style_user_edited = this.css
     }
@@ -898,16 +932,16 @@ export default class PutPullMockRootPage extends Vue {
         webfonts = webfonts.filter((webfont, i, webfonts) => {
             return webfont != ""
         })
-        page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts = webfonts
+        this.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts = webfonts
         this.update_page_webfont()
-        page_list_view.save_pagedatas_to_localstorage()
+        this.save_project_to_localstorage()
     }
 
     update_page_webfont() {
         let page_list_view: any = this.$refs["page_list_view"]
         let page_web_font_links = []
-        for (let i = 0; i < page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts.length; i++) {
-            let page_web_font = page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts[i]
+        for (let i = 0; i < this.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts.length; i++) {
+            let page_web_font = this.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts[i]
             page_web_font_links.push({
                 href: page_web_font,
                 rel: "stylesheet",
@@ -940,7 +974,7 @@ export default class PutPullMockRootPage extends Vue {
     delete_tagdata(tagdata: HTMLTagDataBase) {
         this.append_history()
         let page_list_view: any = this.$refs['page_list_view']
-        let tagdatas: Array<HTMLTagDataBase> = page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas
+        let tagdatas: Array<HTMLTagDataBase> = this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas
 
         let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
         walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -955,9 +989,9 @@ export default class PutPullMockRootPage extends Vue {
             }
         }
         walk_tagdatas(tagdatas)
-        page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas = tagdatas
-        this.clicked_page(page_list_view.project.ppmk_project_data.project_data[page_list_view.selected_index])
-        page_list_view.save_pagedatas_to_localstorage()
+        this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas = tagdatas
+        this.clicked_page(this.project.ppmk_project_data.project_data[page_list_view.selected_index])
+        this.save_project_to_localstorage()
     }
 
     append_history() {
@@ -965,25 +999,27 @@ export default class PutPullMockRootPage extends Vue {
             return
         }
         let page_list_view: any = this.$refs['page_list_view']
-        if (!page_list_view.project) {
+        if (!this.project) {
             return
         }
         if (this.histories.histories[this.histories.index - 1]) {
-            if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(page_list_view.project)) {
+            if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(this.project)) {
                 return
             }
         }
 
         this.histories.histories.length = this.histories.index
         let page_datas = Array<PageData>()
-        if (page_list_view.project.ppmk_project_data.project_data) {
-            page_list_view.project.ppmk_project_data.project_data.forEach(pagedata => {
+        if (this.project.ppmk_project_data.project_data) {
+            this.project.ppmk_project_data.project_data.forEach(pagedata => {
                 page_datas.push(pagedata.clone())
             });
         }
         this.histories.histories[this.histories.index] = page_datas
         this.histories.page_index.length = this.histories.index + 1
-        this.histories.page_index[this.histories.index] = page_list_view.selected_index
+        if (page_list_view) {
+            this.histories.page_index[this.histories.index] = page_list_view.selected_index
+        }
         this.histories.index++
     }
 
@@ -991,16 +1027,12 @@ export default class PutPullMockRootPage extends Vue {
         this.copied_tagdata = tagdata
     }
 
-    update_auto_save_pagedatas_to_localstorage(auto_save_pagedatas_to_localstorage) {
-        this.auto_save_pagedatas_to_localstorage = auto_save_pagedatas_to_localstorage
-    }
-
     delete_page() {
         let page_list_view: any = this.$refs['page_list_view']
         let dropzone: any = this.$refs["dropzone"]
         let page_property_view: any = this.$refs["page_property_view"]
-        page_list_view.save_pagedatas_to_localstorage()
-        page_list_view.clicked_page(page_list_view.project.ppmk_project_data.project_data[0])
+        this.save_project_to_localstorage()
+        page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
         page_property_view.page_data = null
         dropzone.html_tagdatas = null
         dropzone.html_tagdatas_root = null
@@ -1049,20 +1081,47 @@ export default class PutPullMockRootPage extends Vue {
         project.ppmk_project_data = project_data
         project.ppmk_project_share = project_share
 
-        page_list_view.project = project
-        page_list_view.clicked_page(page_list_view.project.ppmk_project_data.project_data[0])
+        this.project = project
+        page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
         this.is_show_readin_dialog = false
     }
 
     save_ppmk_project_to_server() {
-        let page_list_view: any = this.$refs['page_list_view']
         let api = new API()
-        let project: Project = page_list_view.project
+        let project: Project = this.project
         project.ppmk_project_data.project_data_id = generateUUID()
         api.save_project_data(api.session_id, project)
             .then((res) => {
                 //TODO
             })
+    }
+
+    is_show_oversize_localstorage_dialog = false
+    @Watch('project')
+    save_project_to_localstorage() {
+        let project = JSON.stringify(this.project)
+        if (this.auto_save_pagedatas_to_localstorage) {
+            try {
+                window.localStorage.setItem("ppmk_project", project)
+            } catch (e) {
+                this.is_show_oversize_localstorage_dialog = true
+                this.$emit("update_auto_save_pagedatas_to_localstorage", false)
+                this.clear_pagedatas_at_localstorage()
+            }
+        }
+    }
+
+    @Watch('auto_save_pagedatas_to_localstorage')
+    clear_pagedatas_at_localstorage() {
+        if (!this.auto_save_pagedatas_to_localstorage) {
+            window.localStorage.setItem("ppmk_project", "")
+        }
+    }
+
+    update_project_data(project_data: Array<PageData>) {
+        this.project.ppmk_project_data.project_data = project_data
+        let page_list_view: any = this.$refs['page_list_view']
+        page_list_view.updated_project()
     }
 }
 </script>
@@ -1097,11 +1156,16 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .html_tag_list_view {
-    height: calc(100vh - 254px);
+    height: calc(100vh - 423px);
     overflow-y: scroll;
 }
 
 .page_property_view {
+    height: 170px;
+    overflow: scroll;
+}
+
+.project_view {
     height: 170px;
     overflow: scroll;
 }

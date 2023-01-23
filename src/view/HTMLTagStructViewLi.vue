@@ -706,7 +706,7 @@ export default class HTMLTagPropertyView extends Vue {
 
     @Watch('clicked_tagdata')
     update_show_contextmenu_state() {
-        if (this.clicked_tagdata.tagid != this.tagdata.tagid) {
+        if (this.clicked_tagdata && this.clicked_tagdata.tagid != this.tagdata.tagid) {
             this.is_show_contextmenu = false
         }
     }

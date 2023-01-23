@@ -164,7 +164,7 @@ import LITagData from '@/html_tagdata/LITagData'
 })
 
 export default class DropZone extends Vue {
-    html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
+    html_tagdatas: Array<HTMLTagDataBase>
     style_user_edited = ""
     @Prop() show_border: boolean
     @Prop() dropzone_style: any

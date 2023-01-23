@@ -4,21 +4,26 @@ import md5 from "md5"
 import Settings from "../Settings"
 import TagListViewMode from "../TagListViewMode"
 
-export const status_address = "/ppmk_server/status"
-export const login_address = "/ppmk_server/login"
-export const logout_address = "/ppmk_server/logout"
-export const reset_password_address = "/ppmk_server/reset_password"
-export const register_address = "/ppmk_server/register"
-export const list_project_summaries_address = "/ppmk_server/list_project_summaries"
-export const get_project_address = "/ppmk_server/get_project_data"
-export const save_project_data_address = "/ppmk_server/save_project_data"
-export const delete_project_data_address = "/ppmk_server/delete_project_data"
-export const update_project_data_address = "/ppmk_server/update_project_data"
-export const delete_project_address = "/ppmk_server/delete_project"
-export const update_project_address = "/ppmk_server/update_project"
-export const addProjectShareAddress = "/ppmk_server/add_project_share"
-export const deleteProjectShareAddress = "/ppmk_server/delete_project_share"
-export const updateProjectShareAddress = "/ppmk_server/update_project_share"
+const host = "http://localhost:51520"
+// const host = "http://localhost:51520"
+
+export const status_address = host + "/ppmk_server/status"
+export const login_address = host + "/ppmk_server/login"
+export const logout_address = host + "/ppmk_server/logout"
+export const reset_password_address = host + "/ppmk_server/reset_password"
+export const register_address = host + "/ppmk_server/register"
+export const list_project_summaries_address = host + "/ppmk_server/list_project_summaries"
+export const get_project_address = host + "/ppmk_server/get_project_data"
+export const save_project_data_address = host + "/ppmk_server/save_project_data"
+export const delete_project_data_address = host + "/ppmk_server/delete_project_data"
+export const update_project_data_address = host + "/ppmk_server/update_project_data"
+export const delete_project_address = host + "/ppmk_server/delete_project"
+export const update_project_address = host + "/ppmk_server/update_project"
+export const addProjectShareAddress = host + "/ppmk_server/add_project_share"
+export const deleteProjectShareAddress = host + "/ppmk_server/delete_project_share"
+export const updateProjectShareAddress = host + "/ppmk_server/update_project_share"
+export const share_view_address = host + "/ppmk/share_view"
+
 
 export class ServerStatus {
     share_view_system: boolean
@@ -26,9 +31,9 @@ export class ServerStatus {
 }
 
 export class PPMKProjectSummary {
-    ppmk_project: PPMKProject
-    ppmk_project_datas: Array<PPMKProjectData>
-    ppmk_project_share: PPMKProjectShare
+    ppmk_project = new PPMKProjectShare()
+    ppmk_project_datas = new Array<PPMKProjectData>()
+    ppmk_project_share = new PPMKProjectShare()
 }
 
 export class LoginRequest {
@@ -155,6 +160,10 @@ export class UpdateProjectShareResponse {
 }
 
 export default class API {
+    generate_share_view_link(project: Project) {
+        return share_view_address + "?project_id=" + project.project_id
+    }
+
     save_settings_to_cookie(settings: Settings) {
         document.cookie = JSON.stringify(settings)
     }
