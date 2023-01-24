@@ -427,7 +427,7 @@ export default class PutPullMockRootPage extends Vue {
 
     first_launch = true
 
-    inited = false
+    preparated = false
     project_data_memo = ""
 
     @Watch('export_base64_image')
@@ -518,7 +518,6 @@ export default class PutPullMockRootPage extends Vue {
             }).catch((e) => {
                 this.enable_system = false
             })
-            this.session_id = api.session_id
 
             window.onkeydown = (e: KeyboardEvent) => {
                 if (e.code == "KeyS" && e.ctrlKey) {
@@ -551,13 +550,18 @@ export default class PutPullMockRootPage extends Vue {
                     this.histories.index--
                     let project: Project = this.histories.histories[this.histories.index]
                     if (project) {
-                        this.project = project
                         this.page_list_view.project = project
                         this.project_view.project = project
                         this.page_list_view.selected_index = this.histories.page_index[this.histories.index]
                         this.updated_htmltagdatas(project.ppmk_project_data.project_data[0].html_tagdatas, null, false)
+
+                        this.preparated = false
+                        this.update_project(project)
                         this.$nextTick(() => {
-                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
+                            this.preparated = true
+                            this.$nextTick(() => {
+                                this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
+                            })
                         })
                     }
                 }
@@ -569,13 +573,18 @@ export default class PutPullMockRootPage extends Vue {
                         project = this.histories.histories[this.histories.index]
                     }
                     if (project) {
-                        this.project = project
                         this.page_list_view.project = project
                         this.project_view.project = project
                         this.page_list_view.selected_index = this.histories.page_index[this.histories.index]
                         this.updated_htmltagdatas(project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas, null, false)
+
+                        this.preparated = false
+                        this.update_project(project)
                         this.$nextTick(() => {
-                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
+                            this.preparated = true
+                            this.$nextTick(() => {
+                                this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
+                            })
                         })
                     }
                 }
@@ -679,7 +688,7 @@ export default class PutPullMockRootPage extends Vue {
 
         if (this.load_settings_from_cookie().first_launch) {
             this.$nextTick(() => {
-                this.inited = true
+                this.preparated = true
                 this.first_launch = false
                 this.save_settings_to_cookie()
                 let sample_project: Project = JSON.parse(JSON.stringify(sample_project_json), deserialize)
@@ -702,7 +711,7 @@ export default class PutPullMockRootPage extends Vue {
             })
         } else {
             this.$nextTick(() => {
-                this.inited = true
+                this.preparated = true
                 if (this.auto_save_project_data_to_localstorage) {
                     if (project.ppmk_project_data && project.ppmk_project_data.project_data && project.ppmk_project_data.project_data.length > 0) {
                         this.update_project(project)
@@ -954,7 +963,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     update_project(project: Project) {
-        if (!this.inited) return
+        if (!this.preparated) return
         if (!project) return
         if (!this.dropzone ||
             !this.page_list_view ||
@@ -1180,7 +1189,7 @@ export default class PutPullMockRootPage extends Vue {
 
     @Watch('project')
     save_project_to_localstorage() {
-        if (!this.inited) return
+        if (!this.preparated) return
         if (this.auto_save_project_data_to_localstorage) {
             try {
                 let project = JSON.stringify(this.project)

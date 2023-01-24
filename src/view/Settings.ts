@@ -14,5 +14,5 @@ export default class Settings {
     auto_scroll_tag_struct_view = true
     tag_list_view_mode = TagListViewMode.Text
     use_undo = true
-    session_id: string = null
+    session_id: string = undefined
 }
