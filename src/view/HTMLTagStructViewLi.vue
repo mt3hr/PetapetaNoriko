@@ -185,9 +185,10 @@ export default class HTMLTagPropertyView extends Vue {
 
     dragover(e: DragEvent) {
         if (e.dataTransfer.getData("ppmk/struct_li_id")) e.dataTransfer.dropEffect = "move"
-        // if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
-        if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
-        if (e.dataTransfer.files.length != 0) e.dataTransfer.dropEffect = "copy"
+        else if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
+        else if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
+        else if (e.dataTransfer.files.length != 0) e.dataTransfer.dropEffect = "copy"
+        // else e.dataTransfer.dropEffect = "none"
     }
     can_drop(move_tagid: string, target_tagdata: HTMLTagDataBase): boolean {
         if (move_tagid == target_tagdata.tagid) {
@@ -249,7 +250,7 @@ export default class HTMLTagPropertyView extends Vue {
                             } else if (e.ctrlKey) {
                                 tagdatas[i].child_tagdatas.push(tag_data)
                             } else {
-                                tagdatas[i].child_tagdatas.push(tag_data)
+                                tagdatas[i].child_tagdatas.unshift(tag_data)
                             }
                             child_appended = true
                             return true
@@ -286,7 +287,7 @@ export default class HTMLTagPropertyView extends Vue {
                             } else if (e.ctrlKey) {
                                 tagdatas.splice(i + 1, 0, tag_data)
                             } else {
-                                tagdatas.splice(i + 1, 0, tag_data)
+                                tagdatas.splice(i, 0, tag_data)
                             }
                             return true
                         }
@@ -366,7 +367,7 @@ export default class HTMLTagPropertyView extends Vue {
                             } else if (e.ctrlKey) {
                                 tagdatas[i].child_tagdatas.splice(i + 1, 0, move_tagdata)
                             } else {
-                                tagdatas[i].child_tagdatas.splice(i + 1, 0, move_tagdata)
+                                tagdatas[i].child_tagdatas.splice(i, 0, move_tagdata)
                             }
                             child_appended = true
                             return true
@@ -400,7 +401,7 @@ export default class HTMLTagPropertyView extends Vue {
                             } else if (e.ctrlKey) {
                                 tagdatas.splice(i + 1, 0, move_tagdata)
                             } else {
-                                tagdatas.splice(i + 1, 0, move_tagdata)
+                                tagdatas.splice(i, 0, move_tagdata)
                             }
                             return true
                         }
@@ -436,7 +437,7 @@ export default class HTMLTagPropertyView extends Vue {
                                 } else if (e.ctrlKey) {
                                     tagdatas[i].child_tagdatas.push(tag_data)
                                 } else {
-                                    tagdatas[i].child_tagdatas.push(tag_data)
+                                    tagdatas[i].child_tagdatas.unshift(tag_data)
                                 }
                                 child_appended = true
                                 return true
@@ -475,7 +476,7 @@ export default class HTMLTagPropertyView extends Vue {
                                 } else if (e.ctrlKey) {
                                     tagdatas.splice(i + 1, 0, tag_data)
                                 } else {
-                                    tagdatas.splice(i + 1, 0, tag_data)
+                                    tagdatas.splice(i, 0, tag_data)
                                 }
                                 return true
                             }
@@ -550,7 +551,7 @@ export default class HTMLTagPropertyView extends Vue {
             } else if (e.ctrlKey) {
                 tagdata_typed.child_tagdatas.push(copied_tagdata)
             } else {
-                tagdata_typed.child_tagdatas.push(copied_tagdata)
+                tagdata_typed.child_tagdatas.unshift(copied_tagdata)
             }
 
             this.updated_tagdata(tagdata_typed)
@@ -706,7 +707,7 @@ export default class HTMLTagPropertyView extends Vue {
 
     @Watch('clicked_tagdata')
     update_show_contextmenu_state() {
-        if (this.clicked_tagdata.tagid != this.tagdata.tagid) {
+        if (this.clicked_tagdata && this.clicked_tagdata.tagid != this.tagdata.tagid) {
             this.is_show_contextmenu = false
         }
     }

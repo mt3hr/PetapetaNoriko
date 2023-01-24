@@ -2,6 +2,7 @@ package ppmk
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"log"
@@ -24,14 +25,25 @@ func init() {
 	cmd.AddCommand(serverCmd)
 	cmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", proxy, "proxy")
 	cmd.PersistentFlags().Uint16VarP(&port, "port", "p", port, "port")
+	cmd.PersistentFlags().BoolVarP(&shareViewSystem, "share_view_system", "s", shareViewSystem,
+		`share_view_system
+		環境変数を設定して起動してください
+		PPMK_EMAIL_HOSTNAME: パスワードリセット用メールのホスト名
+		PPMK_EMAIL_PORT:     パスワードリセット用メールのポート番号
+		PPMK_EMAIL_USERNAME: パスワードリセット用メールのユーザ名
+		PPMK_EMAIL_PASSWORD: パスワードリセット用メールのパスワード`)
+	cmd.PersistentFlags().StringVarP(&dbfilename, "dbfilename", "d", dbfilename, "dbfilename")
 }
 
 var (
-	//go:embed dist
+	//go:embed embed
 	htmlFS embed.FS // htmlファイル郡
 
-	port  = uint16(51520)
-	proxy = ""
+	port            = uint16(51520)
+	proxy           = ""
+	shareViewSystem = false
+	dbfilename      = "ppmk.db"
+	serverStatus    = ServerStatus{}
 
 	serverCmd = &cobra.Command{
 		Use: "server",
@@ -175,13 +187,46 @@ func openbrowser(url string) error {
 }
 
 func launchServer() error {
+	if shareViewSystem {
+		initializeSystemVariable()
+	}
+
+	serverStatus.ShareViewSystem = shareViewSystem
+	serverStatus.EnableResetPassword = serverStatus.ShareViewSystem &&
+		(emailhostname != "" &&
+			emailport != 0 &&
+			emailusername != "" &&
+			emailpassword != "")
 	router := mux.NewRouter()
 
-	html, err := fs.Sub(htmlFS, "dist")
+	html, err := fs.Sub(htmlFS, "embed/dist")
 	if err != nil {
 		return err
 	}
-	router.PathPrefix("/").Handler(http.FileServer(http.FS(html)))
+	if shareViewSystem {
+		ppmkDB, err := newPPMKDB(dbfilename)
+		if err != nil {
+			panic(err)
+		}
+
+		applyShareViewSystem(router, ppmkDB)
+	}
+
+	router.PathPrefix(statusAddress).HandlerFunc(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		encoder := json.NewEncoder(w)
+		encoder.Encode(serverStatus)
+	}))
+
+	hf := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		http.FileServer(http.FS(html)).ServeHTTP(w, r)
+	})
+
+	router.PathPrefix("/reset_password").Handler(http.StripPrefix("/reset_password", hf))
+	router.PathPrefix("/login").Handler(http.StripPrefix("/login", hf))
+	router.PathPrefix("/register").Handler(http.StripPrefix("/login", hf))
+	router.PathPrefix("/").Handler(hf)
 
 	var handler http.Handler = router
 	err = http.ListenAndServe(":"+fmt.Sprintf("%d", port), handler)
@@ -190,4 +235,9 @@ func launchServer() error {
 		return err
 	}
 	return nil
+}
+
+type ServerStatus struct {
+	ShareViewSystem     bool `json:"share_view_system"`
+	EnableResetPassword bool `json:"enable_reset_password"`
 }

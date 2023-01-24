@@ -3,20 +3,22 @@
         <component :is="'style'">
             {{ style_user_edited_fixed }}
         </component>
-        <h2>ドロップゾーン</h2>
+        <h2 v-if="editor_mode">ドロップゾーン</h2>
+        <h2 v-else>画面</h2>
         <div id="dropzone" class="dropzone" @click="onclick" @drop.stop.prevent="on_drop"
             @dragover.prevent="on_dragover" :style="dropzone_style" @contextmenu="show_contextmenu">
 
             <body id="dropzone_body" class="page" :style="dropzone_style">
-                <div v-if="!html_tagdatas"
+                <div v-if="html_tagdatas == null"
                     :style="{ 'text-align': 'center', 'vertical-align': 'middle', 'height': '-webkit-fill-available' }">
                     <v-btn @click="add_page"
                         :style="{ 'margin': 'auto', 'position': 'rerative', 'top': '45%' }">ページを追加</v-btn>
                 </div>
                 <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas"
-                    :clicked_tagdata="clicked_tagdata" :show_border="show_border" :tagdata="tagdata"
-                    :copied_tagdata="copied_tagdata" @updated_tagdatas_root="updated_tagdatas_root" @copy_tag="copy_tag"
-                    @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag" @delete_tagdata="delete_tagdata" />
+                    :editor_mode="editor_mode" :clicked_tagdata="clicked_tagdata" :show_border="show_border"
+                    :tagdata="tagdata" :copied_tagdata="copied_tagdata" @updated_tagdatas_root="updated_tagdatas_root"
+                    @copy_tag="copy_tag" @updated_tagdata="updated_tagdata" @onclick_tag="onclick_tag"
+                    @delete_tagdata="delete_tagdata" />
             </body>
         </div>
         <v-menu v-if="is_show_contextmenu" v-model="is_show_contextmenu" :style="contextmenu_style">
@@ -144,7 +146,7 @@ import { Vue, Options } from 'vue-class-component'
 import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase'
 import HTMLTagView from '@/view/HTMLTagView.vue'
 import IMGTagData from '@/html_tagdata/IMGTagData'
-import { Prop } from 'vue-property-decorator'
+import { Prop, Watch } from 'vue-property-decorator'
 import { deserialize } from '@/serializable/serializable'
 import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by_tagname'
 import generateUUID from '@/uuid'
@@ -162,12 +164,13 @@ import LITagData from '@/html_tagdata/LITagData'
 })
 
 export default class DropZone extends Vue {
-    html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
+    html_tagdatas = new Array<HTMLTagDataBase>()
     style_user_edited = ""
     @Prop() show_border: boolean
     @Prop() dropzone_style: any
     @Prop() clicked_tagdata: HTMLTagDataBase
     @Prop() copied_tagdata: HTMLTagDataBase
+    @Prop() editor_mode: boolean
 
     is_show_contextmenu = false
     x_contextmenu = 0
@@ -254,6 +257,10 @@ export default class DropZone extends Vue {
     }
 
     on_dragover(e: DragEvent) {
+        if (!this.editor_mode) {
+            e.dataTransfer.dropEffect = 'none'
+            return
+        }
         if (!this.html_tagdatas) {
             e.dataTransfer.dropEffect = 'none'
             return
@@ -263,6 +270,8 @@ export default class DropZone extends Vue {
             e.dataTransfer.items.length != 0
         ) {
             e.dataTransfer.dropEffect = "move"
+        } else {
+            e.dataTransfer.dropEffect = "none"
         }
     }
 
@@ -283,9 +292,7 @@ export default class DropZone extends Vue {
             html_tagdatas.push(tag_data)
             this.$emit('updated_htmltagdatas', html_tagdatas, null, true)
             this.$nextTick(() => {
-                this.$nextTick(() => {
-                    this.onclick_tag(tag_data)
-                })
+                this.onclick_tag(tag_data)
             })
 
             switch (tagname) {
@@ -335,10 +342,10 @@ export default class DropZone extends Vue {
                     move_in_root = true
                 }
                 this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
-                e.stopPropagation()
                 this.$nextTick(() => {
                     this.onclick_tag(move_tagdata)
                 })
+                e.stopPropagation()
             }
             if (move_in_root) return
 
@@ -370,10 +377,13 @@ export default class DropZone extends Vue {
             } else if (e.ctrlKey) {
                 html_tagdatas_root.push(move_tagdata)
             } else {
-                html_tagdatas_root.push(move_tagdata)
+                html_tagdatas_root.unshift(move_tagdata)
             }
 
             this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
+            this.$nextTick(() => {
+                this.onclick_tag(move_tagdata)
+            })
             e.stopPropagation()
         } else if (e.dataTransfer.items.length != 0) {
             const reader = new FileReader()
@@ -516,7 +526,8 @@ export default class DropZone extends Vue {
         this.copy_tag(tagdata)
         this.delete_tagdata(tagdata)
     }
-    created(): void {
+    mounted(): void {
+        this.html_tagdatas = null
         this.$emit('updated_htmltagdatas', this.html_tagdatas, null, true)
     }
 }

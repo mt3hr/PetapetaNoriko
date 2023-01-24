@@ -1,10 +1,10 @@
 <template>
-    <div class="mainside">
+    <div>
         <h2>ページプロパティ</h2>
         <table>
             <tr v-for="property, index in properties" :key="index">
                 <td>{{ get_property_name_jp(property.name) }}:</td>
-                <td><input class="textbox" type="text" :value="property.value"
+                <td><input type="text" :value="property.value"
                         @keyup="(e) => updated_property_value(e, property.name)" /> </td>
             </tr>
         </table>
@@ -14,7 +14,7 @@
 import PageData from '@/page/PageData';
 import { deserialize } from '@/serializable/serializable';
 import { Vue } from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
+import { Prop, Watch } from 'vue-property-decorator';
 
 class Property {
     name: string
@@ -71,20 +71,5 @@ export default class PagePropertyView extends Vue {
     }
 }
 </script>
-<style>
-.mainside h2{
-    font-family: "Roboto", sans-serif;
-    font-size: 30px;
-    color: steelblue;  
-}
-.textbox{
-    background: whitesmoke;
-    transition: all 0.1s ease;
-}
-.textbox:hover{
-    opacity:0.6;
-}
-.textbox:focus{
-    outline: solid 2px steelblue;
-}
+<style scoped>
 </style>

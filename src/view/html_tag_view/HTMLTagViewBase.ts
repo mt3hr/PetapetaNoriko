@@ -19,6 +19,7 @@ export default class HTMLTagViewBase extends Vue {
     @Prop({ require: true }) clicked_tagdata: HTMLTagDataBase
     @Prop() show_border: boolean
     @Prop() copied_tagdata: HTMLTagDataBase
+    @Prop() editor_mode: boolean
     position_css: string
     selected_this_tag = false
 
@@ -91,10 +92,11 @@ export default class HTMLTagViewBase extends Vue {
     }
 
     on_dragover(e: DragEvent) {
-        // if (e.dataTransfer.getData("ppmk/struct_li_id")) e.dataTransfer.dropEffect = "move"
-        if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
-        if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
-        if (e.dataTransfer.files.length != 0) e.dataTransfer.dropEffect = "copy"
+        if (e.dataTransfer.getData("ppmk/struct_li_id")) e.dataTransfer.dropEffect = "move"
+        else if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
+        else if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
+        else if (e.dataTransfer.files.length != 0) e.dataTransfer.dropEffect = "copy"
+        // else e.dataTransfer.dropEffect = "none"
     }
 
     on_drop(e: DragEvent, tagdata: HTMLTagDataBase) {
@@ -397,7 +399,8 @@ export default class HTMLTagViewBase extends Vue {
     }
 
     beforeCreate(): void {
-        (this as any).$options.components.HTMLTagView = HTMLTagView
+        this.$options.components = {}
+        this.$options.components.HTMLTagView = HTMLTagView
     }
 
     updated_tagdatas_root(tagdatas: Array<HTMLTagDataBase>) {

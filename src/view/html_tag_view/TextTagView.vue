@@ -48,6 +48,7 @@ export default class TextTagView extends HTMLTagViewBase {
         tagdata.readonly = this.readonly
         tagdata.required = this.required
         tagdata.list = this.list
+        tagdata.tagclass = this.tagclass
         this.$emit("updated_tagdata", tagdata)
     }
 
@@ -65,6 +66,7 @@ export default class TextTagView extends HTMLTagViewBase {
         this.readonly = this.tagdata_typed.readonly
         this.required = this.tagdata_typed.required
         this.list = this.tagdata_typed.list
+        this.tagclass = this.tagdata_typed.tagclass
     }
 
     created(): void {

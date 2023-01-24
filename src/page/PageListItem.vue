@@ -2,7 +2,7 @@
     <li @contextmenu.prevent="show_contextmenu" @click="clicked_page" @drop.stop="drop" @dragover.prevent="dragover"
         :style="style" draggable="true" @dragstart.stop="on_drag_start">
         {{ pagedata.pagename }}</li>
-    <v-menu v-model="is_show_contextmenu" :style="contextmenu_style">
+    <v-menu v-model="is_show_contextmenu" :style="contextmenu_style" v-if="editor_mode">
         <v-list>
             <v-list-item @click="copy_page()">コピーを作成</v-list-item>
             <v-list-item @click="delete_page()">削除</v-list-item>
@@ -19,6 +19,7 @@ import PageData from './PageData';
 export default class PageListItem extends Vue {
     @Prop() pagedata: PageData
     @Prop() selected: boolean
+    @Prop() editor_mode: boolean
     is_show_contextmenu = false
     x_contextmenu = 0
     y_contextmenu = 0
@@ -64,9 +65,9 @@ export default class PageListItem extends Vue {
     }
 
     dragover(e: DragEvent) {
-        if (e.dataTransfer.getData("ppmk/move_page_id")) {
-            e.dataTransfer.dropEffect = "move"
-        }
+        if (e.dataTransfer.getData("ppmk/move_page_id") != "") e.dataTransfer.dropEffect = "move"
+        // else e.dataTransfer.dropEffect = 'none'
+
     }
 
     on_drag_start(e: DragEvent) {

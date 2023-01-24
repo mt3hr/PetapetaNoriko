@@ -8,9 +8,9 @@ export default class PageData {
     pagename = "ページ"
     width = window.innerWidth - 300 - 300 - 19
     height = window.innerHeight - 159
-    html_tagdatas: Array<HTMLTagDataBase> = new Array<HTMLTagDataBase>()
-    css: string
-    webfonts: Array<string> = new Array<string>()
+    html_tagdatas = new Array<HTMLTagDataBase>()
+    css = ""
+    webfonts = new Array<string>()
 
     generate_html(options: GenerateHTMLOptions): string {
         let html = ""
@@ -60,9 +60,26 @@ export default class PageData {
         c.width = this.width
         c.height = this.height
         c.html_tagdatas = new Array<HTMLTagDataBase>()
-        this.html_tagdatas.forEach((child_tagdata) => { c.html_tagdatas.push(child_tagdata.clone()) })
+        if (this.html_tagdatas != null) {
+            this.html_tagdatas.forEach((child_tagdata) => { c.html_tagdatas.push(child_tagdata.clone()) })
+        }
         c.css = this.css
         c.webfonts = this.webfonts
         return c
     }
+}
+
+export function clone_pagedata(pagedata: PageData): PageData {
+    const c = new PageData()
+    c.pageid = pagedata.pageid
+    c.pagename = pagedata.pagename
+    c.width = pagedata.width
+    c.height = pagedata.height
+    c.html_tagdatas = new Array<HTMLTagDataBase>()
+    if (pagedata.html_tagdatas != null) {
+        pagedata.html_tagdatas.forEach((child_tagdata) => { c.html_tagdatas.push(child_tagdata.clone()) })
+    }
+    c.css = pagedata.css
+    c.webfonts = pagedata.webfonts
+    return c
 }

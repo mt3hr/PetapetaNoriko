@@ -1,38 +1,21 @@
 <template>
-    <div class="mainside">
+    <div :style="style">
         <h2>
             ページ一覧
-            <v-btn @click="add_page">+</v-btn>
+            <v-btn v-if="editor_mode" @click="add_page">+</v-btn>
         </h2>
         <ul>
-            <PageListItem v-for="(pagedata, index) in pagedatas" :pagedata="pagedata" :key="index"
-                @copy_page="(pagedata) => copy_page(pagedata, index)" :style="generate_style(index)"
-                @move_pagedata="(e, pagedata) => move_pagedata(e, pagedata, index)" @clicked_page="clicked_page"
-                :selected="selected_index == index" @delete_page="delete_page" />
+            <PageListItem v-for="(pagedata, index) in project_data" :pagedata="pagedata" :key="pagedata.pageid"
+                :editor_mode="editor_mode" @copy_page="(pagedata) => copy_page(pagedata, index)"
+                :style="generate_style(index)" @move_pagedata="(e, pagedata) => move_pagedata(e, pagedata, index)"
+                @clicked_page="clicked_page" :selected="selected_index == index" @delete_page="delete_page" />
         </ul>
-        <v-dialog v-model="is_show_oversize_localstorage_dialog">
-            <v-card class="pa-5">
-                <v-card-title>
-                    自動保存容量超過
-                </v-card-title>
-                <v-card-text>
-                    データが大きすぎるため自動保存できません。
-                    自動保存機能を無効化します。
-                    （書き出しはできます）
-                </v-card-text>
-
-                <v-row>
-                    <v-col cols="auto">
-                        <v-btn @click="is_show_oversize_localstorage_dialog = false">閉じる</v-btn>
-                    </v-col>
-                </v-row>
-            </v-card>
-        </v-dialog>
     </div>
 </template>
 <script lang="ts">
 import PageData from '@/page/PageData';
 import PageListItem from '@/page/PageListItem.vue';
+import Project, { PPMKProjectData } from '@/project/Project';
 import { deserialize } from '@/serializable/serializable';
 import { Options, Vue } from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
@@ -44,73 +27,53 @@ import { Prop, Watch } from 'vue-property-decorator';
 })
 export default class Page extends Vue {
     selected_index = 0
-    pagedatas: Array<PageData> = new Array<PageData>()
-    @Prop() auto_save_pagedatas_to_localstorage: boolean
+    project_data = new Array<PageData>()
 
-    is_show_oversize_localstorage_dialog = false
+    project = new Project()
+    @Prop() editor_mode: boolean
+    @Prop() project_name: string
 
-    @Watch('pagedatas')
-    save_pagedatas_to_localstorage() {
-        let pagedata = JSON.stringify(this.pagedatas)
-        if (this.auto_save_pagedatas_to_localstorage) {
-            try {
-                window.localStorage.setItem("ppmk_pagedatas", pagedata)
-            } catch (e) {
-                this.is_show_oversize_localstorage_dialog = true
-                this.$emit("update_auto_save_pagedatas_to_localstorage", false)
-                this.clear_pagedatas_at_localstorage()
-            }
-        }
-    }
-
-    @Watch('auto_save_pagedatas_to_localstorage')
-    clear_pagedatas_at_localstorage() {
-        if (!this.auto_save_pagedatas_to_localstorage) {
-            window.localStorage.setItem("ppmk_pagedatas", "")
-        }
+    mounted() {
+        this.project.project_id = ""
     }
 
     clicked_page(pagedata: PageData) {
-        for (let i = 0; i < this.pagedatas.length; i++) {
-            if (pagedata.pageid == this.pagedatas[i].pageid) {
+        if (!pagedata) {
+            this.selected_index = -1
+            this.$emit('clicked_page', null)
+            return
+        }
+        for (let i = 0; i < this.project_data.length; i++) {
+            if (pagedata.pageid == this.project_data[i].pageid) {
                 this.selected_index = i
                 break
             }
         }
-        this.$nextTick(() => {
-            this.$emit('clicked_page', pagedata)
-        })
+        this.$emit('clicked_page', pagedata)
     }
 
     delete_page(pagedata: PageData) {
         let deleteindex = -1
-        for (let i = 0; i < this.pagedatas.length; i++) {
-            if (pagedata.pageid == this.pagedatas[i].pageid) {
+        for (let i = 0; i < this.project_data.length; i++) {
+            if (pagedata.pageid == this.project_data[i].pageid) {
                 deleteindex = i
                 break
             }
         }
         if (deleteindex != -1) {
-            this.pagedatas.splice(deleteindex, 1)
-            this.$emit('delete_page', pagedata)
+            let project_data = new Array<PageData>()
+            this.project_data.forEach((page_data: PageData) => {
+                project_data.push(page_data)
+            });
+            project_data.splice(deleteindex, 1)
+            if (this.project.project_id == "") return
+            this.$emit("updated_pagedatas", project_data) //TODO rootpageで拾って
+            this.$emit("deleted_page")
         }
     }
 
-    created(): void {
-        if (this.auto_save_pagedatas_to_localstorage) {
-            try {
-                this.pagedatas = JSON.parse(window.localStorage.getItem("ppmk_pagedatas"), deserialize)
-                if (this.pagedatas && this.pagedatas.length > 0) {
-                    this.clicked_page(this.pagedatas[0])
-                } else {
-                    this.clicked_page(null)
-                }
-            } catch (e) {
-                this.add_page()
-            }
-        } else {
-            this.add_page()
-        }
+    updated_project() {
+        this.project_data = this.project.ppmk_project_data.project_data
     }
 
     generate_style(index: number): any {
@@ -123,49 +86,70 @@ export default class Page extends Vue {
     }
 
     add_page() {
+        let project_data = new Array<PageData>()
+        this.project_data.forEach((page_data: PageData) => {
+            project_data.push(page_data)
+        });
         let pagedata = new PageData()
-        this.pagedatas.push(pagedata)
-        this.clicked_page(pagedata)
+        project_data.push(pagedata)
+        if (this.project.project_id == "") return
+        this.$emit("updated_pagedatas", project_data) //TODO rootpageで拾って
+        this.$nextTick(() => {
+            this.clicked_page(pagedata)
+        })
     }
 
     copy_page(pagedata: any, index: number) {
-        this.pagedatas.splice(index + 1, 0, pagedata)
-        this.clicked_page(pagedata)
+        this.project.ppmk_project_data.project_data.splice(index + 1, 0, pagedata)
+        let project_data = new Array<PageData>()
+        this.project_data.forEach((page_data: PageData) => {
+            project_data.push(page_data)
+        });
+        if (this.project.project_id == "") return
+        this.$emit("updated_pagedatas", project_data) //TODO rootpageで拾って
+        this.$nextTick(() => {
+            this.clicked_page(pagedata)
+        })
     }
 
     move_pagedata(e: DragEvent, pagedata: PageData, index: number) {
+        if (!e.dataTransfer.getData("ppmk/move_page_id")) {
+            return
+        }
         if (e.dataTransfer.getData("ppmk/move_page_id") == pagedata.pageid) {
             return
         }
 
-        let pagedatas = new Array<PageData>()
-        this.pagedatas.forEach((child_tagdata) => { pagedatas.push(child_tagdata.clone()) })
+        let project_data = new Array<PageData>()
+        this.project.ppmk_project_data.project_data.forEach((child_tagdata) => { project_data.push(child_tagdata.clone()) })
 
         let move_pagedata: PageData
-        for (let i = 0; i < pagedatas.length; i++) {
-            if (e.dataTransfer.getData("ppmk/move_page_id") == pagedatas[i].pageid) {
-                move_pagedata = pagedatas[i]
-                pagedatas.splice(i, 1)
+        for (let i = 0; i < project_data.length; i++) {
+            if (e.dataTransfer.getData("ppmk/move_page_id") == project_data[i].pageid) {
+                move_pagedata = project_data[i]
+                project_data.splice(i, 1)
                 break
             }
         }
 
-        pagedatas.splice(index, 0, move_pagedata)
-        this.pagedatas = pagedatas
-        this.selected_index = index
-        this.clicked_page(this.pagedatas[index])
+        project_data.splice(index, 0, move_pagedata)
+        if (this.project.project_id == "") return
+        this.$emit("updated_pagedatas", project_data) //TODO rootpageで拾って
+        this.$nextTick(() => {
+            this.project.ppmk_project_data.project_data = project_data
+            this.selected_index = index
+            this.clicked_page(this.project.ppmk_project_data.project_data[index])
+        })
+    }
+
+    get style(): any {
+        if (this.editor_mode) {
+            return {}
+        } else {
+            return {
+                'height': window.innerHeight - 104 + "px !important"
+            }
+        }
     }
 }
 </script>
-<style>
-.mainside h2{
-    font-family: "Roboto", sans-serif;
-    font-size: 30px;
-    color: steelblue;  
-}
-.pageitem{
-}
-.pageitem:hover{
-}
-
-</style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="mainside" dropzone="true" @drop.stop="drop" @dragover.prevent="dragover">
+    <div dropzone="true" @drop.stop="drop" @dragover.prevent="dragover">
         <h2>構造</h2>
         <div class="struct_view">
             <ul class="dropzone_wrap">
@@ -177,7 +177,7 @@ export default class HTMLTagPropertyView extends Vue {
             } else if (e.ctrlKey) {
                 html_tagdatas.push(tagdata)
             } else {
-                html_tagdatas.push(tagdata)
+                html_tagdatas.unshift(tagdata)
             }
 
             switch (tagname) {
@@ -239,9 +239,10 @@ export default class HTMLTagPropertyView extends Vue {
 
     dragover(e: DragEvent) {
         if (e.dataTransfer.getData("ppmk/struct_li_id")) e.dataTransfer.dropEffect = "move"
-        // if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
-        if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
-        if (e.dataTransfer.files.length != 0) e.dataTransfer.dropEffect = "copy"
+        else if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
+        else if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
+        else if (e.dataTransfer.files.length != 0) e.dataTransfer.dropEffect = "copy"
+        // else e.dataTransfer.dropEffect = "none"
     }
 
     onclick_tag(tagdata: HTMLTagDataBase) {
@@ -387,11 +388,5 @@ li {
 
 .struct_view {
     width: fit-content;
-}
-
-.mainside h2{
-    font-family: "Roboto", sans-serif;
-    font-size: 30px;
-    color: steelblue;  
 }
 </style>

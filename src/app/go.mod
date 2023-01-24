@@ -5,7 +5,9 @@ go 1.19
 require (
 	github.com/asticode/go-astikit v0.37.0
 	github.com/asticode/go-astilectron v0.29.0
+	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.6.1
 )
 
