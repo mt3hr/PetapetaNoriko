@@ -23,15 +23,15 @@
                     <v-row>
                         <v-col cols="auto">
                             <ProjectPropertyView class="component project_view" ref="project_view"
-                                @updated_project_info="update_project_info" />
+                                @new_project="show_new_project_dialog" @updated_project_info="update_project_info" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
                         <v-col cols="auto">
                             <PageListView class="component page_list_view" ref="page_list_view"
-                                @updated_pagedatas="update_pagedatas" :editor_mode="editor_mode"
-                                @clicked_page="show_page" />
+                                @deleted_page="deleted_page" @updated_pagedatas="update_pagedatas"
+                                :editor_mode="editor_mode" @clicked_page="show_page" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -128,7 +128,7 @@
                     <input type="file" @change="read_ppmk_project" />
                 </v-col>
             </v-row>
-            <v-row>
+            <v-row v-if="enable_system && session_id">
                 <v-col>
                     <ProjectSummariesList v-if="session_id" @loaded_project="loaded_project" />
                 </v-col>
@@ -206,6 +206,23 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-spacer />
                 <v-col cols="auto">
                     <v-btn @click="() => { apply_project_data_memo(); save_ppmk_project_to_server() }">保存</v-btn>
+                </v-col>
+            </v-row>
+        </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="is_show_new_project_dialog">
+        <v-card class="pa-5">
+            <v-card-title>プロジェクト新規作成</v-card-title>
+            <p>プロジェクトを新規作成します</p>
+            <p>注: 保存されていない作業は破棄されます</p>
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_new_project_dialog = false">閉じる</v-btn>
+                </v-col>
+                <v-spacer />
+                <v-col cols="auto">
+                    <v-btn @click="new_project">新規作成</v-btn>
                 </v-col>
             </v-row>
         </v-card>
@@ -374,6 +391,7 @@ export default class PutPullMockRootPage extends Vue {
     is_show_options_dialog = false
     is_show_oversize_localstorage_dialog = false
     is_show_save_to_server_dialog = false
+    is_show_new_project_dialog = false
     css = ""
     page_html = ""
     page_webfont = ""
@@ -463,6 +481,18 @@ export default class PutPullMockRootPage extends Vue {
         this.session_id = settings.session_id
         this.first_launch = settings.first_launch
         return settings
+    }
+
+    show_new_project_dialog() {
+        this.is_show_new_project_dialog = true
+    }
+
+    new_project() {
+        this.is_show_new_project_dialog = false
+        let project = new Project()
+        project.project_id = generateUUID()
+        this.update_project(project)
+        this.page_list_view.add_page()
     }
 
     mounted(): void {
@@ -1069,7 +1099,7 @@ export default class PutPullMockRootPage extends Vue {
         this.copied_tagdata = tagdata
     }
 
-    delete_page() {
+    deleted_page() {
         this.$nextTick(() => {
             this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
         })
@@ -1159,7 +1189,6 @@ export default class PutPullMockRootPage extends Vue {
             try {
                 let project = JSON.stringify(this.project)
                 window.localStorage.setItem("ppmk_project", project)
-                console.log(JSON.parse(project, deserialize))
             } catch (e) {
                 this.is_show_oversize_localstorage_dialog = true
                 this.auto_save_project_data_to_localstorage = false

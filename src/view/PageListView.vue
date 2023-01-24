@@ -68,6 +68,7 @@ export default class Page extends Vue {
             project_data.splice(deleteindex, 1)
             if (this.project.project_id == "") return
             this.$emit("updated_pagedatas", project_data) //TODO rootpageで拾って
+            this.$emit("deleted_page")
         }
     }
 

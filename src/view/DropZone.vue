@@ -9,7 +9,7 @@
             @dragover.prevent="on_dragover" :style="dropzone_style" @contextmenu="show_contextmenu">
 
             <body id="dropzone_body" class="page" :style="dropzone_style">
-                <div v-if="!html_tagdatas"
+                <div v-if="html_tagdatas == null"
                     :style="{ 'text-align': 'center', 'vertical-align': 'middle', 'height': '-webkit-fill-available' }">
                     <v-btn @click="add_page"
                         :style="{ 'margin': 'auto', 'position': 'rerative', 'top': '45%' }">ページを追加</v-btn>
@@ -146,7 +146,7 @@ import { Vue, Options } from 'vue-class-component'
 import HTMLTagDataBase, { PositionStyle } from '@/html_tagdata/HTMLTagDataBase'
 import HTMLTagView from '@/view/HTMLTagView.vue'
 import IMGTagData from '@/html_tagdata/IMGTagData'
-import { Prop } from 'vue-property-decorator'
+import { Prop, Watch } from 'vue-property-decorator'
 import { deserialize } from '@/serializable/serializable'
 import { generate_tagdata_by_tagname } from './html_tag_view/generate_tagdata_by_tagname'
 import generateUUID from '@/uuid'
@@ -164,7 +164,7 @@ import LITagData from '@/html_tagdata/LITagData'
 })
 
 export default class DropZone extends Vue {
-    html_tagdatas: Array<HTMLTagDataBase>
+    html_tagdatas = new Array<HTMLTagDataBase>()
     style_user_edited = ""
     @Prop() show_border: boolean
     @Prop() dropzone_style: any
@@ -525,6 +525,7 @@ export default class DropZone extends Vue {
         this.delete_tagdata(tagdata)
     }
     mounted(): void {
+        this.html_tagdatas = null
         this.$emit('updated_htmltagdatas', this.html_tagdatas, null, true)
     }
 }

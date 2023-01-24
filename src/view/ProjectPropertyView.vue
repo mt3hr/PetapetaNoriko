@@ -67,7 +67,7 @@ export default class ProjectPropertyView extends Vue {
     }
 
     new_project() {
-        this.$emit("new_project")//TODO
+        this.$emit("new_project")
     }
 
     share_view(do_share: boolean) {
