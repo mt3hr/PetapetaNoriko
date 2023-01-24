@@ -245,18 +245,6 @@ export default class API {
             settings = JSON.parse(document.cookie, deserialize)
         } catch (e) {
             let settings = new Settings()
-            settings.export_base64_image = false
-            settings.export_head = true
-            settings.export_position_css = false
-            settings.show_border = false
-            settings.transparent_page_css_view = false
-            settings.auto_save_project_data_to_localstorage = true
-            settings.auto_scroll_tag_struct_view = true
-            settings.tag_list_view_mode = TagListViewMode.Text
-            settings.use_undo = true
-            settings.auto_focus_tag_property_view = true
-            // settings.session_id = this.session_id
-
             this.save_settings_to_cookie(settings)
             settings = JSON.parse(document.cookie, deserialize)
         }
