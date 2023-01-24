@@ -681,7 +681,7 @@ export default class PutPullMockRootPage extends Vue {
         let reader = new FileReader()
         reader.addEventListener('load', (e) => {
             let project: Project = JSON.parse(e.target.result.toString(), deserialize)
-            this.project = project
+            this.update_project(project)
             this.$nextTick(() => {
                 this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
             })
@@ -1100,7 +1100,7 @@ export default class PutPullMockRootPage extends Vue {
         project.ppmk_project_data = project_data
         project.ppmk_project_share = project_share
 
-        this.project = project
+        this.update_project(project)
         this.$nextTick(() => {
             this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
         })
