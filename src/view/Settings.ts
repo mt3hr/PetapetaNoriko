@@ -7,7 +7,7 @@ export default class Settings {
     export_base64_image = false
     export_head = true
     export_position_css = false
-    show_border = true
+    show_border = false
     transparent_page_css_view = false
     auto_save_project_data_to_localstorage = true
     auto_scroll_tag_struct_view = false
