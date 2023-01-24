@@ -270,6 +270,8 @@ export default class DropZone extends Vue {
             e.dataTransfer.items.length != 0
         ) {
             e.dataTransfer.dropEffect = "move"
+        } else {
+            e.dataTransfer.dropEffect = "none"
         }
     }
 

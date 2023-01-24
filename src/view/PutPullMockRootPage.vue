@@ -557,7 +557,7 @@ export default class PutPullMockRootPage extends Vue {
                         this.page_list_view.selected_index = this.histories.page_index[this.histories.index]
                         this.updated_htmltagdatas(project.ppmk_project_data.project_data[0].html_tagdatas, null, false)
                         this.$nextTick(() => {
-                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
                         })
                     }
                 }
@@ -575,7 +575,7 @@ export default class PutPullMockRootPage extends Vue {
                         this.page_list_view.selected_index = this.histories.page_index[this.histories.index]
                         this.updated_htmltagdatas(project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas, null, false)
                         this.$nextTick(() => {
-                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
                         })
                     }
                 }

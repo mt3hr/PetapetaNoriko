@@ -105,7 +105,6 @@ export default class Page extends Vue {
         this.project_data.forEach((page_data: PageData) => {
             project_data.push(page_data)
         });
-        project_data.splice(index + 1, 0, pagedata)
         if (this.project.project_id == "") return
         this.$emit("updated_pagedatas", project_data) //TODO rootpageで拾って
         this.$nextTick(() => {

@@ -239,9 +239,10 @@ export default class HTMLTagPropertyView extends Vue {
 
     dragover(e: DragEvent) {
         if (e.dataTransfer.getData("ppmk/struct_li_id")) e.dataTransfer.dropEffect = "move"
-        // if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
-        if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
-        if (e.dataTransfer.files.length != 0) e.dataTransfer.dropEffect = "copy"
+        else if (e.dataTransfer.getData("ppmk/move_tag_id")) e.dataTransfer.dropEffect = "move"
+        else if (e.dataTransfer.getData("ppmk/htmltag")) e.dataTransfer.dropEffect = "move"
+        else if (e.dataTransfer.files.length != 0) e.dataTransfer.dropEffect = "copy"
+        // else e.dataTransfer.dropEffect = "none"
     }
 
     onclick_tag(tagdata: HTMLTagDataBase) {
