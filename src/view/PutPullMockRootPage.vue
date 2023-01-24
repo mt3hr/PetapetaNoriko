@@ -1176,10 +1176,8 @@ export default class PutPullMockRootPage extends Vue {
         let api = new API()
         let project: Project = this.project
         project.ppmk_project_data.project_data_id = generateUUID()
-        api.save_project_data(api.session_id, project)
-            .then((res) => {
-                //TODO
-            })
+        let update_project_response = await api.update_project(api.session_id, project)
+        let save_project_data_response = await api.save_project_data(api.session_id, project)
     }
 
     @Watch('project')

@@ -1674,7 +1674,7 @@ func (p *ppmkDBImpl) DeleteProject(ctx context.Context, projectID string) error 
 
 	}
 
-	statement := `DELETE FROM Project WHERE ProjectID='` + projectID + `';`
+	statement := `DELETE FROM PPMKProject WHERE ProjectID='` + projectID + `';`
 	_, err = p.db.ExecContext(ctx, statement)
 	if err != nil {
 		return err
@@ -1683,7 +1683,7 @@ func (p *ppmkDBImpl) DeleteProject(ctx context.Context, projectID string) error 
 }
 
 func (p *ppmkDBImpl) UpdateProject(ctx context.Context, project *PPMKProject) error {
-	statement := `UPDATE Project SET  OwnerUserID='` +
+	statement := `UPDATE PPMKProject SET  OwnerUserID='` +
 		escapeSQLite(project.OwnerUserID) + `', ProjectName='` +
 		escapeSQLite(project.ProjectName) + `', IsSharedView='` +
 		escapeSQLite(strconv.FormatBool(project.IsSharedView)) + `' WHERE ProjectID='` +
