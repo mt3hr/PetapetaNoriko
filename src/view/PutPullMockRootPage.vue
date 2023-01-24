@@ -354,7 +354,7 @@ import { Histories } from './History'
 import Settings from './Settings'
 import TagListViewMode from './TagListViewMode'
 import API, { ServerStatus } from './share_view_system/api'
-import Project, { PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
+import Project, { clone_project, PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
 import ProjectSummariesList from '@/view/share_view_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
 
@@ -500,7 +500,7 @@ export default class PutPullMockRootPage extends Vue {
         try {
             project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
         this.$nextTick(() => {
             this.page_list_view = this.$refs["page_list_view"]
@@ -549,29 +549,33 @@ export default class PutPullMockRootPage extends Vue {
                         this.histories.index = 1
                     }
                     this.histories.index--
-                    let pagedatas: Array<PageData> = this.histories.histories[this.histories.index]
-                    if (pagedatas) {
-                        this.project.ppmk_project_data.project_data = pagedatas
+                    let project: Project = this.histories.histories[this.histories.index]
+                    if (project) {
+                        this.project = project
+                        this.page_list_view.project = project
+                        this.project_view.project = project
                         this.page_list_view.selected_index = this.histories.page_index[this.histories.index]
-                        this.updated_htmltagdatas(pagedatas[0].html_tagdatas, null, false)
+                        this.updated_htmltagdatas(project.ppmk_project_data.project_data[0].html_tagdatas, null, false)
                         this.$nextTick(() => {
-                            this.page_list_view.clicked_page(pagedatas[0].html_tagdatas)
+                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
                         })
                     }
                 }
                 if (e.ctrlKey && e.code == "KeyY") {
                     if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
-                    let pagedatas: Array<PageData>
+                    let project: Project
                     if (this.histories.histories.length > this.histories.index + 1) {
                         this.histories.index++
-                        pagedatas = this.histories.histories[this.histories.index]
+                        project = this.histories.histories[this.histories.index]
                     }
-                    if (pagedatas) {
-                        this.project.ppmk_project_data.project_data = pagedatas
+                    if (project) {
+                        this.project = project
+                        this.page_list_view.project = project
+                        this.project_view.project = project
                         this.page_list_view.selected_index = this.histories.page_index[this.histories.index]
-                        this.updated_htmltagdatas(pagedatas[this.page_list_view.selected_index].html_tagdatas, null, false)
+                        this.updated_htmltagdatas(project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas, null, false)
                         this.$nextTick(() => {
-                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index])
+                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
                         })
                     }
                 }
@@ -1081,13 +1085,7 @@ export default class PutPullMockRootPage extends Vue {
         }
 
         this.histories.histories.length = this.histories.index
-        let page_datas = Array<PageData>()
-        if (this.project.ppmk_project_data.project_data) {
-            this.project.ppmk_project_data.project_data.forEach(pagedata => {
-                page_datas.push(pagedata.clone())
-            });
-        }
-        this.histories.histories[this.histories.index] = page_datas
+        this.histories.histories[this.histories.index] = clone_project(this.project)
         this.histories.page_index.length = this.histories.index + 1
         if (this.page_list_view) {
             this.histories.page_index[this.histories.index] = this.page_list_view.selected_index

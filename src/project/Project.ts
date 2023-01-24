@@ -1,4 +1,4 @@
-import PageData from "@/page/PageData";
+import PageData, { clone_pagedata } from "@/page/PageData";
 import { serializable } from "@/serializable/serializable";
 import generateUUID from "@/uuid";
 
@@ -84,4 +84,47 @@ export class PPMKProjectShare {
         project_share.writable = this.writable
         return project_share
     }
+}
+
+export function clone_project(project: Project): Project {
+    const clone = new Project()
+    clone.ppmk_project = clone_ppmk_project(project.ppmk_project)
+    clone.ppmk_project_data = clone_ppmk_project_data(project.ppmk_project_data)
+    clone.ppmk_project_share = clone_ppmk_project_share(project.ppmk_project_share)
+    return clone
+}
+
+export function clone_ppmk_project(ppmk_project: PPMKProject): PPMKProject {
+    const clone = new PPMKProject()
+    clone.project_id = ppmk_project.project_id
+    clone.owner_user_id = ppmk_project.owner_user_id
+    clone.project_name = ppmk_project.project_name
+    clone.is_shared_view = ppmk_project.is_shared_view
+    return clone
+}
+
+export function clone_ppmk_project_data(ppmk_project_data: PPMKProjectData): PPMKProjectData {
+    const clone = new PPMKProjectData()
+    clone.project_data_id = generateUUID()
+    clone.project_id = ppmk_project_data.project_id
+    clone.saved_time = ppmk_project_data.saved_time
+    if (ppmk_project_data.project_data) {
+        ppmk_project_data.project_data.forEach((pagedata: PageData) => {
+            clone.project_data.push(clone_pagedata(pagedata))
+        });
+    }
+
+    clone.author = ppmk_project_data.author
+    clone.memo = ppmk_project_data.memo
+    return clone
+}
+
+export function clone_ppmk_project_share(ppmk_project_share: PPMKProjectShare): PPMKProjectShare {
+    const clone = new PPMKProjectShare()
+    clone.project_id = ppmk_project_share.project_id
+    clone.user_id = ppmk_project_share.user_id
+    clone.user_name = ppmk_project_share.user_name
+    clone.user_email = ppmk_project_share.user_email
+    clone.writable = ppmk_project_share.writable
+    return clone
 }

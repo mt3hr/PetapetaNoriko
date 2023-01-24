@@ -1,7 +1,8 @@
 import PageData from "@/page/PageData"
+import Project from "@/project/Project"
 
 export class Histories {
-    histories: Array<Array<PageData>> = new Array<Array<PageData>>()
+    histories = new Array<Project>()
     index = 0
     page_index = new Array<number>()
 }
