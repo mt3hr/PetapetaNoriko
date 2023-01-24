@@ -65,11 +65,10 @@ export default class PageListItem extends Vue {
     }
 
     dragover(e: DragEvent) {
-        if (e.dataTransfer.getData("ppmk/move_page_id")) {
-            e.dataTransfer.dropEffect = "move"
-        } else {
-            e.dataTransfer.dropEffect = 'none'
-        }
+        console.log(e.dataTransfer.getData("ppmk/move_page_id"))
+        if (e.dataTransfer.getData("ppmk/move_page_id") != "") e.dataTransfer.dropEffect = "move"
+        // else e.dataTransfer.dropEffect = 'none'
+
     }
 
     on_drag_start(e: DragEvent) {

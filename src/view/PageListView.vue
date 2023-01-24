@@ -113,6 +113,9 @@ export default class Page extends Vue {
     }
 
     move_pagedata(e: DragEvent, pagedata: PageData, index: number) {
+        if (!e.dataTransfer.getData("ppmk/move_page_id")) {
+            return
+        }
         if (e.dataTransfer.getData("ppmk/move_page_id") == pagedata.pageid) {
             return
         }
