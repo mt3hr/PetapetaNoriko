@@ -22,15 +22,16 @@
                 <v-container>
                     <v-row>
                         <v-col cols="auto">
-                            <ProjectPropertyView class="component project_view" ref="project_view" />
+                            <ProjectPropertyView class="component project_view" ref="project_view"
+                                @updated_project_info="update_project_info" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
                         <v-col cols="auto">
-                            <PageListView class="component page_list_view" ref="page_list_view" :project="project"
-                                @updated_project_data="update_project_data" :editor_mode="editor_mode"
-                                @delete_page="delete_page" @clicked_page="clicked_page" />
+                            <PageListView class="component page_list_view" ref="page_list_view"
+                                @updated_pagedatas="update_pagedatas" :editor_mode="editor_mode"
+                                @clicked_page="show_page" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -65,7 +66,7 @@
                     <v-row>
                         <v-col cols="auto">
                             <!--プロパティビュー-->
-                            <HTMLTagPropertyView class="component property_view" ref="property_view"
+                            <HTMLTagPropertyView class="component property_view" ref="tag_property_view"
                                 :auto_focus_tag_property_view="auto_focus_tag_property_view"
                                 @updated_html_tag_property="updated_html_tag_property" />
                         </v-col>
@@ -75,7 +76,7 @@
                             <!--構造ビュー-->
                             <HTMLTagStructView @onclick_tag="onclick_tag" class="component struct_view"
                                 @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
-                                :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" ref="struct_view"
+                                :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" ref="tag_struct_view"
                                 :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view"
                                 @delete_tagdata="delete_tagdata" @updated_html_tagdatas="updated_htmltagdatas" />
                         </v-col>
@@ -122,10 +123,14 @@
     </v-dialog>
     <v-dialog v-model="is_show_readin_dialog">
         <v-card class="pa-5">
-            <input type="file" @change="read_ppmk_project" />
-            <v-row v-if="enable_system && api.session_id">
+            <v-row>
                 <v-col>
-                    <ProjectSummariesList v-if="is_show_readin_dialog" @loaded_project="loaded_project" />
+                    <input type="file" @change="read_ppmk_project" />
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col>
+                    <ProjectSummariesList v-if="session_id" @loaded_project="loaded_project" />
                 </v-col>
             </v-row>
             <v-row>
@@ -204,7 +209,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
             <v-row>
                 <v-col cols="auto">
-                    <v-checkbox class="checkbox" v-model="auto_save_pagedatas_to_localstorage" :label="'自動保存'" />
+                    <v-checkbox class="checkbox" v-model="auto_save_project_data_to_localstorage" :label="'自動保存'" />
                 </v-col>
             </v-row>
             <v-row>
@@ -331,6 +336,13 @@ import ProjectPropertyView from './ProjectPropertyView.vue'
 })
 
 export default class PutPullMockRootPage extends Vue {
+    page_list_view: any
+    dropzone: any
+    project_view: any
+    page_property_view: any
+    tag_property_view: any
+    tag_struct_view: any
+
     TagListViewMode = TagListViewMode
     api = new API()
     width_dropzone = window.innerWidth - 300 - 300 - 19
@@ -341,6 +353,7 @@ export default class PutPullMockRootPage extends Vue {
     is_show_readin_dialog = false
     is_show_webfont_dialog = false
     is_show_options_dialog = false
+    is_show_oversize_localstorage_dialog = false
     css = ""
     page_html = ""
     page_webfont = ""
@@ -352,7 +365,7 @@ export default class PutPullMockRootPage extends Vue {
     show_border = false
     transparent_page_css_view = false
 
-    auto_save_pagedatas_to_localstorage = true
+    auto_save_project_data_to_localstorage = true
     auto_scroll_tag_struct_view = true
 
     clicked_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
@@ -374,12 +387,16 @@ export default class PutPullMockRootPage extends Vue {
 
     enable_system = false
 
+    first_launch = true
+
+    inited = false
+
     @Watch('export_base64_image')
     @Watch('export_head')
     @Watch('export_position_css')
     @Watch('show_border')
     @Watch('transparent_page_css_view')
-    @Watch('auto_save_pagedatas_to_localstorage')
+    @Watch('auto_save_project_data_to_localstorage')
     @Watch('auto_scroll_tag_struct_view')
     @Watch('tag_list_view_mode')
     @Watch('use_undo')
@@ -390,30 +407,19 @@ export default class PutPullMockRootPage extends Vue {
         settings.export_position_css = this.export_position_css
         settings.show_border = this.show_border
         settings.transparent_page_css_view = this.transparent_page_css_view
-        settings.auto_save_pagedatas_to_localstorage = this.auto_save_pagedatas_to_localstorage
+        settings.auto_save_project_data_to_localstorage = this.auto_save_project_data_to_localstorage
         settings.auto_scroll_tag_struct_view = this.auto_scroll_tag_struct_view
         settings.tag_list_view_mode = this.tag_list_view_mode
         settings.use_undo = this.use_undo
         settings.auto_focus_tag_property_view = this.auto_focus_tag_property_view
-        // settings.session_id = this.session_id
+        settings.first_launch = this.first_launch
         document.cookie = JSON.stringify(settings)
     }
 
-    load_settings_from_cookie() {
+    load_settings_from_cookie(): Settings {
         let settings: Settings
         if (!this.editor_mode) {
             settings = new Settings()
-            settings.export_base64_image = false
-            settings.export_head = false
-            settings.export_position_css = false
-            settings.show_border = false
-            settings.transparent_page_css_view = false
-            settings.auto_save_pagedatas_to_localstorage = false
-            settings.auto_scroll_tag_struct_view = false
-            settings.tag_list_view_mode = TagListViewMode.Text
-            settings.use_undo = false
-            settings.auto_focus_tag_property_view = false
-            // settings.session_id = undefined
             return settings
         }
         try {
@@ -421,222 +427,243 @@ export default class PutPullMockRootPage extends Vue {
         } catch (e) {
             this.save_settings_to_cookie()
             settings = JSON.parse(document.cookie, deserialize)
-
-            let sample_project: Project = JSON.parse(JSON.stringify(sample_project_json), deserialize)
-            let about_ppmk_pagedata: PageData
-            for (let i = 0; i < sample_project.ppmk_project_data.project_data.length; i++) {
-                if (sample_project.ppmk_project_data.project_data[i].pagename == "About Put Pull Mock") {
-                    about_ppmk_pagedata = sample_project.ppmk_project_data.project_data[i].clone()
-                    break
-                }
-            }
-            this.project.ppmk_project_data.project_data.push(about_ppmk_pagedata)
-            this.$nextTick(() => {
-                let page_list_view: any = this.$refs['page_list_view']
-                page_list_view.clicked_page(about_ppmk_pagedata)
-            })
         }
+
         this.export_base64_image = settings.export_base64_image
         this.export_head = settings.export_head
         this.export_position_css = settings.export_position_css
         this.show_border = settings.show_border
         this.transparent_page_css_view = settings.transparent_page_css_view
-        this.auto_save_pagedatas_to_localstorage = settings.auto_save_pagedatas_to_localstorage
+        this.auto_save_project_data_to_localstorage = settings.auto_save_project_data_to_localstorage
         this.auto_scroll_tag_struct_view = settings.auto_scroll_tag_struct_view
         this.tag_list_view_mode = settings.tag_list_view_mode
         this.use_undo = settings.use_undo
         this.auto_focus_tag_property_view = settings.auto_focus_tag_property_view
         this.session_id = settings.session_id
+        this.first_launch = settings.first_launch
+        return settings
     }
 
-    created(): void {
-        new API().status().then((server_status: ServerStatus) => {
-            this.enable_system = server_status.share_view_system
-        }).catch((e) => {
-            this.enable_system = false
-        })
-
-        this.load_settings_from_cookie()
-
-        window.onkeydown = (e: KeyboardEvent) => {
-            if (e.code == "KeyS" && e.ctrlKey) {
-                e.preventDefault()
-                e.stopPropagation()
-                this.save_project_to_localstorage()
-                this.save_ppmk_project()
-            }
-            if (e.code == "KeyP" && e.ctrlKey) {
-                e.preventDefault()
-                e.stopPropagation()
-                this.save_project_to_localstorage()
-                this.print_this_page()
-            }
-            if (e.code == "Escape") {
-                this.clicked_tagdata = null
-            }
+    mounted(): void {
+        let project: Project
+        try {
+            project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
+        } catch (e) {
+            console.log(e)
         }
-
-        window.addEventListener('keyup', (e: KeyboardEvent) => {
-            let page_list_view: any = this.$refs['page_list_view']
-            if (e.ctrlKey && e.code == "KeyZ") {
-                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
-                if (this.histories.index > 0) {
-                    if (this.histories.index >= this.histories.histories.length) {
-                        this.histories.index = this.histories.histories.length - 1
-                    }
-                } else {
-                    this.histories.index = 1
-                }
-                this.histories.index--
-                let pagedatas: Array<PageData> = this.histories.histories[this.histories.index]
-                if (pagedatas) {
-                    this.project.ppmk_project_data.project_data = pagedatas
-                    page_list_view.selected_index = this.histories.page_index[this.histories.index]
-                    this.$nextTick(() => {
-                        this.updated_htmltagdatas(pagedatas[0].html_tagdatas, null, false)
-                        let page_list_view: any = this.$refs['page_list_view']
-                        page_list_view.clicked_page(pagedatas[0].html_tagdatas)
-                    })
-                }
-            }
-            if (e.ctrlKey && e.code == "KeyY") {
-                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
-                let pagedatas: Array<PageData>
-                if (this.histories.histories.length > this.histories.index + 1) {
-                    this.histories.index++
-                    pagedatas = this.histories.histories[this.histories.index]
-                }
-                if (pagedatas) {
-                    this.project.ppmk_project_data.project_data = pagedatas
-                    page_list_view.selected_index = this.histories.page_index[this.histories.index]
-                    this.updated_htmltagdatas(pagedatas[page_list_view.selected_index].html_tagdatas, null, false)
-                    page_list_view.clicked_page(this.project.ppmk_project_data.project_data[page_list_view.selected_index])
-                }
-            }
-        })
-
-        window.addEventListener('keydown', (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.code == "KeyC") {
-                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
-                this.copy_tag(this.clicked_tagdata)
-            }
-            if (e.ctrlKey && e.code == "KeyV" && this.copied_tagdata.tagname != "tagbase") {
-                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
-                if (!this.clicked_tagdata) {
-                    let dropzone: any = this.$refs["dropzone"]
-                    dropzone.paste_tag()
-                } else {
-                    const copied_tagdata = this.copied_tagdata.clone()
-                    copied_tagdata.tagid = "id_" + generateUUID()
-                    copied_tagdata.position_style = PositionStyle.None
-                    copied_tagdata.position_x = undefined
-                    copied_tagdata.position_y = undefined
-                    let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
-                        // 後で代入する
-                    }
-                    walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
-                        for (let i = 0; i < tagdatas.length; i++) {
-                            tagdatas[i].tagid = "id_" + generateUUID()
-                            walk_tagdatas(tagdatas[i].child_tagdatas)
-                        }
-                    }
-                    walk_tagdatas(copied_tagdata.child_tagdatas)
-
-                    let dropzone: any = this.$refs["dropzone"]
-
-                    const html_tagdatas = new Array<HTMLTagDataBase>()
-                    dropzone.html_tagdatas.forEach((child_tagdata) => { html_tagdatas.push(child_tagdata.clone()) })
-                    const clicked_tagdata = this.clicked_tagdata.clone()
-
-                    if (e.altKey || !clicked_tagdata.has_child_tag) {
-                        let parent_node: HTMLTagDataBase
-                        let index_at_parent_node = -1
-                        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>, parent: HTMLTagDataBase, parent_index: number): boolean { return false }
-                        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>, parent: HTMLTagDataBase, parent_index: number): boolean {
-                            for (let i = 0; i < tagdatas.length; i++) {
-                                if (clicked_tagdata.tagid == tagdatas[i].tagid) {
-                                    parent_node = parent
-                                    index_at_parent_node = i
-                                    return true
-                                }
-                                if (walk_tagdatas(tagdatas[i].child_tagdatas, tagdatas[i], i)) {
-                                    return true
-                                }
-                            }
-                            return false
-                        }
-                        walk_tagdatas(html_tagdatas, null, -1)
-
-                        if (e.shiftKey) {
-                            if (!parent_node) {
-                                dropzone.html_tagdatas.unshift(copied_tagdata)
-                            } else {
-                                parent_node.child_tagdatas.splice(index_at_parent_node, 0, copied_tagdata)
-                            }
-                        } else if (e.ctrlKey) {
-                            if (!parent_node) {
-                                dropzone.html_tagdatas.push(copied_tagdata)
-                            } else {
-                                parent_node.child_tagdatas.splice(index_at_parent_node + 1, 0, copied_tagdata)
-                            }
-                        } else {
-                            if (!parent_node) {
-                                dropzone.html_tagdatas.push(copied_tagdata)
-                            } else {
-                                parent_node.child_tagdatas.splice(index_at_parent_node + 1, 0, copied_tagdata)
-                            }
-                        }
-                        dropzone.updated_tagdata(parent_node)
-                    } else {
-                        if (e.shiftKey) {
-                            clicked_tagdata.child_tagdatas.unshift(copied_tagdata)
-                        } else if (e.ctrlKey) {
-                            clicked_tagdata.child_tagdatas.push(copied_tagdata)
-                        } else {
-                            clicked_tagdata.child_tagdatas.push(copied_tagdata)
-                        }
-                        dropzone.updated_tagdata(clicked_tagdata)
-                    }
-                    this.$nextTick(() => {
-                        this.$nextTick(() => {
-                            this.onclick_tag(clicked_tagdata)
-                        })
-                    })
-                }
-            }
-            if (e.ctrlKey && e.code == "KeyX" && this.clicked_tagdata) {
-                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
-                this.copy_tag(this.clicked_tagdata)
-                let dropzone: any = this.$refs["dropzone"]
-                dropzone.delete_tagdata(this.clicked_tagdata)
-                this.clicked_tagdata = null
-            }
-            if (e.code == "Delete" && this.clicked_tagdata) {
-                if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
-                let dropzone: any = this.$refs["dropzone"]
-                dropzone.delete_tagdata(this.clicked_tagdata)
-            }
-        })
         this.$nextTick(() => {
-            if (this.auto_save_pagedatas_to_localstorage) {
-                try {
-                    this.project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
-                    let page_list_view: any = this.$refs['page_list_view']
-                    if (this.project.ppmk_project_data.project_data && this.project.ppmk_project_data.project_data.length > 0) {
-                        this.clicked_page(this.project.ppmk_project_data.project_data[0])
-                        page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
-                    } else {
-                        this.clicked_page(null)
-                        page_list_view.clicked_page(null)
-                    }
-                } catch (e) {
-                    return
+            this.page_list_view = this.$refs["page_list_view"]
+            this.dropzone = this.$refs["dropzone"]
+            this.project_view = this.$refs["project_view"]
+            this.page_property_view = this.$refs["page_property_view"]
+            this.tag_property_view = this.$refs["tag_property_view"]
+            this.tag_struct_view = this.$refs["tag_struct_view"]
+
+            this.load_settings_from_cookie()
+
+            let api = new API()
+            api.status().then((server_status: ServerStatus) => {
+                this.enable_system = server_status.share_view_system
+            }).catch((e) => {
+                this.enable_system = false
+            })
+            this.session_id = api.session_id
+
+            window.onkeydown = (e: KeyboardEvent) => {
+                if (e.code == "KeyS" && e.ctrlKey) {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    this.save_project_to_localstorage()
+                    this.save_ppmk_project()
+                }
+                if (e.code == "KeyP" && e.ctrlKey) {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    this.save_project_to_localstorage()
+                    this.print_this_page()
+                }
+                if (e.code == "Escape") {
+                    this.clicked_tagdata = null
                 }
             }
-            this.$nextTick(() => {
-                this.append_history()
+
+            window.addEventListener('keyup', (e: KeyboardEvent) => {
+                if (e.ctrlKey && e.code == "KeyZ") {
+                    if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
+                    if (this.histories.index > 0) {
+                        if (this.histories.index >= this.histories.histories.length) {
+                            this.histories.index = this.histories.histories.length - 1
+                        }
+                    } else {
+                        this.histories.index = 1
+                    }
+                    this.histories.index--
+                    let pagedatas: Array<PageData> = this.histories.histories[this.histories.index]
+                    if (pagedatas) {
+                        this.project.ppmk_project_data.project_data = pagedatas
+                        this.page_list_view.selected_index = this.histories.page_index[this.histories.index]
+                        this.updated_htmltagdatas(pagedatas[0].html_tagdatas, null, false)
+                        this.$nextTick(() => {
+                            this.page_list_view.clicked_page(pagedatas[0].html_tagdatas)
+                        })
+                    }
+                }
+                if (e.ctrlKey && e.code == "KeyY") {
+                    if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
+                    let pagedatas: Array<PageData>
+                    if (this.histories.histories.length > this.histories.index + 1) {
+                        this.histories.index++
+                        pagedatas = this.histories.histories[this.histories.index]
+                    }
+                    if (pagedatas) {
+                        this.project.ppmk_project_data.project_data = pagedatas
+                        this.page_list_view.selected_index = this.histories.page_index[this.histories.index]
+                        this.updated_htmltagdatas(pagedatas[this.page_list_view.selected_index].html_tagdatas, null, false)
+                        this.$nextTick(() => {
+                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index])
+                        })
+                    }
+                }
             })
+
+            window.addEventListener('keydown', (e: KeyboardEvent) => {
+                if (e.ctrlKey && e.code == "KeyC") {
+                    if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
+                    this.copy_tag(this.clicked_tagdata)
+                }
+                if (e.ctrlKey && e.code == "KeyV" && this.copied_tagdata.tagname != "tagbase") {
+                    if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
+                    if (!this.clicked_tagdata) {
+                        this.dropzone.paste_tag()
+                    } else {
+                        const copied_tagdata = this.copied_tagdata.clone()
+                        copied_tagdata.tagid = "id_" + generateUUID()
+                        copied_tagdata.position_style = PositionStyle.None
+                        copied_tagdata.position_x = undefined
+                        copied_tagdata.position_y = undefined
+                        let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                            // 後で代入する
+                        }
+                        walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>) {
+                            for (let i = 0; i < tagdatas.length; i++) {
+                                tagdatas[i].tagid = "id_" + generateUUID()
+                                walk_tagdatas(tagdatas[i].child_tagdatas)
+                            }
+                        }
+                        walk_tagdatas(copied_tagdata.child_tagdatas)
+
+                        const html_tagdatas = new Array<HTMLTagDataBase>()
+                        this.dropzone.html_tagdatas.forEach((child_tagdata) => { html_tagdatas.push(child_tagdata.clone()) })
+                        const clicked_tagdata = this.clicked_tagdata.clone()
+
+                        if (e.altKey || !clicked_tagdata.has_child_tag) {
+                            let parent_node: HTMLTagDataBase
+                            let index_at_parent_node = -1
+                            let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>, parent: HTMLTagDataBase, parent_index: number): boolean { return false }
+                            walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>, parent: HTMLTagDataBase, parent_index: number): boolean {
+                                for (let i = 0; i < tagdatas.length; i++) {
+                                    if (clicked_tagdata.tagid == tagdatas[i].tagid) {
+                                        parent_node = parent
+                                        index_at_parent_node = i
+                                        return true
+                                    }
+                                    if (walk_tagdatas(tagdatas[i].child_tagdatas, tagdatas[i], i)) {
+                                        return true
+                                    }
+                                }
+                                return false
+                            }
+                            walk_tagdatas(html_tagdatas, null, -1)
+
+                            if (e.shiftKey) {
+                                if (!parent_node) {
+                                    this.dropzone.html_tagdatas.unshift(copied_tagdata)
+                                } else {
+                                    parent_node.child_tagdatas.splice(index_at_parent_node, 0, copied_tagdata)
+                                }
+                            } else if (e.ctrlKey) {
+                                if (!parent_node) {
+                                    this.dropzone.html_tagdatas.push(copied_tagdata)
+                                } else {
+                                    parent_node.child_tagdatas.splice(index_at_parent_node + 1, 0, copied_tagdata)
+                                }
+                            } else {
+                                if (!parent_node) {
+                                    this.dropzone.html_tagdatas.push(copied_tagdata)
+                                } else {
+                                    parent_node.child_tagdatas.splice(index_at_parent_node + 1, 0, copied_tagdata)
+                                }
+                            }
+                            this.dropzone.updated_tagdata(parent_node)
+                        } else {
+                            if (e.shiftKey) {
+                                clicked_tagdata.child_tagdatas.unshift(copied_tagdata)
+                            } else if (e.ctrlKey) {
+                                clicked_tagdata.child_tagdatas.push(copied_tagdata)
+                            } else {
+                                clicked_tagdata.child_tagdatas.push(copied_tagdata)
+                            }
+                            this.dropzone.updated_tagdata(clicked_tagdata)
+                        }
+                        this.onclick_tag(clicked_tagdata)
+                    }
+                }
+                if (e.ctrlKey && e.code == "KeyX" && this.clicked_tagdata) {
+                    if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
+                    this.copy_tag(this.clicked_tagdata)
+                    this.dropzone.delete_tagdata(this.clicked_tagdata)
+                    this.clicked_tagdata = null
+                }
+                if (e.code == "Delete" && this.clicked_tagdata) {
+                    if ((e as any).target.nodeName == "INPUT" || (e as any).target.nodeName == "TEXTAREA") return
+                    this.dropzone.delete_tagdata(this.clicked_tagdata)
+                }
+            })
+
         })
+
+        if (this.load_settings_from_cookie().first_launch) {
+            this.$nextTick(() => {
+                this.inited = true
+                this.first_launch = false
+                this.save_settings_to_cookie()
+                let sample_project: Project = JSON.parse(JSON.stringify(sample_project_json), deserialize)
+                let about_ppmk_pagedata: PageData
+                for (let i = 0; i < sample_project.ppmk_project_data.project_data.length; i++) {
+                    if (sample_project.ppmk_project_data.project_data[i].pagename == "About Put Pull Mock") {
+                        about_ppmk_pagedata = sample_project.ppmk_project_data.project_data[i]
+                        break
+                    }
+                }
+                let project = new Project()
+                project.ppmk_project.project_name = "About Put Pull Mock"
+                project.ppmk_project_data.project_data.push(about_ppmk_pagedata)
+                this.$nextTick(() => {
+                    this.update_project(project)
+                    this.page_list_view.clicked_page(about_ppmk_pagedata)
+                    this.save_project_to_localstorage()
+                    this.append_history()
+                })
+            })
+        } else {
+            this.$nextTick(() => {
+                this.inited = true
+                if (this.auto_save_project_data_to_localstorage) {
+                    if (project.ppmk_project_data && project.ppmk_project_data.project_data && project.ppmk_project_data.project_data.length > 0) {
+                        this.update_project(project)
+                        this.$nextTick(() => {
+                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+                            this.save_project_to_localstorage()
+                            this.append_history()
+                        })
+                    } else {
+                        this.$nextTick(() => {
+                            this.page_list_view.clicked_page(null)
+                        })
+                    }
+                }
+            })
+        }
     }
 
     get page_css_view_style(): any {
@@ -651,12 +678,13 @@ export default class PutPullMockRootPage extends Vue {
 
     read_ppmk_project(e) {
         let file: File = e.target.files[0]
-        let page_list_view: any = this.$refs['page_list_view']
         let reader = new FileReader()
         reader.addEventListener('load', (e) => {
             let project: Project = JSON.parse(e.target.result.toString(), deserialize)
             this.project = project
-            page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+            this.$nextTick(() => {
+                this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+            })
             this.append_history()
             this.is_show_readin_dialog = false
             this.save_project_to_localstorage()
@@ -681,8 +709,7 @@ export default class PutPullMockRootPage extends Vue {
 
     save_ppmk_html_css_this_page() {
         this.clicked_tagdata = new HTMLTagDataBase()
-        let page_list_view: any = this.$refs['page_list_view']
-        let page_index = page_list_view.selected_index
+        let page_index = this.page_list_view.selected_index
         let pagedata = this.project.ppmk_project_data.project_data[page_index]
         let export_options = new GenerateHTMLOptions()
         export_options.export_base64_image = this.export_base64_image
@@ -766,8 +793,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     update_page_html() {
-        let page_list_view: any = this.$refs["page_list_view"]
-        let page_index = page_list_view.selected_index
+        let page_index = this.page_list_view.selected_index
         let pagedata: PageData = this.project.ppmk_project_data.project_data[page_index]
         let export_options = new GenerateHTMLOptions()
         export_options.export_base64_image = this.export_base64_image
@@ -781,67 +807,49 @@ export default class PutPullMockRootPage extends Vue {
     updated_htmltagdatas(html_tagdatas: Array<HTMLTagDataBase>, tagdata: HTMLTagDataBase, history_mode: boolean) {
         if (!html_tagdatas) return
         if (history_mode) this.append_history()
-        let page_list_view: any = this.$refs["page_list_view"]
-        if (!page_list_view) {
-            this.$nextTick(() => {
-                this.updated_htmltagdatas(html_tagdatas, tagdata, history_mode)
-            })
-            return
-        }
 
-        this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas = html_tagdatas
+        this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas = html_tagdatas
 
-        page_list_view.clicked_page(this.project.ppmk_project_data.project_data[page_list_view.selected_index])
-        this.update_struct_view(this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
-        this.save_project_to_localstorage()
+        this.$nextTick(() => {
+            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index])
+        })
+        this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
         if (history_mode) this.append_history()
+        this.save_project_to_localstorage()
     }
 
-    clicked_page(pagedata: PageData) {
+    show_page(pagedata: PageData) {
         if (!pagedata) {
-            let dropzone: any = this.$refs["dropzone"]
-            let page_property_view: any = this.$refs["page_property_view"]
-
-            page_property_view.page_data = null
-            dropzone.html_tagdatas = null
-            dropzone.html_tagdatas_root = null
+            this.page_property_view.page_data = null
+            this.dropzone.html_tagdatas = null
             return
         }
-        let dropzone: any = this.$refs["dropzone"]
         let html_tagdatas = pagedata.html_tagdatas
-        dropzone.html_tagdatas = html_tagdatas
-        dropzone.html_tagdatas_root = html_tagdatas
+        this.dropzone.html_tagdatas = html_tagdatas
 
-        let page_property_view: any = this.$refs["page_property_view"]
-        page_property_view.page_data = pagedata
+        this.page_property_view.page_data = pagedata
         this.width_dropzone = pagedata.width
         this.height_dropzone = pagedata.height
         this.onclick_tag(null)
 
-        let page_list_view: any = this.$refs["page_list_view"]
-        this.update_struct_view(this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
-        this.css = this.project.ppmk_project_data.project_data[page_list_view.selected_index].css
-        this.page_webfont = this.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts.join("\n")
+        if (this.page_list_view.selected_index >= 0) {
+            this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
+            this.css = this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].css
+            this.page_webfont = this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].webfonts.join("\n")
+        }
         this.update_page_webfont()
         this.save_project_to_localstorage()
     }
 
     onclick_tag(tagdata: HTMLTagDataBase) {
         if (!this.editor_mode) return
-        let property_view: any = this.$refs["property_view"]
-        property_view.html_tagdata = new HTMLTagDataBase()
-        this.$nextTick(() => {
-            this.$nextTick(() => {
-                property_view.html_tagdata = tagdata
-                this.clicked_tagdata = tagdata
-            })
-        })
+        this.tag_property_view.html_tagdata = new HTMLTagDataBase()
+        this.tag_property_view.html_tagdata = tagdata
+        this.clicked_tagdata = tagdata
     }
 
     updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
-        let page_list_view: any = this.$refs["page_list_view"]
-        let property_view: any = this.$refs["property_view"]
-        let tagdatas: Array<HTMLTagDataBase> = this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas
+        let tagdatas: Array<HTMLTagDataBase> = this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas
 
         let updated_tagdata: HTMLTagDataBase
 
@@ -860,27 +868,26 @@ export default class PutPullMockRootPage extends Vue {
             return false
         }
         walk_tagdatas(tagdatas)
-        this.update_struct_view(this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
-        property_view.html_tagdata = updated_tagdata
-        page_list_view.save_pagedatas_to_localstorage()
+        this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
+        this.tag_property_view.html_tagdata = updated_tagdata
+        this.page_list_view.save_pagedatas_to_localstorage()
     }
     updated_page_property(page_data: PageData) {
-        let page_list_view: any = this.$refs["page_list_view"]
         for (let i = 0; i < this.project.ppmk_project_data.project_data.length; i++) {
             if (this.project.ppmk_project_data.project_data[i].pageid == page_data.pageid) {
                 this.project.ppmk_project_data.project_data.splice(i, 1, page_data)
                 break
             }
         }
-        page_list_view.clicked_page(this.project.ppmk_project_data.project_data[page_list_view.selected_index])
-        this.update_struct_view(this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas)
-        page_list_view.save_pagedatas_to_localstorage()
+        this.$nextTick(() => {
+            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index])
+        })
+        this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
+        this.page_list_view.save_pagedatas_to_localstorage()
     }
 
     update_struct_view(tagdatas: Array<HTMLTagDataBase>) {
-        let struct_view: any = this.$refs["struct_view"]
-        struct_view.html_tagdatas = tagdatas
-        struct_view.html_tagdatas_root = tagdatas
+        this.tag_struct_view.html_tagdatas = tagdatas
     }
 
     get dropzone_style(): any {
@@ -890,11 +897,24 @@ export default class PutPullMockRootPage extends Vue {
         }
     }
 
-    @Watch('project')
-    updated_project() {
-        let dropzone: any = this.$refs["dropzone"]
-        dropzone.html_tagdatas = this.project.ppmk_project_data.project_data
-        dropzone.html_tagdatas_root = this.project.ppmk_project_data.project_data
+    update_project(project: Project) {
+        if (!this.inited) return
+        if (!project) return
+        if (!this.dropzone ||
+            !this.page_list_view ||
+            !this.project_view) {
+            this.$nextTick(() => {
+                this.update_project(project)
+            })
+            return
+        }
+
+        this.project = project
+        this.page_list_view.project = project
+        this.project_view.project = project
+        this.page_list_view.updated_project()
+        this.project_view.updated_project()
+        this.save_project_to_localstorage()
     }
 
     @Watch('css')
@@ -914,14 +934,11 @@ export default class PutPullMockRootPage extends Vue {
             }
         }
 
-        let page_list_view: any = this.$refs["page_list_view"]
-        this.project.ppmk_project_data.project_data[page_list_view.selected_index].css = this.css
-        let dropzone: any = this.$refs["dropzone"]
-        dropzone.style_user_edited = this.css
+        this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].css = this.css
+        this.dropzone.style_user_edited = this.css
     }
     @Watch('page_webfont')
     updated_page_webfont() {
-        let page_list_view: any = this.$refs["page_list_view"]
         let webfonts: Array<string> = new Array<string>()
         if (this.page_webfont) {
             webfonts = this.page_webfont.split("\n")
@@ -932,16 +949,21 @@ export default class PutPullMockRootPage extends Vue {
         webfonts = webfonts.filter((webfont, i, webfonts) => {
             return webfont != ""
         })
-        this.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts = webfonts
+        this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].webfonts = webfonts
         this.update_page_webfont()
         this.save_project_to_localstorage()
     }
 
     update_page_webfont() {
-        let page_list_view: any = this.$refs["page_list_view"]
+        if (!this.project.ppmk_project_data.project_data[this.page_list_view.selected_index]) {
+            this.$nextTick(() => {
+                this.update_page_webfont()
+            })
+            return
+        }
         let page_web_font_links = []
-        for (let i = 0; i < this.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts.length; i++) {
-            let page_web_font = this.project.ppmk_project_data.project_data[page_list_view.selected_index].webfonts[i]
+        for (let i = 0; i < this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].webfonts.length; i++) {
+            let page_web_font = this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].webfonts[i]
             page_web_font_links.push({
                 href: page_web_font,
                 rel: "stylesheet",
@@ -973,8 +995,7 @@ export default class PutPullMockRootPage extends Vue {
 
     delete_tagdata(tagdata: HTMLTagDataBase) {
         this.append_history()
-        let page_list_view: any = this.$refs['page_list_view']
-        let tagdatas: Array<HTMLTagDataBase> = this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas
+        let tagdatas: Array<HTMLTagDataBase> = this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas
 
         let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
         walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
@@ -989,8 +1010,8 @@ export default class PutPullMockRootPage extends Vue {
             }
         }
         walk_tagdatas(tagdatas)
-        this.project.ppmk_project_data.project_data[page_list_view.selected_index].html_tagdatas = tagdatas
-        this.clicked_page(this.project.ppmk_project_data.project_data[page_list_view.selected_index])
+        this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas = tagdatas
+        this.show_page(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index])
         this.save_project_to_localstorage()
     }
 
@@ -998,7 +1019,6 @@ export default class PutPullMockRootPage extends Vue {
         if (!this.use_undo || !this.editor_mode) {
             return
         }
-        let page_list_view: any = this.$refs['page_list_view']
         if (!this.project) {
             return
         }
@@ -1017,8 +1037,8 @@ export default class PutPullMockRootPage extends Vue {
         }
         this.histories.histories[this.histories.index] = page_datas
         this.histories.page_index.length = this.histories.index + 1
-        if (page_list_view) {
-            this.histories.page_index[this.histories.index] = page_list_view.selected_index
+        if (this.page_list_view) {
+            this.histories.page_index[this.histories.index] = this.page_list_view.selected_index
         }
         this.histories.index++
     }
@@ -1028,14 +1048,11 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     delete_page() {
-        let page_list_view: any = this.$refs['page_list_view']
-        let dropzone: any = this.$refs["dropzone"]
-        let page_property_view: any = this.$refs["page_property_view"]
-        this.save_project_to_localstorage()
-        page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
-        page_property_view.page_data = null
-        dropzone.html_tagdatas = null
-        dropzone.html_tagdatas_root = null
+        this.$nextTick(() => {
+            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+        })
+        this.page_property_view.page_data = null
+        this.dropzone.html_tagdatas = null
         this.update_struct_view(null)
         this.onclick_tag(null)
 
@@ -1046,14 +1063,13 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     add_page() {
-        let page_list_view: any = this.$refs['page_list_view']
-        page_list_view.add_page()
+        this.page_list_view.add_page()
         this.save_project_to_localstorage()
+        this.update_project(this.project)
     }
 
     updated_tagdata(tagdata: HTMLTagDataBase) {
-        let dropzone: any = this.$refs["dropzone"]
-        dropzone.updated_tagdata(tagdata)
+        this.dropzone.updated_tagdata(tagdata)
         this.save_project_to_localstorage()
     }
     to_toppage() {
@@ -1078,7 +1094,6 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     loaded_project(ppmk_project: PPMKProject, project_data: PPMKProjectData, project_share: PPMKProjectShare) {
-        let page_list_view: any = this.$refs['page_list_view']
         let project = new Project()
 
         project.ppmk_project = ppmk_project
@@ -1086,9 +1101,10 @@ export default class PutPullMockRootPage extends Vue {
         project.ppmk_project_share = project_share
 
         this.project = project
-        page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+        this.$nextTick(() => {
+            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+        })
         this.is_show_readin_dialog = false
-
         this.save_project_to_localstorage()
     }
 
@@ -1102,32 +1118,39 @@ export default class PutPullMockRootPage extends Vue {
             })
     }
 
-    is_show_oversize_localstorage_dialog = false
     @Watch('project')
     save_project_to_localstorage() {
-        let project = JSON.stringify(this.project)
-        if (this.auto_save_pagedatas_to_localstorage) {
+        if (!this.inited) return
+        if (this.auto_save_project_data_to_localstorage) {
             try {
+                let project = JSON.stringify(this.project)
                 window.localStorage.setItem("ppmk_project", project)
+                console.log(JSON.parse(project, deserialize))
             } catch (e) {
                 this.is_show_oversize_localstorage_dialog = true
-                this.$emit("update_auto_save_pagedatas_to_localstorage", false)
+                this.auto_save_project_data_to_localstorage = false
                 this.clear_pagedatas_at_localstorage()
             }
         }
     }
 
-    @Watch('auto_save_pagedatas_to_localstorage')
+    @Watch('auto_save_project_data_to_localstorage')
     clear_pagedatas_at_localstorage() {
-        if (!this.auto_save_pagedatas_to_localstorage) {
+        if (!this.auto_save_project_data_to_localstorage) {
             window.localStorage.setItem("ppmk_project", "")
         }
     }
 
-    update_project_data(project_data: Array<PageData>) {
-        this.project.ppmk_project_data.project_data = project_data
-        let page_list_view: any = this.$refs['page_list_view']
-        page_list_view.updated_project()
+    update_project_info(project_info: PPMKProject) {
+        let project = this.project
+        project.ppmk_project = project_info
+        this.update_project(project)
+    }
+
+    update_pagedatas(pagedatas: Array<PageData>) {
+        let project = this.project
+        project.ppmk_project_data.project_data = pagedatas
+        this.update_project(project)
     }
 }
 </script>

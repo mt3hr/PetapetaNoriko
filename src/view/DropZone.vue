@@ -524,7 +524,7 @@ export default class DropZone extends Vue {
         this.copy_tag(tagdata)
         this.delete_tagdata(tagdata)
     }
-    created(): void {
+    mounted(): void {
         this.$emit('updated_htmltagdatas', this.html_tagdatas, null, true)
     }
 }

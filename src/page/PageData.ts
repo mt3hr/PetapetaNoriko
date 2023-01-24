@@ -9,8 +9,8 @@ export default class PageData {
     width = window.innerWidth - 300 - 300 - 19
     height = window.innerHeight - 159
     html_tagdatas = new Array<HTMLTagDataBase>()
-    css =  ""
-    webfonts: Array<string> = new Array<string>()
+    css = ""
+    webfonts = new Array<string>()
 
     generate_html(options: GenerateHTMLOptions): string {
         let html = ""

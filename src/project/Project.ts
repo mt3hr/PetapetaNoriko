@@ -19,9 +19,9 @@ export default class Project {
 
     clone(): Project {
         const project = new Project()
-        project.ppmk_project = this.ppmk_project
-        project.ppmk_project_data = this.ppmk_project_data
-        project.ppmk_project_share = this.ppmk_project_share
+        project.ppmk_project = this.ppmk_project.clone()
+        project.ppmk_project_data = this.ppmk_project_data.clone()
+        project.ppmk_project_share = this.ppmk_project_share.clone()
         return project
     }
 }
@@ -56,13 +56,11 @@ export class PPMKProjectData {
         project_data.project_id = this.project_id
         project_data.saved_time = this.saved_time
 
-        const pagedatas = Array<PageData>()
         if (this.project_data) {
             this.project_data.forEach(pagedata => {
-                pagedatas.push(pagedata.clone())
+                project_data.project_data.push(pagedata.clone())
             });
         }
-        project_data.project_data = pagedatas
 
         project_data.author = this.author
         project_data.memo = this.memo

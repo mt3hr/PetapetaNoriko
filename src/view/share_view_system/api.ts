@@ -179,7 +179,7 @@ export default class API {
             settings.export_position_css = false
             settings.show_border = false
             settings.transparent_page_css_view = false
-            settings.auto_save_pagedatas_to_localstorage = true
+            settings.auto_save_project_data_to_localstorage= true
             settings.auto_scroll_tag_struct_view = true
             settings.tag_list_view_mode = TagListViewMode.Text
             settings.use_undo = true

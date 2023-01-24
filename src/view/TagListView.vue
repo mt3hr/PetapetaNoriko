@@ -158,7 +158,7 @@ export default class TagListView extends Vue {
         e.dataTransfer.setData("ppmk/htmltag", tagname)
     }
 
-    created(): void {
+    mounted(): void {
         this.update_style()
     }
 

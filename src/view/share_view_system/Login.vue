@@ -44,7 +44,7 @@ export default class Login extends Vue {
         this.$router.push('/register')
     }
 
-    created(): void {
+    mounted(): void {
         let api = new API()
         api.status()
             .then(status => {

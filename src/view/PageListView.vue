@@ -29,20 +29,27 @@ export default class Page extends Vue {
     selected_index = 0
     project_data = new Array<PageData>()
 
-    @Prop() project: Project
+    project = new Project()
     @Prop() editor_mode: boolean
     @Prop() project_name: string
 
+    mounted() {
+        this.project.project_id = ""
+    }
+
     clicked_page(pagedata: PageData) {
+        if (!pagedata) {
+            this.selected_index = -1
+            this.$emit('clicked_page', null)
+            return
+        }
         for (let i = 0; i < this.project_data.length; i++) {
             if (pagedata.pageid == this.project_data[i].pageid) {
                 this.selected_index = i
                 break
             }
         }
-        this.$nextTick(() => {
-            this.$emit('clicked_page', pagedata)
-        })
+        this.$emit('clicked_page', pagedata)
     }
 
     delete_page(pagedata: PageData) {
@@ -59,18 +66,13 @@ export default class Page extends Vue {
                 project_data.push(page_data)
             });
             project_data.splice(deleteindex, 1)
-            this.$emit("updated_project_data", project_data) //TODO rootpageで拾って
+            if (this.project.project_id == "") return
+            this.$emit("updated_pagedatas", project_data) //TODO rootpageで拾って
         }
     }
 
-    @Watch('project')
     updated_project() {
-        if (!this.project) return
         this.project_data = this.project.ppmk_project_data.project_data
-    }
-
-    created(): void {
-        this.updated_project()
     }
 
     generate_style(index: number): any {
@@ -89,7 +91,8 @@ export default class Page extends Vue {
         });
         let pagedata = new PageData()
         project_data.push(pagedata)
-        this.$emit("updated_project_data", project_data) //TODO rootpageで拾って
+        if (this.project.project_id == "") return
+        this.$emit("updated_pagedatas", project_data) //TODO rootpageで拾って
         this.$nextTick(() => {
             this.clicked_page(pagedata)
         })
@@ -102,7 +105,8 @@ export default class Page extends Vue {
             project_data.push(page_data)
         });
         project_data.splice(index + 1, 0, pagedata)
-        this.$emit("updated_project_data", project_data) //TODO rootpageで拾って
+        if (this.project.project_id == "") return
+        this.$emit("updated_pagedatas", project_data) //TODO rootpageで拾って
         this.$nextTick(() => {
             this.clicked_page(pagedata)
         })
@@ -126,7 +130,8 @@ export default class Page extends Vue {
         }
 
         project_data.splice(index, 0, move_pagedata)
-        this.$emit("updated_project_data", project_data) //TODO rootpageで拾って
+        if (this.project.project_id == "") return
+        this.$emit("updated_pagedatas", project_data) //TODO rootpageで拾って
         this.$nextTick(() => {
             this.project.ppmk_project_data.project_data = project_data
             this.selected_index = index

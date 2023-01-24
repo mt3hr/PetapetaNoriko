@@ -28,7 +28,7 @@ export default class ProjectSummariesList extends Vue {
     error_message = ""
     show_error_message_snackbar = false
 
-    created(): void {
+    mounted(): void {
         let api = new API()
         api.list_project_summaries(api.session_id)
             .then((res) => {

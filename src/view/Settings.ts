@@ -3,15 +3,16 @@ import TagListViewMode from "./TagListViewMode"
 
 @serializable
 export default class Settings {
-    export_base64_image: boolean
-    export_head: boolean
-    export_position_css: boolean
-    show_border: boolean
-    transparent_page_css_view: boolean
-    auto_save_pagedatas_to_localstorage: boolean
-    auto_scroll_tag_struct_view: boolean
-    tag_list_view_mode: TagListViewMode
-    use_undo: boolean
-    auto_focus_tag_property_view: boolean
+    first_launch = true
+    export_base64_image = false
+    export_head = true
+    export_position_css = false
+    show_border = true
+    transparent_page_css_view = false
+    auto_save_project_data_to_localstorage = true
+    auto_scroll_tag_struct_view = false
+    tag_list_view_mode = TagListViewMode.Text
+    use_undo = true
+    auto_focus_tag_property_view = false
     session_id: string
 }
