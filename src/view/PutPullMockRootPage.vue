@@ -121,7 +121,7 @@
             </v-row>
         </v-card>
     </v-dialog>
-    <v-dialog v-model="is_show_readin_dialog">
+    <v-dialog v-model="is_show_readin_dialog" width="unset">
         <v-card class="pa-5">
             <v-row>
                 <v-col>
@@ -211,7 +211,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
         </v-card>
     </v-dialog>
 
-    <v-dialog v-model="is_show_new_project_dialog">
+    <v-dialog v-model="is_show_new_project_dialog" width="unset">
         <v-card class="pa-5">
             <v-card-title>プロジェクト新規作成</v-card-title>
             <p>プロジェクトを新規作成します</p>
@@ -228,7 +228,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
         </v-card>
     </v-dialog>
 
-    <v-dialog v-model="is_show_options_dialog">
+    <v-dialog v-model="is_show_options_dialog" width="unset">
         <v-card class="pa-5">
             <v-card-title>設定</v-card-title>
             <v-row>
@@ -311,7 +311,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
         </v-card>
     </v-dialog>
-    <v-dialog v-if="editor_mode" v-model="is_show_oversize_localstorage_dialog">
+    <v-dialog v-if="editor_mode" v-model="is_show_oversize_localstorage_dialog" width="unset">
         <v-card class="pa-5">
             <v-card-title>
                 自動保存容量超過

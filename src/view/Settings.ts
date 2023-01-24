@@ -10,9 +10,9 @@ export default class Settings {
     show_border = false
     transparent_page_css_view = false
     auto_save_project_data_to_localstorage = true
-    auto_scroll_tag_struct_view = false
+    auto_focus_tag_property_view = false
+    auto_scroll_tag_struct_view = true
     tag_list_view_mode = TagListViewMode.Text
     use_undo = true
-    auto_focus_tag_property_view = false
     session_id: string
 }
