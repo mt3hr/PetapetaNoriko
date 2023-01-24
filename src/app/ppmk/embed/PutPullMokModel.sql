@@ -1,0 +1,39 @@
+CREATE TABLE IF NOT EXISTS User (
+    UserID TEXT NOT NULL PRIMARY KEY,
+    Email TEXT NOT NULL,
+    PasswordHashMD5 TEXT NOT NULL,
+    UserName TEXT NOT NULL,
+    ResetPasswordID TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS LoginSession (
+    SessionID TEXT NOT NULL PRIMARY KEY,
+    UserID TEXT NOT NULL,
+    FOREIGN KEY (UserID) REFERENCES User(UserID)
+);
+
+CREATE TABLE IF NOT EXISTS PPMKProject (
+    ProjectID TEXT NOT NULL PRIMARY KEY,
+    OwnerUserID TEXT NOT NULL,
+    ProjectName TEXT NOT NULL,
+    IsSharedView TEXT NOT NULL,
+    FOREIGN KEY (OwnerUserID) REFERENCES User(UserID)
+);
+
+CREATE TABLE IF NOT EXISTS PPMKProjectData (
+    ProjectDataID TEXT NOT NULL PRIMARY KEY,
+    ProjectID TEXT NOT NULL,
+    SavedTime TEXT NOT NULL,
+    ProjectData TEXT NOT NULL,
+    Author TEXT NOT NULL,
+    Memo TEXT NOT NULL,
+    FOREIGN KEY (ProjectID) REFERENCES PPMKProject(ProjectID)
+);
+
+CREATE TABLE IF NOT EXISTS ProjectShare (
+    ProjectID TEXT NOT NULL,
+    UserID TEXT NOT NULL,
+    Writable TEXT NOT NULL,
+    FOREIGN KEY (ProjectID) REFERENCES PPMKProject(ProjectID)
+	PRIMARY KEY(ProjectID, UserID)
+);
