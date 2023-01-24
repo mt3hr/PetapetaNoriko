@@ -1,12 +1,10 @@
 <template>
     <div>
-        <v-container>
-            <v-row v-for="project_summary, index in project_summaries" :key="index">
-                <v-col>
-                    <ProjectSummary @loaded_project="loaded_project" :project_summary="project_summary" />
-                </v-col>
-            </v-row>
-        </v-container>
+        <v-row v-for="project_summary, index in project_summaries" :key="index">
+            <v-col>
+                <ProjectSummary @loaded_project="loaded_project" :project_summary="project_summary" />
+            </v-col>
+        </v-row>
         <v-snackbar v-model="show_error_message_snackbar">{{ error_message }}</v-snackbar>
     </div>
 </template>

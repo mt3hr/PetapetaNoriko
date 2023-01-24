@@ -1,5 +1,6 @@
 import Project, { PPMKProject, PPMKProjectData, PPMKProjectShare } from "@/project/Project"
 import { deserialize } from "@/serializable/serializable"
+import generateUUID from "@/uuid"
 import md5 from "md5"
 import Settings from "../Settings"
 import TagListViewMode from "../TagListViewMode"
@@ -23,7 +24,26 @@ export const addProjectShareAddress = host + "/ppmk_server/add_project_share"
 export const deleteProjectShareAddress = host + "/ppmk_server/delete_project_share"
 export const updateProjectShareAddress = host + "/ppmk_server/update_project_share"
 export const share_view_address = host + "/ppmk/share_view"
+export const get_user_id_from_session_id_address = host + "/ppmk_server/get_user_id_from_session_id"
+export const get_user_name_from_user_id_address = host + "/ppmk_server/get_user_name_from_user_id"
 
+export class GetUserIDBySessionIDRequest {
+    session_id: string
+}
+export class GetUserIDBySessionIDResponse {
+    user_id: string
+    error: string
+}
+
+export class GetUserNameFromUserIDRequest {
+    session_id: string
+    user_id: string
+}
+
+export class GetUserNameByUserIDResponse {
+    user_name: string
+    error: string
+}
 
 export class ServerStatus {
     share_view_system: boolean
@@ -31,9 +51,8 @@ export class ServerStatus {
 }
 
 export class PPMKProjectSummary {
-    ppmk_project = new PPMKProjectShare()
+    ppmk_project = new PPMKProject()
     ppmk_project_datas = new Array<PPMKProjectData>()
-    ppmk_project_share = new PPMKProjectShare()
 }
 
 export class LoginRequest {
@@ -160,6 +179,58 @@ export class UpdateProjectShareResponse {
 }
 
 export default class API {
+    async get_user_id_by_session_id(session_id: string): Promise<GetUserIDBySessionIDResponse> {
+        try {
+            const get_user_id_by_session_id_request = new GetUserIDBySessionIDRequest()
+            get_user_id_by_session_id_request.session_id = session_id
+
+            const res = await fetch(get_user_id_from_session_id_address, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(get_user_id_by_session_id_request),
+            })
+            const json = await res.json()
+
+            const response: GetUserIDBySessionIDResponse = json
+            return response
+        } catch (e) {
+            return new GetUserIDBySessionIDResponse()
+        }
+    }
+
+    async get_user_name_by_user_id(user_id: string): Promise<GetUserNameByUserIDResponse> {
+        const get_user_name_by_user_id_request = new GetUserNameFromUserIDRequest()
+        get_user_name_by_user_id_request.session_id = this.session_id
+        get_user_name_by_user_id_request.user_id = user_id
+
+        const res = await fetch(get_user_name_from_user_id_address, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(get_user_name_by_user_id_request),
+        })
+        const json = await res.json()
+        const response: GetUserNameByUserIDResponse = json
+        return response
+    }
+
+
+    async preparate_save_ppmk_project(project: Project) {
+        const user_id = await (await this.get_user_id_by_session_id(this.session_id)).user_id
+        if (project.ppmk_project.project_id == "") {
+            project.ppmk_project.project_id = generateUUID()
+        }
+        if (project.ppmk_project.owner_user_id == "") {
+            project.ppmk_project.owner_user_id = user_id
+        }
+        project.ppmk_project_data.author = user_id
+        project.ppmk_project_data.project_data_id = generateUUID()
+        project.ppmk_project_data.saved_time = new Date().toISOString()
+    }
+
     generate_share_view_link(project: Project) {
         return share_view_address + "?project_id=" + project.project_id
     }
@@ -179,7 +250,7 @@ export default class API {
             settings.export_position_css = false
             settings.show_border = false
             settings.transparent_page_css_view = false
-            settings.auto_save_project_data_to_localstorage= true
+            settings.auto_save_project_data_to_localstorage = true
             settings.auto_scroll_tag_struct_view = true
             settings.tag_list_view_mode = TagListViewMode.Text
             settings.use_undo = true

@@ -20,6 +20,25 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+type GetUserIDFromSessionIDRequest struct {
+	SessionID string `json:"session_id"`
+}
+
+type GetUserIDFromSessionIDResponse struct {
+	UserID string `json:"user_id"`
+	Error  string `json:"error"`
+}
+
+type GetUserNameFromUserIDRequest struct {
+	SessionID string `json:"session_id"`
+	UserID    string `json:"user_id"`
+}
+
+type GetUserNameFromUserIDResponse struct {
+	UserName string `json:"user_name"`
+	Error    string `json:"error"`
+}
+
 type LoginRequest struct {
 	Email           string `json:"email"`
 	PasswordHashMd5 string `json:"password_hash_md5"`
@@ -146,21 +165,23 @@ type UpdateProjectShareResponse struct {
 const (
 	TimeLayout = time.RFC3339
 
-	statusAddress               = "/ppmk_server/status"
-	loginAddress                = "/ppmk_server/login"
-	logoutAddress               = "/ppmk_server/logout"
-	resetPasswordAddress        = "/ppmk_server/reset_password"
-	registerAddress             = "/ppmk_server/register"
-	listProjectSummariesAddress = "/ppmk_server/list_project_summaries"
-	getProjectDataAddress       = "/ppmk_server/get_project_data"
-	saveProjectDataAddress      = "/ppmk_server/save_project_data"
-	deleteProjectDataAddress    = "/ppmk_server/delete_project_data"
-	updateProjectDataAddress    = "/ppmk_server/update_project_data"
-	deleteProjectAddress        = "/ppmk_server/delete_project"
-	updateProjectAddress        = "/ppmk_server/update_project"
-	addProjectShareAddress      = "/ppmk_server/add_project_share"
-	deleteProjectShareAddress   = "/ppmk_server/delete_project_share"
-	updateProjectShareAddress   = "/ppmk_server/update_project_share"
+	statusAddress                 = "/ppmk_server/status"
+	loginAddress                  = "/ppmk_server/login"
+	logoutAddress                 = "/ppmk_server/logout"
+	resetPasswordAddress          = "/ppmk_server/reset_password"
+	registerAddress               = "/ppmk_server/register"
+	listProjectSummariesAddress   = "/ppmk_server/list_project_summaries"
+	getProjectDataAddress         = "/ppmk_server/get_project_data"
+	saveProjectDataAddress        = "/ppmk_server/save_project_data"
+	deleteProjectDataAddress      = "/ppmk_server/delete_project_data"
+	updateProjectDataAddress      = "/ppmk_server/update_project_data"
+	deleteProjectAddress          = "/ppmk_server/delete_project"
+	updateProjectAddress          = "/ppmk_server/update_project"
+	addProjectShareAddress        = "/ppmk_server/add_project_share"
+	deleteProjectShareAddress     = "/ppmk_server/delete_project_share"
+	updateProjectShareAddress     = "/ppmk_server/update_project_share"
+	getUserIDFromSessionIDAddress = "/ppmk_server/get_user_id_from_session_id" //TODO
+	getUserNameFromUserIDAddress  = "/ppmk_server/get_user_name_from_user_id"  //TODO
 )
 
 var (
@@ -1201,6 +1222,117 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			return
 		}
 	}))
+
+	router.PathPrefix(getUserIDFromSessionIDAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		getUserIDFromSessionIDRequest := &GetUserIDFromSessionIDRequest{}
+		getUserIDFromSessionIDResponse := &GetUserIDFromSessionIDResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&getUserIDFromSessionIDRequest)
+		if err != nil {
+			getUserIDFromSessionIDResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(getUserIDFromSessionIDResponse)
+			if e != nil {
+				getUserIDFromSessionIDResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), getUserIDFromSessionIDRequest.SessionID)
+		if err != nil {
+			getUserIDFromSessionIDResponse.Error = fmt.Sprintf("セッション有効期限切れです。再度ログインしてください。")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(getUserIDFromSessionIDResponse)
+			if e != nil {
+				getUserIDFromSessionIDResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		getUserIDFromSessionIDResponse.UserID = userID
+
+		encoder := json.NewEncoder(w)
+		err = encoder.Encode(getUserIDFromSessionIDResponse)
+		if err != nil {
+			getUserIDFromSessionIDResponse.Error = fmt.Sprintf("サーバ内エラー")
+			panic(err)
+			return
+		}
+	}))
+
+	router.PathPrefix(getUserNameFromUserIDAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		getUserNameByUserIDRequest := &GetUserNameFromUserIDRequest{}
+		getUserNameByUserIDResponse := &GetUserNameFromUserIDResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&getUserNameByUserIDRequest)
+		if err != nil {
+			getUserNameByUserIDResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(getUserNameByUserIDResponse)
+			if e != nil {
+				getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		_, err = ppmkDB.GetUserIDFromSessionID(r.Context(), getUserNameByUserIDRequest.SessionID)
+		if err != nil {
+			getUserNameByUserIDResponse.Error = fmt.Sprintf("セッション有効期限切れです。再度ログインしてください。")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(getUserNameByUserIDResponse)
+			if e != nil {
+				getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+			return
+		}
+
+		user, err := ppmkDB.GetUser(r.Context(), getUserNameByUserIDRequest.UserID)
+		if err != nil {
+			getUserNameByUserIDResponse.Error = fmt.Sprintf("エラー:ユーザが取得できません")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(getUserNameByUserIDResponse)
+			if e != nil {
+				getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
+				panic(e)
+				return
+			}
+			panic(err)
+		}
+
+		getUserNameByUserIDResponse.UserName = user.UserName
+
+		encoder := json.NewEncoder(w)
+		err = encoder.Encode(getUserNameByUserIDResponse)
+		if err != nil {
+			getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
+			panic(err)
+			return
+		}
+	}))
 }
 
 func sendResetPasswordMail(address string, subject string, body string) error {
@@ -1447,7 +1579,7 @@ func (p *ppmkDBImpl) GetProjectSummaries(ctx context.Context, userID string) ([]
 	}
 	for _, project := range projects {
 		projectDatas, err := func(project *PPMKProject) ([]*PPMKProjectData, error) {
-			statement := `SELECT ProjectDataID, ProjectID, SavedTime, Author, Memo FROM PPMKProjectData WHERE ProjectID='` + project.ProjectID + `';`
+			statement := `SELECT ProjectDataID, ProjectID, SavedTime, Author, Memo FROM PPMKProjectData WHERE ProjectID='` + project.ProjectID + `' ORDER BY SavedTime DESC;`
 			rows, err := p.db.QueryContext(ctx, statement)
 			if err != nil {
 				err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)

@@ -189,11 +189,28 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                     <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
                 </v-col>
                 <v-col v-if="enable_system" cols="auto">
-                    <v-btn @click="save_ppmk_project_to_server">プロジェクトをサーバに保存</v-btn>
+                    <v-btn @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
                 </v-col>
             </v-row>
         </v-card>
     </v-dialog>
+
+    <v-dialog v-model="is_show_save_to_server_dialog">
+        <v-card class="pa-5">
+            <v-card-title>サーバに保存</v-card-title>
+            <v-textarea v-model="project_data_memo" placeholder="メモ" />
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
+                </v-col>
+                <v-spacer />
+                <v-col cols="auto">
+                    <v-btn @click="() => { apply_project_data_memo(); save_ppmk_project_to_server() }">保存</v-btn>
+                </v-col>
+            </v-row>
+        </v-card>
+    </v-dialog>
+
     <v-dialog v-model="is_show_options_dialog">
         <v-card class="pa-5">
             <v-card-title>設定</v-card-title>
@@ -299,7 +316,9 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 
 <script lang="ts">
 //TODO グローバルナビゲーション 横並びリスト
-//TODO ページデータじゃなくてプロジェクトを保存するようにしよう
+//TODO プロジェクトデータの削除
+//TODO プロジェクトの削除
+//TODO プロジェクトの新規作成
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView from '@/view/TagListView.vue'
@@ -354,6 +373,7 @@ export default class PutPullMockRootPage extends Vue {
     is_show_webfont_dialog = false
     is_show_options_dialog = false
     is_show_oversize_localstorage_dialog = false
+    is_show_save_to_server_dialog = false
     css = ""
     page_html = ""
     page_webfont = ""
@@ -390,6 +410,7 @@ export default class PutPullMockRootPage extends Vue {
     first_launch = true
 
     inited = false
+    project_data_memo = ""
 
     @Watch('export_base64_image')
     @Watch('export_head')
@@ -692,7 +713,8 @@ export default class PutPullMockRootPage extends Vue {
         reader.readAsText(file)
     }
 
-    save_ppmk_project() {
+    async save_ppmk_project() {
+        await this.api.preparate_save_ppmk_project(this.project)
         this.clicked_tagdata = new HTMLTagDataBase()
         let project_data = JSON.stringify(this.project)
         let ppmk_data_blob = new Blob([project_data])
@@ -1108,7 +1130,19 @@ export default class PutPullMockRootPage extends Vue {
         this.save_project_to_localstorage()
     }
 
-    save_ppmk_project_to_server() {
+    show_save_to_server_dialog() {
+        this.is_show_writeout_dialog = false
+        this.is_show_save_to_server_dialog = true
+    }
+
+    apply_project_data_memo() {
+        this.project.ppmk_project_data.memo = this.project_data_memo
+        this.project_data_memo = ""
+    }
+
+    async save_ppmk_project_to_server() {
+        this.is_show_save_to_server_dialog = false
+        await this.api.preparate_save_ppmk_project(this.project)
         let api = new API()
         let project: Project = this.project
         project.ppmk_project_data.project_data_id = generateUUID()
