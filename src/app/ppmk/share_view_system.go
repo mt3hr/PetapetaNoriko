@@ -646,6 +646,14 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			panic(err)
 			return
 		}
+		encoder := json.NewEncoder(w)
+		e := encoder.Encode(saveProjectDataResponse)
+		if e != nil {
+			saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+			panic(e)
+			return
+		}
+
 	}))
 
 	router.PathPrefix(deleteProjectDataAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -188,7 +188,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-col cols="auto">
                     <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
                 </v-col>
-                <v-col v-if="enable_system" cols="auto">
+                <v-col v-if="enable_system && session_id" cols="auto">
                     <v-btn @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
                 </v-col>
             </v-row>
