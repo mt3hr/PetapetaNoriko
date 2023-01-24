@@ -663,7 +663,7 @@ export default class PutPullMockRootPage extends Vue {
                             } else if (e.ctrlKey) {
                                 clicked_tagdata.child_tagdatas.push(copied_tagdata)
                             } else {
-                                clicked_tagdata.child_tagdatas.push(copied_tagdata)
+                                clicked_tagdata.child_tagdatas.unshift(copied_tagdata)
                             }
                             this.dropzone.updated_tagdata(clicked_tagdata)
                         }

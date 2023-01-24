@@ -177,7 +177,7 @@ export default class HTMLTagPropertyView extends Vue {
             } else if (e.ctrlKey) {
                 html_tagdatas.push(tagdata)
             } else {
-                html_tagdatas.push(tagdata)
+                html_tagdatas.unshift(tagdata)
             }
 
             switch (tagname) {

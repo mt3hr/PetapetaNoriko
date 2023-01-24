@@ -250,7 +250,7 @@ export default class HTMLTagPropertyView extends Vue {
                             } else if (e.ctrlKey) {
                                 tagdatas[i].child_tagdatas.push(tag_data)
                             } else {
-                                tagdatas[i].child_tagdatas.push(tag_data)
+                                tagdatas[i].child_tagdatas.unshift(tag_data)
                             }
                             child_appended = true
                             return true
@@ -287,7 +287,7 @@ export default class HTMLTagPropertyView extends Vue {
                             } else if (e.ctrlKey) {
                                 tagdatas.splice(i + 1, 0, tag_data)
                             } else {
-                                tagdatas.splice(i + 1, 0, tag_data)
+                                tagdatas.splice(i, 0, tag_data)
                             }
                             return true
                         }
@@ -367,7 +367,7 @@ export default class HTMLTagPropertyView extends Vue {
                             } else if (e.ctrlKey) {
                                 tagdatas[i].child_tagdatas.splice(i + 1, 0, move_tagdata)
                             } else {
-                                tagdatas[i].child_tagdatas.splice(i + 1, 0, move_tagdata)
+                                tagdatas[i].child_tagdatas.splice(i, 0, move_tagdata)
                             }
                             child_appended = true
                             return true
@@ -401,7 +401,7 @@ export default class HTMLTagPropertyView extends Vue {
                             } else if (e.ctrlKey) {
                                 tagdatas.splice(i + 1, 0, move_tagdata)
                             } else {
-                                tagdatas.splice(i + 1, 0, move_tagdata)
+                                tagdatas.splice(i, 0, move_tagdata)
                             }
                             return true
                         }
@@ -437,7 +437,7 @@ export default class HTMLTagPropertyView extends Vue {
                                 } else if (e.ctrlKey) {
                                     tagdatas[i].child_tagdatas.push(tag_data)
                                 } else {
-                                    tagdatas[i].child_tagdatas.push(tag_data)
+                                    tagdatas[i].child_tagdatas.unshift(tag_data)
                                 }
                                 child_appended = true
                                 return true
@@ -476,7 +476,7 @@ export default class HTMLTagPropertyView extends Vue {
                                 } else if (e.ctrlKey) {
                                     tagdatas.splice(i + 1, 0, tag_data)
                                 } else {
-                                    tagdatas.splice(i + 1, 0, tag_data)
+                                    tagdatas.splice(i, 0, tag_data)
                                 }
                                 return true
                             }
@@ -551,7 +551,7 @@ export default class HTMLTagPropertyView extends Vue {
             } else if (e.ctrlKey) {
                 tagdata_typed.child_tagdatas.push(copied_tagdata)
             } else {
-                tagdata_typed.child_tagdatas.push(copied_tagdata)
+                tagdata_typed.child_tagdatas.unshift(copied_tagdata)
             }
 
             this.updated_tagdata(tagdata_typed)

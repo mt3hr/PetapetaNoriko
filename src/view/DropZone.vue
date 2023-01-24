@@ -377,7 +377,7 @@ export default class DropZone extends Vue {
             } else if (e.ctrlKey) {
                 html_tagdatas_root.push(move_tagdata)
             } else {
-                html_tagdatas_root.push(move_tagdata)
+                html_tagdatas_root.unshift(move_tagdata)
             }
 
             this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
