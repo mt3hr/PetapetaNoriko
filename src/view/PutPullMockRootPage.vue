@@ -553,14 +553,13 @@ export default class PutPullMockRootPage extends Vue {
                         this.page_list_view.project = project
                         this.project_view.project = project
                         this.page_list_view.selected_index = this.histories.page_index[this.histories.index]
-                        this.updated_htmltagdatas(project.ppmk_project_data.project_data[0].html_tagdatas, null, false)
 
-                        this.preparated = false
                         this.update_project(project)
+                        this.preparated = false
                         this.$nextTick(() => {
-                            this.preparated = true
+                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
                             this.$nextTick(() => {
-                                this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
+                                this.preparated = true
                             })
                         })
                     }
@@ -576,14 +575,13 @@ export default class PutPullMockRootPage extends Vue {
                         this.page_list_view.project = project
                         this.project_view.project = project
                         this.page_list_view.selected_index = this.histories.page_index[this.histories.index]
-                        this.updated_htmltagdatas(project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas, null, false)
 
-                        this.preparated = false
                         this.update_project(project)
+                        this.preparated = false
                         this.$nextTick(() => {
-                            this.preparated = true
+                            this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
                             this.$nextTick(() => {
-                                this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
+                                this.preparated = true
                             })
                         })
                     }
@@ -977,9 +975,11 @@ export default class PutPullMockRootPage extends Vue {
         this.project = project
         this.page_list_view.project = project
         this.project_view.project = project
-        this.page_list_view.updated_project()
-        this.project_view.updated_project()
-        this.save_project_to_localstorage()
+        this.$nextTick(() => {
+            this.page_list_view.updated_project()
+            this.project_view.updated_project()
+            this.save_project_to_localstorage()
+        })
     }
 
     @Watch('css')
