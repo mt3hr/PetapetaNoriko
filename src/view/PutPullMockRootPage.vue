@@ -490,9 +490,22 @@ export default class PutPullMockRootPage extends Vue {
     new_project() {
         this.is_show_new_project_dialog = false
         let project = new Project()
-        project.project_id = generateUUID()
         this.update_project(project)
-        this.page_list_view.add_page()
+        project.project_id = generateUUID()
+        this.update_struct_view(null)
+        this.updated_page_property(null)
+        this.updated_html_tag_property(null)
+        this.onclick_tag(null)
+        this.page_list_view.project = project
+        this.project_view.project = project
+        this.$nextTick(() => {
+            this.page_list_view.updated_project()
+            this.project_view.updated_project()
+            this.histories = new Histories()
+            this.show_page(null)
+            this.save_project_to_localstorage()
+        })
+
     }
 
     mounted(): void {
@@ -739,6 +752,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     read_ppmk_project(e) {
+        this.histories = new Histories()
         let file: File = e.target.files[0]
         let reader = new FileReader()
         reader.addEventListener('load', (e) => {
@@ -885,6 +899,12 @@ export default class PutPullMockRootPage extends Vue {
         if (!pagedata) {
             this.page_property_view.page_data = null
             this.dropzone.html_tagdatas = null
+
+            this.width_dropzone = window.innerWidth - 300 - 300 - 19
+            this.height_dropzone = window.innerHeight - 159
+
+
+
             return
         }
         let html_tagdatas = pagedata.html_tagdatas
