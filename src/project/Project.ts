@@ -90,7 +90,7 @@ export function clone_project(project: Project): Project {
     const clone = new Project()
     clone.ppmk_project = clone_ppmk_project(project.ppmk_project)
     clone.ppmk_project_data = clone_ppmk_project_data(project.ppmk_project_data)
-    clone.ppmk_project_share = clone_ppmk_project_share(project.ppmk_project_share)
+    //TODO clone.ppmk_project_share = clone_ppmk_project_share(project.ppmk_project_share)
     return clone
 }
 

@@ -793,7 +793,10 @@ export default class PutPullMockRootPage extends Vue {
         export_options.export_head = this.export_head
         export_options.export_id = this.export_position_css
         export_options.export_position_css = this.export_position_css
-        let html = pagedata.generate_html(export_options)
+        let html = ""
+        if (pagedata) {
+            html = pagedata.generate_html(export_options)
+        }
         let css = pagedata.css
 
         {
@@ -877,7 +880,10 @@ export default class PutPullMockRootPage extends Vue {
         export_options.export_head = this.export_head
         export_options.export_id = this.export_position_css
         export_options.export_position_css = this.export_position_css
-        let html = pagedata.generate_html(export_options)
+        let html = ""
+        if (pagedata) {
+            html = pagedata.generate_html(export_options)
+        }
         this.page_html = html
     }
 
@@ -932,6 +938,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
+        if (!this.project.ppmk_project_data.project_data[this.page_list_view.selected_index]) return
         let tagdatas: Array<HTMLTagDataBase> = this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas
 
         let updated_tagdata: HTMLTagDataBase
@@ -951,7 +958,9 @@ export default class PutPullMockRootPage extends Vue {
             return false
         }
         walk_tagdatas(tagdatas)
-        this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
+        if (this.project.ppmk_project_data.project_data[this.page_list_view.selected_index]) {
+            this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
+        }
         this.tag_property_view.html_tagdata = updated_tagdata
         this.page_list_view.save_pagedatas_to_localstorage()
     }
@@ -965,8 +974,10 @@ export default class PutPullMockRootPage extends Vue {
         this.$nextTick(() => {
             this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index])
         })
-        this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
-        this.page_list_view.save_pagedatas_to_localstorage()
+        if (this.project.ppmk_project_data.project_data[this.page_list_view.selected_index]) {
+            this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
+            this.page_list_view.save_pagedatas_to_localstorage()
+        }
     }
 
     update_struct_view(tagdatas: Array<HTMLTagDataBase>) {
