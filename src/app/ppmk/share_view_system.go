@@ -542,13 +542,13 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				panic(e)
 				return
 			}
-			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			project, err = ppmkDB.GetProject(r.Context(), project.ProjectID)
 			if err != nil {
-				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				getProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
 				encoder := json.NewEncoder(w)
-				er := encoder.Encode(saveProjectDataResponse)
+				er := encoder.Encode(getProjectDataResponse)
 				if er != nil {
-					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 					panic(er)
 					return
 				}
@@ -733,13 +733,13 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				panic(e)
 				return
 			}
-			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			project, err = ppmkDB.GetProject(r.Context(), deleteProjectDataRequest.Project.PPMKProject.ProjectID)
 			if err != nil {
-				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				deleteProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
 				encoder := json.NewEncoder(w)
-				er := encoder.Encode(saveProjectDataResponse)
+				er := encoder.Encode(deleteProjectDataResponse)
 				if er != nil {
-					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 					panic(er)
 					return
 				}
@@ -827,13 +827,13 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				panic(e)
 				return
 			}
-			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			project, err = ppmkDB.GetProject(r.Context(), updateProjectDataRequest.Project.PPMKProject.ProjectID)
 			if err != nil {
-				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				updateProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
 				encoder := json.NewEncoder(w)
-				er := encoder.Encode(saveProjectDataResponse)
+				er := encoder.Encode(updateProjectDataResponse)
 				if er != nil {
-					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 					panic(er)
 					return
 				}
@@ -921,13 +921,13 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				panic(e)
 				return
 			}
-			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			project, err = ppmkDB.GetProject(r.Context(), deleteProjectRequest.Project.PPMKProject.ProjectID)
 			if err != nil {
-				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				deleteProjectResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
 				encoder := json.NewEncoder(w)
-				er := encoder.Encode(saveProjectDataResponse)
+				er := encoder.Encode(deleteProjectResponse)
 				if er != nil {
-					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 					panic(er)
 					return
 				}
@@ -997,13 +997,13 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				panic(e)
 				return
 			}
-			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			project, err = ppmkDB.GetProject(r.Context(), updateProjectRequest.Project.PPMKProject.ProjectID)
 			if err != nil {
-				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				updateProjectResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
 				encoder := json.NewEncoder(w)
-				er := encoder.Encode(saveProjectDataResponse)
+				er := encoder.Encode(updateProjectResponse)
 				if er != nil {
-					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 					panic(er)
 					return
 				}
