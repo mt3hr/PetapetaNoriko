@@ -942,6 +942,14 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 
 		// プロジェクトがなかったら作成する
 		project, err := ppmkDB.GetProject(r.Context(), updateProjectRequest.Project.PPMKProject.ProjectID)
+		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
+			e := ppmkDB.AddProject(r.Context(), updateProjectRequest.Project.PPMKProject)
+			if e != nil {
+				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
+				panic(e)
+				return
+			}
+		}
 		writable := false
 		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
 			if userID == writableUserID {
@@ -959,14 +967,6 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				return
 			}
 			return
-		}
-		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
-			e := ppmkDB.AddProject(r.Context(), updateProjectRequest.Project.PPMKProject)
-			if e != nil {
-				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				panic(e)
-				return
-			}
 		}
 
 		err = ppmkDB.UpdateProject(r.Context(), updateProjectRequest.Project.PPMKProject)
