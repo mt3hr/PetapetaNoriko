@@ -265,7 +265,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-col cols="auto">
                     <v-text>HTML要素一覧の表示</v-text>
                     <v-radio-group v-model="tag_list_view_mode">
-                        <v-radio :label="'タグ名とイメージ'" :value="TagListViewMode.TextAndImage" />
+                        <v-radio :label="'タグ名と画像'" :value="TagListViewMode.TextAndImage" />
                         <v-radio :label="'タグ名'" :value="TagListViewMode.Text" />
                         <v-radio :label="'画像'" :value="TagListViewMode.Image" />
                     </v-radio-group>
