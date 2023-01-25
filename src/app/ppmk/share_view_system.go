@@ -542,6 +542,18 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				panic(e)
 				return
 			}
+			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			if err != nil {
+				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				encoder := json.NewEncoder(w)
+				er := encoder.Encode(saveProjectDataResponse)
+				if er != nil {
+					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					panic(er)
+					return
+				}
+				panic(err)
+			}
 		}
 
 		getProjectDataResponse.ProjectData = projectData
@@ -721,6 +733,18 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				panic(e)
 				return
 			}
+			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			if err != nil {
+				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				encoder := json.NewEncoder(w)
+				er := encoder.Encode(saveProjectDataResponse)
+				if er != nil {
+					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					panic(er)
+					return
+				}
+				panic(err)
+			}
 		}
 
 		err = ppmkDB.DeleteProjectData(r.Context(), deleteProjectDataRequest.Project.PPMKProjectData.ProjectDataID)
@@ -802,6 +826,18 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
 				panic(e)
 				return
+			}
+			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			if err != nil {
+				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				encoder := json.NewEncoder(w)
+				er := encoder.Encode(saveProjectDataResponse)
+				if er != nil {
+					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					panic(er)
+					return
+				}
+				panic(err)
 			}
 		}
 
@@ -885,6 +921,18 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				panic(e)
 				return
 			}
+			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			if err != nil {
+				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				encoder := json.NewEncoder(w)
+				er := encoder.Encode(saveProjectDataResponse)
+				if er != nil {
+					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					panic(er)
+					return
+				}
+				panic(err)
+			}
 		}
 
 		err = ppmkDB.DeleteProject(r.Context(), deleteProjectRequest.Project.PPMKProject.ProjectID)
@@ -948,6 +996,18 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
 				panic(e)
 				return
+			}
+			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
+			if err != nil {
+				saveProjectDataResponse.Error = "サーバ内エラー:プロジェクトの取得に失敗しました"
+				encoder := json.NewEncoder(w)
+				er := encoder.Encode(saveProjectDataResponse)
+				if er != nil {
+					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+					panic(er)
+					return
+				}
+				panic(err)
 			}
 		}
 		writable := false
