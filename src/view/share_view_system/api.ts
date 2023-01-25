@@ -14,7 +14,8 @@ export const logout_address = host + "/ppmk_server/logout"
 export const reset_password_address = host + "/ppmk_server/reset_password"
 export const register_address = host + "/ppmk_server/register"
 export const list_project_summaries_address = host + "/ppmk_server/list_project_summaries"
-export const get_project_address = host + "/ppmk_server/get_project_data"
+export const get_project_address = host + "/ppmk_server/get_project"
+export const get_project_data_address = host + "/ppmk_server/get_project_data"
 export const save_project_data_address = host + "/ppmk_server/save_project_data"
 export const delete_project_data_address = host + "/ppmk_server/delete_project_data"
 export const update_project_data_address = host + "/ppmk_server/update_project_data"
@@ -439,16 +440,16 @@ export default class API {
     }
 
     async get_project_data(session_id: string, project_data_id: string): Promise<GetProjectDataResponse> {
-        const get_project_request = new GetProjectDataRequest()
-        get_project_request.session_id = session_id
-        get_project_request.project_data_id = project_data_id
+        const get_project_data_request = new GetProjectDataRequest()
+        get_project_data_request.session_id = session_id
+        get_project_data_request.project_data_id = project_data_id
 
-        const res = await fetch(get_project_address, {
+        const res = await fetch(get_project_data_address, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(get_project_request),
+            body: JSON.stringify(get_project_data_request),
         })
         const json = await res.json()
         const response: GetProjectDataResponse = json
