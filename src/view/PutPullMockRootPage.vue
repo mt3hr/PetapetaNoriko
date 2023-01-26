@@ -265,7 +265,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-col cols="auto">
                     <v-text>HTML要素一覧の表示</v-text>
                     <v-radio-group v-model="tag_list_view_mode">
-                        <v-radio :label="'タグ名とイメージ'" :value="TagListViewMode.TextAndImage" />
+                        <v-radio :label="'タグ名と画像'" :value="TagListViewMode.TextAndImage" />
                         <v-radio :label="'タグ名'" :value="TagListViewMode.Text" />
                         <v-radio :label="'画像'" :value="TagListViewMode.Image" />
                     </v-radio-group>
@@ -332,10 +332,11 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 </template>
 
 <script lang="ts">
-//TODO グローバルナビゲーション 横並びリスト
-//TODO プロジェクトデータの削除
-//TODO プロジェクトの削除
-//TODO プロジェクトの新規作成
+// グローバルナビゲーション 横並びリストはCSSに3行追加すればいいだけだから実装しなくていいか
+//TODO サーバからのプロジェクトデータの削除
+//TODO サーバからのプロジェクトの削除
+//TODO 卒業制作用POSTからProjectDataを読み込むやつ
+//TODO 卒業制作用サーバにデータを保存するやつ。
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView from '@/view/TagListView.vue'
@@ -490,9 +491,22 @@ export default class PutPullMockRootPage extends Vue {
     new_project() {
         this.is_show_new_project_dialog = false
         let project = new Project()
-        project.project_id = generateUUID()
         this.update_project(project)
-        this.page_list_view.add_page()
+        project.project_id = generateUUID()
+        this.update_struct_view(null)
+        this.updated_page_property(null)
+        this.updated_html_tag_property(null)
+        this.onclick_tag(null)
+        this.page_list_view.project = project
+        this.project_view.project = project
+        this.$nextTick(() => {
+            this.page_list_view.updated_project()
+            this.project_view.updated_project()
+            this.histories = new Histories()
+            this.show_page(null)
+            this.save_project_to_localstorage()
+        })
+
     }
 
     mounted(): void {
@@ -739,6 +753,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     read_ppmk_project(e) {
+        this.histories = new Histories()
         let file: File = e.target.files[0]
         let reader = new FileReader()
         reader.addEventListener('load', (e) => {
@@ -779,7 +794,10 @@ export default class PutPullMockRootPage extends Vue {
         export_options.export_head = this.export_head
         export_options.export_id = this.export_position_css
         export_options.export_position_css = this.export_position_css
-        let html = pagedata.generate_html(export_options)
+        let html = ""
+        if (pagedata) {
+            html = pagedata.generate_html(export_options)
+        }
         let css = pagedata.css
 
         {
@@ -863,7 +881,10 @@ export default class PutPullMockRootPage extends Vue {
         export_options.export_head = this.export_head
         export_options.export_id = this.export_position_css
         export_options.export_position_css = this.export_position_css
-        let html = pagedata.generate_html(export_options)
+        let html = ""
+        if (pagedata) {
+            html = pagedata.generate_html(export_options)
+        }
         this.page_html = html
     }
 
@@ -885,6 +906,12 @@ export default class PutPullMockRootPage extends Vue {
         if (!pagedata) {
             this.page_property_view.page_data = null
             this.dropzone.html_tagdatas = null
+
+            this.width_dropzone = window.innerWidth - 300 - 300 - 19
+            this.height_dropzone = window.innerHeight - 159
+
+
+
             return
         }
         let html_tagdatas = pagedata.html_tagdatas
@@ -912,6 +939,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     updated_html_tag_property(html_tagdata: HTMLTagDataBase) {
+        if (!this.project.ppmk_project_data.project_data[this.page_list_view.selected_index]) return
         let tagdatas: Array<HTMLTagDataBase> = this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas
 
         let updated_tagdata: HTMLTagDataBase
@@ -931,7 +959,9 @@ export default class PutPullMockRootPage extends Vue {
             return false
         }
         walk_tagdatas(tagdatas)
-        this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
+        if (this.project.ppmk_project_data.project_data[this.page_list_view.selected_index]) {
+            this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
+        }
         this.tag_property_view.html_tagdata = updated_tagdata
         this.page_list_view.save_pagedatas_to_localstorage()
     }
@@ -945,8 +975,10 @@ export default class PutPullMockRootPage extends Vue {
         this.$nextTick(() => {
             this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index])
         })
-        this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
-        this.page_list_view.save_pagedatas_to_localstorage()
+        if (this.project.ppmk_project_data.project_data[this.page_list_view.selected_index]) {
+            this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
+            this.page_list_view.save_pagedatas_to_localstorage()
+        }
     }
 
     update_struct_view(tagdatas: Array<HTMLTagDataBase>) {
