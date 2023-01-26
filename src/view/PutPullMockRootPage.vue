@@ -332,10 +332,11 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 </template>
 
 <script lang="ts">
-//TODO グローバルナビゲーション 横並びリスト
-//TODO プロジェクトデータの削除
-//TODO プロジェクトの削除
-//TODO プロジェクトの新規作成
+// グローバルナビゲーション 横並びリストはCSSに3行追加すればいいだけだから実装しなくていいか
+//TODO サーバからのプロジェクトデータの削除
+//TODO サーバからのプロジェクトの削除
+//TODO 卒業制作用POSTからProjectDataを読み込むやつ
+//TODO 卒業制作用サーバにデータを保存するやつ。
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView from '@/view/TagListView.vue'
