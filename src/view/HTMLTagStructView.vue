@@ -380,7 +380,6 @@ export default class HTMLTagPropertyView extends Vue {
 <style scoped>
 li {
     margin-left: 20px;
-    
 }
 
 .dropzone_wrap {

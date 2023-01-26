@@ -79,7 +79,7 @@ export default class Page extends Vue {
     generate_style(index: number): any {
         if (index == this.selected_index) {
             return {
-                "font-weight": "bold"
+                "font-weight": "bold", "font-size": "20px", "color": "steelblue"
             }
         }
         return {}
@@ -161,7 +161,7 @@ export default class Page extends Vue {
 }
 
 .mainside {
-    background: #e6e6e6;
+    background:  #e6e6e6;
 }
 
 .pageitem {}

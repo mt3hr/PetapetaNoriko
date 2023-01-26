@@ -1,8 +1,7 @@
 <template>
     <div class="main_page">
-    <v-container>
-        <div class="header_bar">
-        <v-row class="ppmk_row">
+    <v-container class="main_page">
+        <v-row class="ppmk_row header_bar">
             <v-col cols="auto">
                 <h1><a @click="to_toppage" :style="title_style">PutPullMock</a></h1>
             </v-col>
@@ -18,7 +17,6 @@
                 <v-icon>mdi-cog</v-icon>
             </v-btn>
         </v-row>
-        </div>
         <v-row class="ppmk_row ppmk_main_pane">
             <!--サイドバー-->
             <v-col cols="auto" class="sidebar">
@@ -89,7 +87,7 @@
         </v-row>
         <v-row class="ppmk_row" v-if="editor_mode">
             <v-col cols="auto">
-                <v-btn @click="is_show_css_dialog = true">CSS</v-btn>
+                <input type="button" value="CSS" @click="is_show_css_dialog = true">
                 <v-btn @click="is_show_webfont_dialog = true">WebFont</v-btn>
             </v-col>
             <v-spacer />
@@ -1173,9 +1171,9 @@ export default class PutPullMockRootPage extends Vue {
     }
     get title_style(): any {
         if (this.editor_mode) {
-            return { 'color': 'black', 'text-decoration': 'none', 'cursor': 'pointer' }
+            return { 'color': 'white', 'text-decoration': 'none', 'font-family': "Roboto", 'font-size': '50px', 'cursor': 'pointer' }
         } else {
-            return { 'color': 'black', 'text-decoration': 'none' }
+            return { 'color': 'white', 'text-decoration': 'none' }
         }
     }
     login() {
@@ -1260,16 +1258,17 @@ export default class PutPullMockRootPage extends Vue {
 </script>
 <style scoped>
 .component {
-    /* border: 1px black solid; */
+    border: 2px white solid;
     overflow: hidden;
     width: 300px;
 }
 
 .dropzone_wrap {
     white-space: pre-line;
-    height: calc(100vh - 104px);
-    width: fit-content;
+    height: calc(100vh - 113px);
+    width: calc(100vw - 599px);
     overflow: scroll;
+    overflow-x: scroll;
 }
 
 .dropzone {
@@ -1289,7 +1288,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .html_tag_list_view {
-    height: calc(100vh - 423px + 44px);
+    height: calc(100vh - 387px);
     overflow-y: scroll;
 }
 
@@ -1304,7 +1303,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .property_view {
-    height: calc(100vh - 574px);
+    height: calc(100vh - 582px);
     overflow: scroll;
 }
 
@@ -1323,7 +1322,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .ppmk_main_pane {
-    overflow-x: scroll;
+    overflow-x: none;
 }
 
 .v-input__details {
@@ -1343,17 +1342,14 @@ textarea {
     border: solid 1px silver !important;
 }
 
-body {
+/* body {
     overflow: scroll !important;
-}
+} */
 </style>
 
 <style>
 .main_page {
-    margin: auto;
-    position: relative;
-    justify-content: center;
-    background: white;
+    background: #white;
     font-family: "Roboto", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;      
@@ -1361,8 +1357,12 @@ body {
 
 ::-webkit-scrollbar{
    width: 10px;
+   height: 10px;
 }
 ::-webkit-scrollbar-track{
+   background-color: #e6e6e6;
+}
+::-webkit-scrollbar-corner{
    background-color: #e6e6e6;
 }
 ::-webkit-scrollbar-thumb{
@@ -1373,10 +1373,5 @@ body {
 .header_bar{
     background: steelblue;
     border-radius: 0 0 15px 15px;
-}
-.header_bar h1{
-    font-family: "Roboto", sans-serif;
-    font-size: 50px;
-    color: white;
 }
 </style>

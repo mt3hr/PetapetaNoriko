@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mainside" :style="style">
         <h2>プロジェクト
             <v-btn @click="new_project">+</v-btn>
         </h2>
@@ -9,7 +9,7 @@
                     プロジェクト名:
                 </td>
                 <td>
-                    <input type="text" v-model="project_name" @keydown="update_project_info" />
+                    <input class="textbox" type="text" v-model="project_name" @keydown="update_project_info" />
                 </td>
             </tr>
             <tr class="share_link" v-if="enable_share_view && session_id">

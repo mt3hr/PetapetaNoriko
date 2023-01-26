@@ -26,7 +26,7 @@ export default class PageListItem extends Vue {
 
     get style(): any {
         if (this.selected) {
-            return { "font-weight": "bold" }
+            return { "font-weight": "bold", "font-size": "20px", "color": "steelblue" }
         } else {
             return {}
         }
