@@ -2,7 +2,8 @@
     <div>
         <v-row v-for="project_summary, index in project_summaries" :key="index">
             <v-col>
-                <ProjectSummary @loaded_project="loaded_project" :project_summary="project_summary" />
+                <ProjectSummary @loaded_project="loaded_project" :project_summary="project_summary" 
+               @deleted_project="reload" @deleted_project_data="reload" />
             </v-col>
         </v-row>
         <v-snackbar v-model="show_error_message_snackbar">{{ error_message }}</v-snackbar>
@@ -26,7 +27,11 @@ export default class ProjectSummariesList extends Vue {
     error_message = ""
     show_error_message_snackbar = false
 
-    mounted(): void {
+    mounted() {
+        this.reload()
+    }
+
+    reload() {
         let api = new API()
         api.list_project_summaries(api.session_id)
             .then((res) => {

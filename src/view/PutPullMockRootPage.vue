@@ -22,8 +22,9 @@
                 <v-container>
                     <v-row>
                         <v-col cols="auto">
-                            <ProjectPropertyView class="component project_view" ref="project_view"
-                                @new_project="show_new_project_dialog" @updated_project_info="update_project_info" />
+                            <ProjectPropertyView class="component project_view" ref="project_view" v-show="editor_mode"
+                                :editor_mode="editor_mode" @new_project="show_new_project_dialog"
+                                @updated_project_info="update_project_info" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -329,6 +330,39 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
         </v-card>
     </v-dialog>
+
+    <v-dialog v-model="is_show_login_dialog" width="unset">
+        <v-card class="pa-5">
+            <Login @reset_password="() => { is_show_login_dialog = false; is_show_reset_password_dialog = true }"
+                @register="() => { is_show_login_dialog; is_show_register_dialog = true }" @logined="logined" />
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_login_dialog = false">閉じる</v-btn>
+                </v-col>
+            </v-row>
+        </v-card>
+    </v-dialog>
+    <v-dialog v-model="is_show_reset_password_dialog" width="unset">
+        <v-card class="pa-5">
+            <ResetPassword />
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_reset_password_dialog = false">閉じる</v-btn>
+                </v-col>
+            </v-row>
+        </v-card>
+    </v-dialog>
+    <v-dialog v-model="is_show_register_dialog" width="unset">
+        <v-card class="pa-5">
+            <Register />
+            <v-row>
+                <v-col cols="auto">
+                    <v-btn @click="is_show_register_dialog = false">閉じる</v-btn>
+                </v-col>
+            </v-row>
+        </v-card>
+    </v-dialog>
+
 </template>
 
 <script lang="ts">
@@ -358,6 +392,9 @@ import API, { ServerStatus } from './share_view_system/api'
 import Project, { clone_project, PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
 import ProjectSummariesList from '@/view/share_view_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
+import Login from './share_view_system/Login.vue'
+import Register from './share_view_system/Register.vue'
+import ResetPassword from './share_view_system/ResetPassword.vue'
 
 @Options({
     components: {
@@ -369,6 +406,9 @@ import ProjectPropertyView from './ProjectPropertyView.vue'
         HTMLTagStructView,
         ProjectSummariesList,
         ProjectPropertyView,
+        Login,
+        Register,
+        ResetPassword,
     }
 })
 
@@ -393,6 +433,9 @@ export default class PutPullMockRootPage extends Vue {
     is_show_oversize_localstorage_dialog = false
     is_show_save_to_server_dialog = false
     is_show_new_project_dialog = false
+    is_show_login_dialog = false
+    is_show_reset_password_dialog = false
+    is_show_register_dialog = false
     css = ""
     page_html = ""
     page_webfont = ""
@@ -420,7 +463,7 @@ export default class PutPullMockRootPage extends Vue {
 
     editor_mode = true
 
-    session_id: string
+    session_id = ""
 
     project = new Project()
 
@@ -506,10 +549,10 @@ export default class PutPullMockRootPage extends Vue {
             this.show_page(null)
             this.save_project_to_localstorage()
         })
-
     }
 
     mounted(): void {
+        this.session_id = undefined
         let project: Project
         try {
             project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
@@ -1175,12 +1218,13 @@ export default class PutPullMockRootPage extends Vue {
         }
     }
     login() {
-        this.$router.push('/login')
+        this.is_show_login_dialog = true
     }
     logout() {
         let api = new API()
         api.logout().then(() => {
-            location.reload()
+            let api = new API()
+            this.session_id = api.load_settings_from_cookie().session_id
         })
     }
 
@@ -1252,6 +1296,12 @@ export default class PutPullMockRootPage extends Vue {
         project.ppmk_project_data.project_data = pagedatas
         this.update_project(project)
     }
+
+    logined() {
+        let api = new API()
+        this.session_id = api.load_settings_from_cookie().session_id
+        this.is_show_login_dialog = false
+    }
 }
 </script>
 <style scoped>
@@ -1263,8 +1313,8 @@ export default class PutPullMockRootPage extends Vue {
 
 .dropzone_wrap {
     white-space: pre-line;
-    height: calc(100vh - 104px);
-    width: fit-content;
+    height: calc(100vh - 104px + 18px);
+    width: calc(100vw - 300px - 300px);
     overflow: scroll;
 }
 
@@ -1285,7 +1335,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .html_tag_list_view {
-    height: calc(100vh - 423px + 44px);
+    height: calc(100vh - 423px + 44px + 18px);
     overflow-y: scroll;
 }
 
@@ -1300,7 +1350,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .property_view {
-    height: calc(100vh - 574px);
+    height: calc(100vh - 574px + 18px);
     overflow: scroll;
 }
 
@@ -1316,10 +1366,6 @@ export default class PutPullMockRootPage extends Vue {
 .ppmk_row {
     width: 100vw;
     flex-wrap: nowrap;
-}
-
-.ppmk_main_pane {
-    overflow-x: scroll;
 }
 
 .v-input__details {

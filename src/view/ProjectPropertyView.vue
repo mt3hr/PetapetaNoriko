@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2>プロジェクト
-            <v-btn @click="new_project">+</v-btn>
+            <v-btn v-if="editor_mode" @click="new_project">+</v-btn>
         </h2>
         <table>
             <tr>
@@ -9,7 +9,7 @@
                     プロジェクト名:
                 </td>
                 <td>
-                    <input type="text" v-model="project_name" @keydown="update_project_info" />
+                    <input type="text" :readonly="!editor_mode" v-model="project_name" @keydown="update_project_info" />
                 </td>
             </tr>
             <tr class="share_link" v-if="enable_share_view && session_id">
@@ -32,6 +32,7 @@ import { Prop, Watch } from 'vue-property-decorator'
 import API from './share_view_system/api'
 
 export default class ProjectPropertyView extends Vue {
+    @Prop() editor_mode: boolean
     project: Project = new Project()
     project_name = ""
     is_shared_view = false
