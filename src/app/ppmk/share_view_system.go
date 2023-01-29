@@ -760,6 +760,13 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			panic(err)
 			return
 		}
+		encoder := json.NewEncoder(w)
+		e := encoder.Encode(deleteProjectDataResponse)
+		if e != nil {
+			deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+			panic(e)
+			return
+		}
 	}))
 
 	router.PathPrefix(updateProjectDataAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -946,6 +953,13 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				return
 			}
 			panic(err)
+			return
+		}
+		encoder := json.NewEncoder(w)
+		e := encoder.Encode(deleteProjectResponse)
+		if e != nil {
+			deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+			panic(e)
 			return
 		}
 	}))
@@ -1764,7 +1778,7 @@ func (p *ppmkDBImpl) UpdateProject(ctx context.Context, project *PPMKProject) er
 }
 
 func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*PPMKProjectData, error) {
-	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Autho, Memo FROM PPMKProjectData;`
+	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Author, Memo FROM PPMKProjectData;`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
@@ -1773,6 +1787,7 @@ func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*
 	defer rows.Close()
 
 	projectDatas := []*PPMKProjectData{}
+	jsonProjectData := sql.NullString{}
 	for rows.Next() {
 		select {
 		case <-ctx.Done():
@@ -1780,7 +1795,7 @@ func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*
 		default:
 			projectData := &PPMKProjectData{}
 			timestr := ""
-			err = rows.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &projectData.ProjectData, &projectData.Author, &projectData.Memo)
+			err = rows.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &jsonProjectData, &projectData.Author, &projectData.Memo)
 			if err != nil {
 				err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
 				return nil, err
@@ -1790,6 +1805,7 @@ func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*
 				err = fmt.Errorf("error at parse time %s: %w", timestr, err)
 				return nil, err
 			}
+			projectData.ProjectData = json.RawMessage(jsonProjectData.String)
 			projectData.SavedTime = t
 
 			projectDatas = append(projectDatas, projectData)
