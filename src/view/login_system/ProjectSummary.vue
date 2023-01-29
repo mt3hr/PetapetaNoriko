@@ -27,6 +27,7 @@
                 <v-list-item @click="delete_project_data">このバージョンを削除</v-list-item>
             </v-list>
         </v-menu>
+        <v-snackbar v-model="show_error_message_snackbar">{{ error_message }}</v-snackbar>
     </div>
 </template>
 
@@ -43,6 +44,9 @@ export default class ProjectSummary extends Vue {
     x_contextmenu = 0
     y_contextmenu = 0
     context_menu_target_project_data: PPMKProjectData
+
+    error_message = ""
+    show_error_message_snackbar = false
 
     open_project_latest(e: MouseEvent) {
         this.open_project(e, this.project_summary.ppmk_project_datas[0])
@@ -90,7 +94,9 @@ export default class ProjectSummary extends Vue {
         delete_project.project_id = this.project_summary.ppmk_project.project_id
         let res = await api.delete_project(delete_project)
         if (res.error) {
-            //TODO
+            this.error_message = res.error
+            this.show_error_message_snackbar = true
+            return
         }
         this.$emit("deleted_project")
     }
@@ -103,7 +109,8 @@ export default class ProjectSummary extends Vue {
         delete_project.project_id = this.project_summary.ppmk_project.project_id
         let res = await api.delete_project_data(delete_project)
         if (res.error) {
-            //TODO
+            this.error_message = res.error
+            this.show_error_message_snackbar = true
         }
         this.$emit("deleted_project_data")
     }

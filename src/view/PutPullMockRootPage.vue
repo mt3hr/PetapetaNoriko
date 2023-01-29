@@ -362,13 +362,11 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
         </v-card>
     </v-dialog>
-
+    <v-snackbar v-model="is_show_flush_message">{{ flush_message }}</v-snackbar>
 </template>
 
 <script lang="ts">
 // グローバルナビゲーション 横並びリストはCSSに3行追加すればいいだけだから実装しなくていいか
-//TODO サーバからのプロジェクトデータの削除
-//TODO サーバからのプロジェクトの削除
 //TODO 卒業制作用POSTからProjectDataを読み込むやつ
 //TODO 卒業制作用サーバにデータを保存するやつ。
 import { Vue, Options } from 'vue-class-component'
@@ -423,7 +421,7 @@ export default class PutPullMockRootPage extends Vue {
     TagListViewMode = TagListViewMode
     api = new API()
     width_dropzone = window.innerWidth - 300 - 300 - 19
-    height_dropzone = window.innerHeight - 159
+    height_dropzone = window.innerHeight - 159 + 18
 
     is_show_css_dialog = false
     is_show_writeout_dialog = false
@@ -473,6 +471,9 @@ export default class PutPullMockRootPage extends Vue {
 
     preparated = false
     project_data_memo = ""
+
+    flush_message = ""
+    is_show_flush_message = false
 
     @Watch('export_base64_image')
     @Watch('export_head')
@@ -569,8 +570,7 @@ export default class PutPullMockRootPage extends Vue {
 
             this.load_settings_from_cookie()
 
-            let api = new API()
-            api.status().then((server_status: ServerStatus) => {
+            this.api.status().then((server_status: ServerStatus) => {
                 this.enable_system = server_status.login_system
             }).catch((e) => {
                 this.enable_system = false
@@ -800,7 +800,14 @@ export default class PutPullMockRootPage extends Vue {
         let file: File = e.target.files[0]
         let reader = new FileReader()
         reader.addEventListener('load', (e) => {
-            let project: Project = JSON.parse(e.target.result.toString(), deserialize)
+            let project: Project
+            try {
+                project = JSON.parse(e.target.result.toString(), deserialize)
+            } catch (e) {
+                this.flush_message = "ppmk.jsonファイルを選択してください"
+                this.is_show_flush_message = true
+                return
+            }
             this.update_project(project)
             this.$nextTick(() => {
                 this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
@@ -951,10 +958,7 @@ export default class PutPullMockRootPage extends Vue {
             this.dropzone.html_tagdatas = null
 
             this.width_dropzone = window.innerWidth - 300 - 300 - 19
-            this.height_dropzone = window.innerHeight - 159
-
-
-
+            this.height_dropzone = window.innerHeight - 159 + 18
             return
         }
         let html_tagdatas = pagedata.html_tagdatas
@@ -1191,7 +1195,7 @@ export default class PutPullMockRootPage extends Vue {
         this.onclick_tag(null)
 
         this.width_dropzone = window.innerWidth - 300 - 300 - 19
-        this.height_dropzone = window.innerHeight - 159
+        this.height_dropzone = window.innerHeight - 159 + 18
 
         this.save_project_to_localstorage()
     }
@@ -1225,6 +1229,11 @@ export default class PutPullMockRootPage extends Vue {
         api.logout().then(() => {
             let api = new API()
             this.session_id = api.load_settings_from_cookie().session_id
+            this.flush_message = "ログアウトしました"
+            this.is_show_flush_message = true
+        }).catch((e) => {
+            this.flush_message = "ログアウトに失敗しました"
+            this.is_show_flush_message = true
         })
     }
 
@@ -1258,11 +1267,13 @@ export default class PutPullMockRootPage extends Vue {
         await this.api.preparate_save_ppmk_project(this.project)
         let update_project_response = await this.api.update_project(this.project)
         if (update_project_response.error) {
-            console.log(update_project_response.error)//TODO
+            this.flush_message = "プロジェクトを保存しました"
+            this.is_show_flush_message = true
         }
         let save_project_data_response = await this.api.save_project_data(this.project)
         if (save_project_data_response.error) {
-            console.log(save_project_data_response.error)//TODO
+            this.flush_message = "プロジェクトデータを保存しました"
+            this.is_show_flush_message = true
         }
     }
 
@@ -1292,6 +1303,8 @@ export default class PutPullMockRootPage extends Vue {
         let project = this.project
         project.ppmk_project = project_info
         this.update_project(project)
+        this.save_project_to_localstorage()
+        this.append_history()
     }
 
     update_pagedatas(pagedatas: Array<PageData>) {
@@ -1304,6 +1317,8 @@ export default class PutPullMockRootPage extends Vue {
         let api = new API()
         this.session_id = api.load_settings_from_cookie().session_id
         this.is_show_login_dialog = false
+        this.flush_message = "ログインしました"
+        this.is_show_flush_message = true
     }
 }
 </script>
