@@ -45,7 +45,7 @@ export class PPMKProject {
 export class PPMKProjectData {
     project_data_id = generateUUID()
     project_id = ""
-    saved_time = ""
+    saved_time = "1970-01-01T00:00:00Z"
     project_data = new Array<PageData>()
     author = ""
     memo = ""

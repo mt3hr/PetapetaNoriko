@@ -1,336 +1,370 @@
 <template>
     <div class="main_page">
-    <v-container class="main_page">
-        <v-row class="ppmk_row header_bar">
-            <v-col cols="auto">
-                <h1><a @click="to_toppage" :style="title_style">PutPullMock</a></h1>
-            </v-col>
-            <v-spacer />
-            <v-col cols="auto">
-                <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
-            </v-col>
-            <v-col v-if="enable_system" cols="auto">
-                <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
-                <v-btn v-else @click="logout">ログアウト</v-btn>
-            </v-col>
-            <v-btn icon v-if="editor_mode" @click="show_options_dialog">
-                <v-icon>mdi-cog</v-icon>
-            </v-btn>
-        </v-row>
-        <v-row class="ppmk_row ppmk_main_pane">
-            <!--サイドバー-->
-            <v-col cols="auto" class="sidebar">
-                <v-container>
-                    <v-row>
-                        <v-col cols="auto">
-                            <ProjectPropertyView class="component project_view" ref="project_view"
-                                @new_project="show_new_project_dialog" @updated_project_info="update_project_info" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <!--ページリストビュー。ここをクリックしてページを選択する-->
-                        <v-col cols="auto">
-                            <PageListView class="component page_list_view" ref="page_list_view"
-                                @deleted_page="deleted_page" @updated_pagedatas="update_pagedatas"
-                                :editor_mode="editor_mode" @clicked_page="show_page" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <!--タグリストビュー。ここからタグをドラッグしてドロップゾーンに貼り付ける-->
-                        <v-col cols="auto">
-                            <TagListView v-show="editor_mode" :mode="tag_list_view_mode"
-                                class="component html_tag_list_view" />
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-col>
+        <v-container class="main_page">
+            <v-row class="ppmk_row header_bar">
+                <v-col cols="auto">
+                    <h1><a @click="to_toppage" :style="title_style">PutPullMock</a></h1>
+                </v-col>
+                <v-spacer />
+                <v-col cols="auto">
+                    <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
+                </v-col>
+                <v-col v-if="enable_system" cols="auto">
+                    <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
+                    <v-btn v-else @click="logout">ログアウト</v-btn>
+                </v-col>
+                <v-btn icon v-if="editor_mode" @click="show_options_dialog">
+                    <v-icon>mdi-cog</v-icon>
+                </v-btn>
+            </v-row>
+            <v-row class="ppmk_row ppmk_main_pane">
+                <!--サイドバー-->
+                <v-col cols="auto" class="sidebar">
+                    <v-container>
+                        <v-row>
+                            <v-col cols="auto">
+                                <ProjectPropertyView class="component project_view" ref="project_view"
+                                    v-show="editor_mode" :editor_mode="editor_mode"
+                                    @new_project="show_new_project_dialog"
+                                    @updated_project_info="update_project_info" />
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <!--ページリストビュー。ここをクリックしてページを選択する-->
+                            <v-col cols="auto">
+                                <PageListView class="component page_list_view" ref="page_list_view"
+                                    @deleted_page="deleted_page" @updated_pagedatas="update_pagedatas"
+                                    :editor_mode="editor_mode" @clicked_page="show_page" />
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <!--タグリストビュー。ここからタグをドラッグしてドロップゾーンに貼り付ける-->
+                            <v-col cols="auto">
+                                <TagListView v-show="editor_mode" :mode="tag_list_view_mode"
+                                    class="component html_tag_list_view" />
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-col>
 
-            <!--ドロップゾーン-->
-            <v-col cols="auto" class="dropzone_wrap">
-                <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
-                    :editor_mode="editor_mode" :clicked_tagdata="clicked_tagdata"
-                    @updated_tagdatas_root="updated_htmltagdatas" @add_page="add_page"
-                    @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata" @copy_tag="copy_tag"
-                    @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
-            </v-col>
+                <!--ドロップゾーン-->
+                <v-col cols="auto" class="dropzone_wrap">
+                    <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
+                        :editor_mode="editor_mode" :clicked_tagdata="clicked_tagdata"
+                        @updated_tagdatas_root="updated_htmltagdatas" @add_page="add_page"
+                        @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata"
+                        @copy_tag="copy_tag" @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
+                </v-col>
 
-            <!--プロパティビュー-->
-            <v-col cols="auto" class="propertyview" v-show="editor_mode">
-                <v-container>
-                    <v-row>
-                        <v-col cols="auto">
-                            <!--ページプロパティビュー-->
-                            <PagePropertyView class="component page_property_view" ref="page_property_view"
-                                @updated_page_property="updated_page_property" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="auto">
-                            <!--プロパティビュー-->
-                            <HTMLTagPropertyView class="component property_view" ref="tag_property_view"
-                                :auto_focus_tag_property_view="auto_focus_tag_property_view"
-                                @updated_html_tag_property="updated_html_tag_property" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="auto">
-                            <!--構造ビュー-->
-                            <HTMLTagStructView @onclick_tag="onclick_tag" class="component struct_view"
-                                @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
-                                :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" ref="tag_struct_view"
-                                :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view"
-                                @delete_tagdata="delete_tagdata" @updated_html_tagdatas="updated_htmltagdatas" />
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-col>
-        </v-row>
-        <v-row class="ppmk_row" v-if="editor_mode">
-            <v-col cols="auto">
-                <input type="button" value="CSS" @click="is_show_css_dialog = true">
-                <v-btn @click="is_show_webfont_dialog = true">WebFont</v-btn>
-            </v-col>
-            <v-spacer />
-            <v-col cols="auto">
-                <v-btn @click="show_readin_dialog">読み込み</v-btn>
-                <v-btn @click="show_writeout_dialog">書き出し</v-btn>
-            </v-col>
-        </v-row>
-    </v-container>
+                <!--プロパティビュー-->
+                <v-col cols="auto" class="propertyview" v-show="editor_mode">
+                    <v-container>
+                        <v-row>
+                            <v-col cols="auto">
+                                <!--ページプロパティビュー-->
+                                <PagePropertyView class="component page_property_view" ref="page_property_view"
+                                    @updated_page_property="updated_page_property" />
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="auto">
+                                <!--プロパティビュー-->
+                                <HTMLTagPropertyView class="component property_view" ref="tag_property_view"
+                                    :auto_focus_tag_property_view="auto_focus_tag_property_view"
+                                    @updated_html_tag_property="updated_html_tag_property" />
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="auto">
+                                <!--構造ビュー-->
+                                <HTMLTagStructView @onclick_tag="onclick_tag" class="component struct_view"
+                                    @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
+                                    :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" ref="tag_struct_view"
+                                    :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view"
+                                    @delete_tagdata="delete_tagdata" @updated_html_tagdatas="updated_htmltagdatas" />
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-col>
+            </v-row>
+            <v-row class="ppmk_row" v-if="editor_mode">
+                <v-col cols="auto">
+                    <input type="button" value="CSS" @click="is_show_css_dialog = true">
+                    <v-btn @click="is_show_webfont_dialog = true">WebFont</v-btn>
+                </v-col>
+                <v-spacer />
+                <v-col cols="auto">
+                    <v-btn @click="show_readin_dialog">読み込み</v-btn>
+                    <v-btn @click="show_writeout_dialog">書き出し</v-btn>
+                </v-col>
+            </v-row>
+        </v-container>
 
-    <v-dialog v-model="is_show_css_dialog">
-        <v-card class="pa-5" :style="page_css_view_style">
-            <v-card-title>
+        <v-dialog v-model="is_show_css_dialog">
+            <v-card class="pa-5" :style="page_css_view_style">
+                <v-card-title>
+                    <v-row>
+                        <v-col cols="auto">
+                            ページCSS
+                        </v-col>
+                        <v-spacer />
+                        <v-col cols="auto">
+                            <v-checkbox class="checkbox" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
+                        </v-col>
+                    </v-row>
+                </v-card-title>
+                <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
+  width: 200px;
+  height: auto;
+}"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
-                        ページCSS
+                        <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_readin_dialog" width="unset">
+            <v-card class="pa-5">
+                <v-row>
+                    <v-col>
+                        <input type="file" @change="read_ppmk_project" />
+                    </v-col>
+                </v-row>
+                <v-row v-if="enable_system && session_id">
+                    <v-col>
+                        <ProjectSummariesList v-if="session_id" @loaded_project="loaded_project" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_readin_dialog = false">閉じる</v-btn>
                     </v-col>
                     <v-spacer />
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_webfont_dialog">
+            <v-card class="pa-5">
+                <v-card-title>ページウェブフォント</v-card-title>
+                <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
+                <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
+https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog id="writeout_dialog" v-model="is_show_writeout_dialog">
+            <v-card class="pa-5">
+                <v-card-title>ページHTML</v-card-title>
+                <v-row>
+                    <v-col>
+                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
+                    </v-col>
+                    <v-col>
+                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
+                            :label="'埋め込み画像'" />
+                    </v-col>
+                    <v-col>
+                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
+                            :label="'位置情報'" />
+                    </v-col>
+                </v-row>
+                <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="print_this_page">このページを印刷する</v-btn>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn @click="save_ppmk_html_css_this_page">このページをHTMLファイルに保存</v-btn>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn @click="save_ppmk_html_css_all_pages">すべてのページをHTMLファイルに保存</v-btn>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
+                    </v-col>
+                    <v-col v-if="enable_system && session_id" cols="auto">
+                        <v-btn @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="is_show_save_to_server_dialog">
+            <v-card class="pa-5">
+                <v-card-title>サーバに保存</v-card-title>
+                <v-textarea v-model="project_data_memo" placeholder="メモ" />
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="() => { apply_project_data_memo(); save_ppmk_project_to_server() }">保存</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="is_show_new_project_dialog" width="unset">
+            <v-card class="pa-5">
+                <v-card-title>プロジェクト新規作成</v-card-title>
+                <p>プロジェクトを新規作成します</p>
+                <p>注: 保存されていない作業は破棄されます</p>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_new_project_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="new_project">新規作成</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="is_show_options_dialog" width="unset">
+            <v-card class="pa-5">
+                <v-card-title>設定</v-card-title>
+                <v-row>
+                    <v-col cols="auto">
+                        <h3>全般</h3>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-checkbox class="checkbox" v-model="show_border" :label="'境界を表示'" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-checkbox class="checkbox" v-model="auto_save_project_data_to_localstorage" :label="'自動保存'" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-checkbox class="checkbox" v-model="use_undo" :label="'Undo機能'" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-checkbox class="checkbox" v-model="auto_focus_tag_property_view"
+                            :label="'プロパティビューオートフォーカス'" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-checkbox class="checkbox" v-model="auto_scroll_tag_struct_view" :label="'構造ビュー自動スクロール'" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-text>HTML要素一覧の表示</v-text>
+                        <v-radio-group v-model="tag_list_view_mode">
+                            <v-radio :label="'タグ名と画像'" :value="TagListViewMode.TextAndImage" />
+                            <v-radio :label="'タグ名'" :value="TagListViewMode.Text" />
+                            <v-radio :label="'画像'" :value="TagListViewMode.Image" />
+                        </v-radio-group>
+                    </v-col>
+                </v-row>
+
+                <v-row>
+                    <v-col cols="auto">
+                        <h3>CSS編集画面</h3>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col cols="auto">
                         <v-checkbox class="checkbox" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
                     </v-col>
                 </v-row>
-            </v-card-title>
-            <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-  width: 200px;
-  height: auto;
-}"></v-textarea>
-            <v-row>
-                <v-col cols="auto">
-                    <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
-                </v-col>
-            </v-row>
-        </v-card>
-    </v-dialog>
-    <v-dialog v-model="is_show_readin_dialog" width="unset">
-        <v-card class="pa-5">
-            <v-row>
-                <v-col>
-                    <input type="file" @change="read_ppmk_project" />
-                </v-col>
-            </v-row>
-            <v-row v-if="enable_system && session_id">
-                <v-col>
-                    <ProjectSummariesList v-if="session_id" @loaded_project="loaded_project" />
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-btn @click="is_show_readin_dialog = false">閉じる</v-btn>
-                </v-col>
-                <v-spacer />
-            </v-row>
-        </v-card>
-    </v-dialog>
-    <v-dialog v-model="is_show_webfont_dialog">
-        <v-card class="pa-5">
-            <v-card-title>ページウェブフォント</v-card-title>
-            <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
-            <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
-            <v-row>
-                <v-col cols="auto">
-                    <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
-                </v-col>
-            </v-row>
-        </v-card>
-    </v-dialog>
-    <v-dialog id="writeout_dialog" v-model="is_show_writeout_dialog">
-        <v-card class="pa-5">
-            <v-card-title>ページHTML</v-card-title>
-            <v-row>
-                <v-col>
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
-                </v-col>
-                <v-col>
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
-                        :label="'埋め込み画像'" />
-                </v-col>
-                <v-col>
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
-                        :label="'位置情報'" />
-                </v-col>
-            </v-row>
-            <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
-            <v-row>
-                <v-col cols="auto">
-                    <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
-                </v-col>
-                <v-spacer />
-                <v-col cols="auto">
-                    <v-btn @click="print_this_page">このページを印刷する</v-btn>
-                </v-col>
-                <v-col cols="auto">
-                    <v-btn @click="save_ppmk_html_css_this_page">このページをHTMLファイルに保存</v-btn>
-                </v-col>
-                <v-col cols="auto">
-                    <v-btn @click="save_ppmk_html_css_all_pages">すべてのページをHTMLファイルに保存</v-btn>
-                </v-col>
-                <v-col cols="auto">
-                    <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
-                </v-col>
-                <v-col v-if="enable_system && session_id" cols="auto">
-                    <v-btn @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
-                </v-col>
-            </v-row>
-        </v-card>
-    </v-dialog>
+                <v-row>
+                    <v-col cols="auto">
+                        <h3>出力画面</h3>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
+                            :label="'埋め込み画像'" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
+                            :label="'位置情報'" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_options_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-if="editor_mode" v-model="is_show_oversize_localstorage_dialog" width="unset">
+            <v-card class="pa-5">
+                <v-card-title>
+                    自動保存容量超過
+                </v-card-title>
+                <v-card-text>
+                    データが大きすぎるため自動保存できません。
+                    自動保存機能を無効化します。
+                    （書き出しはできます）
+                </v-card-text>
 
-    <v-dialog v-model="is_show_save_to_server_dialog">
-        <v-card class="pa-5">
-            <v-card-title>サーバに保存</v-card-title>
-            <v-textarea v-model="project_data_memo" placeholder="メモ" />
-            <v-row>
-                <v-col cols="auto">
-                    <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
-                </v-col>
-                <v-spacer />
-                <v-col cols="auto">
-                    <v-btn @click="() => { apply_project_data_memo(); save_ppmk_project_to_server() }">保存</v-btn>
-                </v-col>
-            </v-row>
-        </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="is_show_new_project_dialog" width="unset">
-        <v-card class="pa-5">
-            <v-card-title>プロジェクト新規作成</v-card-title>
-            <p>プロジェクトを新規作成します</p>
-            <p>注: 保存されていない作業は破棄されます</p>
-            <v-row>
-                <v-col cols="auto">
-                    <v-btn @click="is_show_new_project_dialog = false">閉じる</v-btn>
-                </v-col>
-                <v-spacer />
-                <v-col cols="auto">
-                    <v-btn @click="new_project">新規作成</v-btn>
-                </v-col>
-            </v-row>
-        </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="is_show_options_dialog" width="unset">
-        <v-card class="pa-5">
-            <v-card-title>設定</v-card-title>
-            <v-row>
-                <v-col cols="auto">
-                    <h3>全般</h3>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-checkbox class="checkbox" v-model="show_border" :label="'境界を表示'" />
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-checkbox class="checkbox" v-model="auto_save_project_data_to_localstorage" :label="'自動保存'" />
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-checkbox class="checkbox" v-model="use_undo" :label="'Undo機能'" />
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-checkbox class="checkbox" v-model="auto_focus_tag_property_view" :label="'プロパティビューオートフォーカス'" />
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-checkbox class="checkbox" v-model="auto_scroll_tag_struct_view" :label="'構造ビュー自動スクロール'" />
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-text>HTML要素一覧の表示</v-text>
-                    <v-radio-group v-model="tag_list_view_mode">
-                        <v-radio :label="'タグ名と画像'" :value="TagListViewMode.TextAndImage" />
-                        <v-radio :label="'タグ名'" :value="TagListViewMode.Text" />
-                        <v-radio :label="'画像'" :value="TagListViewMode.Image" />
-                    </v-radio-group>
-                </v-col>
-            </v-row>
-
-            <v-row>
-                <v-col cols="auto">
-                    <h3>CSS編集画面</h3>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-checkbox class="checkbox" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <h3>出力画面</h3>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
-                        :label="'埋め込み画像'" />
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
-                        :label="'位置情報'" />
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-btn @click="is_show_options_dialog = false">閉じる</v-btn>
-                </v-col>
-            </v-row>
-        </v-card>
-    </v-dialog>
-    <v-dialog v-if="editor_mode" v-model="is_show_oversize_localstorage_dialog" width="unset">
-        <v-card class="pa-5">
-            <v-card-title>
-                自動保存容量超過
-            </v-card-title>
-            <v-card-text>
-                データが大きすぎるため自動保存できません。
-                自動保存機能を無効化します。
-                （書き出しはできます）
-            </v-card-text>
-
-            <v-row>
-                <v-col cols="auto">
-                    <v-btn @click="is_show_oversize_localstorage_dialog = false">閉じる</v-btn>
-                </v-col>
-            </v-row>
-        </v-card>
-    </v-dialog>
-        </div>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_oversize_localstorage_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_login_dialog" width="unset">
+            <v-card class="pa-5">
+                <Login @reset_password="() => { is_show_login_dialog = false; is_show_reset_password_dialog = true }"
+                    @register="() => { is_show_login_dialog; is_show_register_dialog = true }" @logined="logined" />
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_login_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_reset_password_dialog" width="unset">
+            <v-card class="pa-5">
+                <ResetPassword />
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_reset_password_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_register_dialog" width="unset">
+            <v-card class="pa-5">
+                <Register />
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_register_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+    </div>
 </template>
 
 <script lang="ts">
@@ -360,6 +394,9 @@ import API, { ServerStatus } from './share_view_system/api'
 import Project, { clone_project, PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
 import ProjectSummariesList from '@/view/share_view_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
+import Login from './share_view_system/Login.vue'
+import Register from './share_view_system/Register.vue'
+import ResetPassword from './share_view_system/ResetPassword.vue'
 
 @Options({
     components: {
@@ -371,6 +408,9 @@ import ProjectPropertyView from './ProjectPropertyView.vue'
         HTMLTagStructView,
         ProjectSummariesList,
         ProjectPropertyView,
+        Login,
+        Register,
+        ResetPassword,
     }
 })
 
@@ -395,6 +435,9 @@ export default class PutPullMockRootPage extends Vue {
     is_show_oversize_localstorage_dialog = false
     is_show_save_to_server_dialog = false
     is_show_new_project_dialog = false
+    is_show_login_dialog = false
+    is_show_reset_password_dialog = false
+    is_show_register_dialog = false
     css = ""
     page_html = ""
     page_webfont = ""
@@ -422,7 +465,7 @@ export default class PutPullMockRootPage extends Vue {
 
     editor_mode = true
 
-    session_id: string
+    session_id = ""
 
     project = new Project()
 
@@ -508,10 +551,10 @@ export default class PutPullMockRootPage extends Vue {
             this.show_page(null)
             this.save_project_to_localstorage()
         })
-
     }
 
     mounted(): void {
+        this.session_id = undefined
         let project: Project
         try {
             project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
@@ -1177,12 +1220,13 @@ export default class PutPullMockRootPage extends Vue {
         }
     }
     login() {
-        this.$router.push('/login')
+        this.is_show_login_dialog = true
     }
     logout() {
         let api = new API()
         api.logout().then(() => {
-            location.reload()
+            let api = new API()
+            this.session_id = api.load_settings_from_cookie().session_id
         })
     }
 
@@ -1253,6 +1297,12 @@ export default class PutPullMockRootPage extends Vue {
         let project = this.project
         project.ppmk_project_data.project_data = pagedatas
         this.update_project(project)
+    }
+
+    logined() {
+        let api = new API()
+        this.session_id = api.load_settings_from_cookie().session_id
+        this.is_show_login_dialog = false
     }
 }
 </script>
@@ -1352,25 +1402,28 @@ textarea {
     background: #white;
     font-family: "Roboto", sans-serif;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;      
+    -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar{
-   width: 10px;
-   height: 10px;
-}
-::-webkit-scrollbar-track{
-   background-color: #e6e6e6;
-}
-::-webkit-scrollbar-corner{
-   background-color: #e6e6e6;
-}
-::-webkit-scrollbar-thumb{
-   background-color: steelblue;
-   border-radius: 5px;
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
 }
 
-.header_bar{
+::-webkit-scrollbar-track {
+    background-color: #e6e6e6;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: #e6e6e6;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: steelblue;
+    border-radius: 5px;
+}
+
+.header_bar {
     background: steelblue;
     border-radius: 0 0 15px 15px;
 }
