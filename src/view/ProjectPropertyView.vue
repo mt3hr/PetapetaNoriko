@@ -12,7 +12,7 @@
                     <input type="text" :readonly="!editor_mode" v-model="project_name" @keydown="update_project_info" />
                 </td>
             </tr>
-            <tr class="share_link" v-if="enable_share_view && session_id" v-show="false">
+            <tr class="share_link" v-if="login_view && session_id" v-show="false">
                 <td>
                     共有
                 </td>
@@ -29,14 +29,14 @@ import Project, { PPMKProject } from '@/project/Project'
 import { deserialize } from '@/serializable/serializable'
 import { Vue } from 'vue-class-component'
 import { Prop, Watch } from 'vue-property-decorator'
-import API from './share_view_system/api'
+import API from '@/view/login_system/api'
 
 export default class ProjectPropertyView extends Vue {
     @Prop() editor_mode: boolean
     project: Project = new Project()
     project_name = ""
     is_shared_view = false
-    enable_share_view = false
+    login_view = false
     session_id: string
 
     updated_project() {
@@ -49,7 +49,7 @@ export default class ProjectPropertyView extends Vue {
         this.session_id = api.session_id
         api.status()
             .then((res) => {
-                this.enable_share_view = res.share_view_system
+                this.login_view = res.login_system
             })
         this.project.project_id = ""
         this.updated_project()

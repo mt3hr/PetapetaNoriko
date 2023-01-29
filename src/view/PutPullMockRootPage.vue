@@ -388,13 +388,13 @@ import generateUUID from '@/uuid'
 import { Histories } from './History'
 import Settings from './Settings'
 import TagListViewMode from './TagListViewMode'
-import API, { ServerStatus } from './share_view_system/api'
+import API, { ServerStatus } from '@/view/login_system/api'
 import Project, { clone_project, PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
-import ProjectSummariesList from '@/view/share_view_system/ProjectSummariesList.vue'
+import ProjectSummariesList from '@/view/login_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
-import Login from './share_view_system/Login.vue'
-import Register from './share_view_system/Register.vue'
-import ResetPassword from './share_view_system/ResetPassword.vue'
+import Login from './login_system/Login.vue'
+import Register from './login_system/Register.vue'
+import ResetPassword from './login_system/ResetPassword.vue'
 
 @Options({
     components: {
@@ -571,7 +571,7 @@ export default class PutPullMockRootPage extends Vue {
 
             let api = new API()
             api.status().then((server_status: ServerStatus) => {
-                this.enable_system = server_status.share_view_system
+                this.enable_system = server_status.login_system
             }).catch((e) => {
                 this.enable_system = false
             })
@@ -1256,11 +1256,14 @@ export default class PutPullMockRootPage extends Vue {
     async save_ppmk_project_to_server() {
         this.is_show_save_to_server_dialog = false
         await this.api.preparate_save_ppmk_project(this.project)
-        let api = new API()
-        let project: Project = this.project
-        project.ppmk_project_data.project_data_id = generateUUID()
-        let update_project_response = await api.update_project(api.session_id, project)
-        let save_project_data_response = await api.save_project_data(api.session_id, project)
+        let update_project_response = await this.api.update_project(this.project)
+        if (update_project_response.error) {
+            console.log(update_project_response.error)//TODO
+        }
+        let save_project_data_response = await this.api.save_project_data(this.project)
+        if (save_project_data_response.error) {
+            console.log(save_project_data_response.error)//TODO
+        }
     }
 
     @Watch('project')

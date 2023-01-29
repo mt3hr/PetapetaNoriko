@@ -50,7 +50,7 @@ export default class ProjectSummary extends Vue {
 
     open_project(e: MouseEvent, project_data: PPMKProjectData) {
         let api = new API()
-        api.get_project_data(api.session_id, project_data.project_data_id)
+        api.get_project_data(project_data.project_data_id)
             .then((res) => {
                 this.$emit("loaded_project", this.project_summary.ppmk_project, res.project_data)
             })
@@ -88,7 +88,7 @@ export default class ProjectSummary extends Vue {
         let delete_project = new Project()
         delete_project.ppmk_project = this.project_summary.ppmk_project
         delete_project.project_id = this.project_summary.ppmk_project.project_id
-        let res = await api.delete_project(api.session_id, delete_project)
+        let res = await api.delete_project(delete_project)
         if (res.error) {
             //TODO
         }
@@ -101,7 +101,7 @@ export default class ProjectSummary extends Vue {
         delete_project.ppmk_project = this.project_summary.ppmk_project
         delete_project.ppmk_project_data = this.context_menu_target_project_data
         delete_project.project_id = this.project_summary.ppmk_project.project_id
-        let res = await api.delete_project_data(api.session_id, delete_project)
+        let res = await api.delete_project_data(delete_project)
         if (res.error) {
             //TODO
         }
