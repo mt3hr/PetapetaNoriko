@@ -1263,8 +1263,8 @@ export default class PutPullMockRootPage extends Vue {
 
 .dropzone_wrap {
     white-space: pre-line;
-    height: calc(100vh - 104px);
-    width: fit-content;
+    height: calc(100vh - 104px + 18px);
+    width: calc(100vw - 300px - 300px);
     overflow: scroll;
 }
 
@@ -1285,7 +1285,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .html_tag_list_view {
-    height: calc(100vh - 423px + 44px);
+    height: calc(100vh - 423px + 44px + 18px);
     overflow-y: scroll;
 }
 
@@ -1300,7 +1300,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .property_view {
-    height: calc(100vh - 574px);
+    height: calc(100vh - 574px + 18px);
     overflow: scroll;
 }
 
@@ -1316,10 +1316,6 @@ export default class PutPullMockRootPage extends Vue {
 .ppmk_row {
     width: 100vw;
     flex-wrap: nowrap;
-}
-
-.ppmk_main_pane {
-    overflow-x: scroll;
 }
 
 .v-input__details {
