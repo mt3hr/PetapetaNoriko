@@ -25,8 +25,9 @@ func init() {
 	cmd.AddCommand(serverCmd)
 	cmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", proxy, "proxy")
 	cmd.PersistentFlags().Uint16VarP(&port, "port", "p", port, "port")
-	cmd.PersistentFlags().BoolVarP(&shareViewSystem, "share_view_system", "s", shareViewSystem,
-		`share_view_system
+	cmd.PersistentFlags().BoolVarP(&register, "register", "r", register, "register")
+	cmd.PersistentFlags().BoolVarP(&loginSystem, "login_system", "s", loginSystem,
+		`login_system
 		環境変数を設定して起動してください
 		PPMK_EMAIL_HOSTNAME: パスワードリセット用メールのホスト名
 		PPMK_EMAIL_PORT:     パスワードリセット用メールのポート番号
@@ -39,11 +40,12 @@ var (
 	//go:embed embed
 	htmlFS embed.FS // htmlファイル郡
 
-	port            = uint16(51520)
-	proxy           = ""
-	shareViewSystem = false
-	dbfilename      = "ppmk.db"
-	serverStatus    = ServerStatus{}
+	port         = uint16(51520)
+	proxy        = ""
+	loginSystem  = false
+	dbfilename   = "ppmk.db"
+	register     = true
+	serverStatus = ServerStatus{}
 
 	serverCmd = &cobra.Command{
 		Use: "server",
@@ -187,12 +189,13 @@ func openbrowser(url string) error {
 }
 
 func launchServer() error {
-	if shareViewSystem {
+	if loginSystem {
 		initializeSystemVariable()
 	}
 
-	serverStatus.ShareViewSystem = shareViewSystem
-	serverStatus.EnableResetPassword = serverStatus.ShareViewSystem &&
+	serverStatus.EnableRegister = register
+	serverStatus.LoginSystem = loginSystem
+	serverStatus.EnableResetPassword = serverStatus.LoginSystem &&
 		(emailhostname != "" &&
 			emailport != 0 &&
 			emailusername != "" &&
@@ -203,7 +206,7 @@ func launchServer() error {
 	if err != nil {
 		return err
 	}
-	if shareViewSystem {
+	if loginSystem {
 		ppmkDB, err := newPPMKDB(dbfilename)
 		if err != nil {
 			panic(err)
@@ -238,6 +241,7 @@ func launchServer() error {
 }
 
 type ServerStatus struct {
-	ShareViewSystem     bool `json:"share_view_system"`
+	LoginSystem         bool `json:"login_system"`
 	EnableResetPassword bool `json:"enable_reset_password"`
+	EnableRegister      bool `json:"enable_register"`
 }
