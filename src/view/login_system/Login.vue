@@ -2,7 +2,7 @@
     <div>
         <input type="email" v-model="email" placeholder="メールアドレス" name="email"><br />
         <input type="password" v-model="password" placeholder="パスワード" name="password"><br />
-        <v-btn @click.once="login">ログイン</v-btn><br />
+        <v-btn @click="login">ログイン</v-btn><br />
         <a v-if="enable_register" @click="register">新規登録</a><br />
         <a v-if="enable_reset_password" @click="reset_password">パスワードリセット</a><br />
         <v-snackbar v-model="show_error_message_snackbar">{{ error_message }}</v-snackbar>
