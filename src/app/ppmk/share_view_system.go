@@ -180,8 +180,8 @@ const (
 	addProjectShareAddress        = "/ppmk_server/add_project_share"
 	deleteProjectShareAddress     = "/ppmk_server/delete_project_share"
 	updateProjectShareAddress     = "/ppmk_server/update_project_share"
-	getUserIDFromSessionIDAddress = "/ppmk_server/get_user_id_from_session_id" //TODO
-	getUserNameFromUserIDAddress  = "/ppmk_server/get_user_name_from_user_id"  //TODO
+	getUserIDFromSessionIDAddress = "/ppmk_server/get_user_id_from_session_id"
+	getUserNameFromUserIDAddress  = "/ppmk_server/get_user_name_from_user_id"
 )
 
 var (
@@ -233,9 +233,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				loginResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(loginResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 		if loginResponse == nil {
 			w.Write([]byte(""))
@@ -250,9 +250,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				loginResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(loginResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 		loginResponse.SessionId = sessionID
 		encoder := json.NewEncoder(w)
@@ -260,7 +260,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		if err != nil {
 			loginResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder.Encode(loginResponse)
-			panic(err)
+			return
 		}
 	}))
 	router.PathPrefix(logoutAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -274,11 +274,11 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&logoutRequest)
 		if err != nil {
-			panic(err)
+			return
 		}
 		err = ppmkDB.Logout(r.Context(), logoutRequest.SessionId)
 		if err != nil {
-			panic(err)
+			return
 		}
 	}))
 	router.PathPrefix(resetPasswordAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -300,9 +300,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
 				decoder.Decode(resetPasswordResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		subject := "PPMK パスワードリセットメール"
@@ -317,9 +317,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
 				decoder.Decode(resetPasswordResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		encoder := json.NewEncoder(w)
@@ -327,7 +327,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		if err != nil {
 			resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
 			decoder.Decode(resetPasswordResponse)
-			panic(err)
+			return
 		}
 	}))
 	router.PathPrefix(registerAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -348,9 +348,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				registerResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(registerResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		user := &User{
@@ -369,16 +369,16 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				registerResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(registerResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 		encoder := json.NewEncoder(w)
 		err = encoder.Encode(registerResponse)
 		if err != nil {
 			registerResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder.Encode(registerResponse)
-			panic(err)
+			return
 		}
 	}))
 
@@ -400,9 +400,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(listProjectSummariesResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), listProjectSummariesRequest.SessionID)
@@ -413,9 +413,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(listProjectSummariesResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		projectSummaries, err := ppmkDB.GetProjectSummaries(r.Context(), userID)
@@ -426,9 +426,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(listProjectSummariesResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 		listProjectSummariesResponse.ProjectSummaries = projectSummaries
 		encoder := json.NewEncoder(w)
@@ -436,7 +436,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		if err != nil {
 			listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder.Encode(listProjectSummariesResponse)
-			panic(err)
+			return
 		}
 	}))
 
@@ -458,9 +458,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(getProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), getProjectDataRequest.SessionID)
@@ -471,9 +471,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(getProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		projectData, err := ppmkDB.GetProjectData(r.Context(), getProjectDataRequest.ProjectDataID)
@@ -484,9 +484,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(getProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		// プロジェクトがなかったら作成する
@@ -497,7 +497,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
 				encoder := json.NewEncoder(w)
 				encoder.Encode(getProjectDataResponse)
-				panic(e)
+				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), project.ProjectID)
 			if err != nil {
@@ -507,9 +507,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				if er != nil {
 					getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 					encoder.Encode(getProjectDataResponse)
-					panic(err)
+					return
 				}
-				panic(err)
+				return
 			}
 		}
 		writable := false
@@ -527,7 +527,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(getProjectDataResponse)
-				panic(e)
+				return
 			}
 			return
 		}
@@ -537,7 +537,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		if err != nil {
 			getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder.Encode(getProjectDataResponse)
-			panic(err)
+			return
 		}
 	}))
 
@@ -559,9 +559,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(saveProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), saveProjectDataRequest.SessionID)
@@ -572,9 +572,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(saveProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		// プロジェクトがなかったら作成する
@@ -585,7 +585,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
 				encoder := json.NewEncoder(w)
 				encoder.Encode(saveProjectDataResponse)
-				panic(e)
+				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
 			if err != nil {
@@ -595,9 +595,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				if er != nil {
 					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 					encoder.Encode(saveProjectDataResponse)
-					panic(er)
+					return
 				}
-				panic(err)
+				return
 			}
 		}
 		writable := false
@@ -615,7 +615,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(saveProjectDataResponse)
-				panic(e)
+				return
 			}
 			return
 		}
@@ -628,16 +628,16 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(saveProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 		encoder := json.NewEncoder(w)
 		e := encoder.Encode(saveProjectDataResponse)
 		if e != nil {
 			saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder.Encode(saveProjectDataResponse)
-			panic(e)
+			return
 		}
 
 	}))
@@ -660,9 +660,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(deleteProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), deleteProjectDataRequest.SessionID)
@@ -673,9 +673,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(deleteProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		// プロジェクトがなかったら作成する
@@ -687,7 +687,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
 				encoder := json.NewEncoder(w)
 				encoder.Encode(deleteProjectDataResponse)
-				panic(e)
+				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), deleteProjectDataRequest.Project.PPMKProject.ProjectID)
 			if err != nil {
@@ -697,9 +697,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				if er != nil {
 					deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 					encoder.Encode(deleteProjectDataResponse)
-					panic(er)
+					return
 				}
-				panic(err)
+				return
 			}
 		}
 
@@ -718,7 +718,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(deleteProjectDataResponse)
-				panic(e)
+				return
 			}
 			return
 		}
@@ -731,16 +731,16 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(deleteProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 		encoder := json.NewEncoder(w)
 		e := encoder.Encode(deleteProjectDataResponse)
 		if e != nil {
 			deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder.Encode(deleteProjectDataResponse)
-			panic(e)
+			return
 		}
 	}))
 
@@ -762,9 +762,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(updateProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), updateProjectDataRequest.SessionID)
@@ -775,9 +775,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(updateProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		// プロジェクトがなかったら作成する
@@ -788,7 +788,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
 				encoder := json.NewEncoder(w)
 				encoder.Encode(updateProjectDataResponse)
-				panic(e)
+				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), updateProjectDataRequest.Project.PPMKProject.ProjectID)
 			if err != nil {
@@ -798,9 +798,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				if er != nil {
 					updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 					encoder.Encode(updateProjectDataResponse)
-					panic(er)
+					return
 				}
-				panic(err)
+				return
 			}
 		}
 		writable := false
@@ -818,7 +818,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(updateProjectDataResponse)
-				panic(e)
+				return
 			}
 			return
 		}
@@ -831,9 +831,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(updateProjectDataResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 	}))
 
@@ -855,9 +855,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(deleteProjectResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), deleteProjectRequest.SessionID)
@@ -868,9 +868,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(deleteProjectResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		// プロジェクトがなかったら作成する
@@ -882,7 +882,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
 				encoder := json.NewEncoder(w)
 				encoder.Encode(deleteProjectResponse)
-				panic(e)
+				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), deleteProjectRequest.Project.PPMKProject.ProjectID)
 			if err != nil {
@@ -892,9 +892,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				if er != nil {
 					deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 					encoder.Encode(deleteProjectResponse)
-					panic(er)
+					return
 				}
-				panic(err)
+				return
 			}
 		}
 
@@ -913,7 +913,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(deleteProjectResponse)
-				panic(e)
+				return
 			}
 			return
 		}
@@ -926,16 +926,16 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(deleteProjectResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 		encoder := json.NewEncoder(w)
 		e := encoder.Encode(deleteProjectResponse)
 		if e != nil {
 			deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder.Encode(deleteProjectResponse)
-			panic(e)
+			return
 		}
 	}))
 
@@ -957,9 +957,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(updateProjectResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), updateProjectRequest.SessionID)
@@ -970,9 +970,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(updateProjectResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		// プロジェクトがなかったら作成する
@@ -983,7 +983,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
 				encoder := json.NewEncoder(w)
 				encoder.Encode(updateProjectResponse)
-				panic(e)
+				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), updateProjectRequest.Project.PPMKProject.ProjectID)
 			if err != nil {
@@ -993,9 +993,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				if er != nil {
 					updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 					encoder.Encode(updateProjectResponse)
-					panic(er)
+					return
 				}
-				panic(err)
+				return
 			}
 		}
 
@@ -1014,7 +1014,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(updateProjectResponse)
-				panic(e)
+				return
 			}
 			return
 		}
@@ -1027,9 +1027,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(updateProjectResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		encoder := json.NewEncoder(w)
@@ -1037,7 +1037,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		if err != nil {
 			updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder.Encode(updateProjectResponse)
-			panic(err)
+			return
 		}
 	}))
 
@@ -1059,9 +1059,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				addProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(addProjectShareResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), addProjectShareRequest.SessionID)
@@ -1072,14 +1072,14 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				addProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(addProjectShareResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		project, err := ppmkDB.GetProject(r.Context(), addProjectShareRequest.ProjectShare.ProjectID)
 		if err != nil {
-			panic(err)
+			return
 		}
 		writable := false
 		for _, writableUserID := range []string{project.OwnerUserID} { //TODO 書き込み権限がある共有済みユーザの編集も許可して
@@ -1096,7 +1096,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				addProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(addProjectShareResponse)
-				panic(e)
+				return
 			}
 			return
 		}
@@ -1109,9 +1109,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				addProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(addProjectShareResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 	}))
 
@@ -1133,9 +1133,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				decoder.Decode(&deleteProjectShareRequest)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), deleteProjectShareRequest.SessionID)
@@ -1146,9 +1146,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				decoder.Decode(&deleteProjectShareRequest)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		project, err := ppmkDB.GetProject(r.Context(), deleteProjectShareRequest.ProjectShare.ProjectID)
@@ -1157,7 +1157,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
 				decoder.Decode(&deleteProjectShareRequest)
-				panic(e)
+				return
 			}
 		}
 
@@ -1176,7 +1176,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				decoder.Decode(&deleteProjectShareRequest)
-				panic(e)
+				return
 			}
 			return
 		}
@@ -1188,9 +1188,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				decoder.Decode(&deleteProjectShareRequest)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 	}))
 
@@ -1212,9 +1212,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				decoder.Decode(&updateProjectShareRequest)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), updateProjectShareRequest.SessionID)
@@ -1225,9 +1225,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				decoder.Decode(&updateProjectShareRequest)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		project, err := ppmkDB.GetProject(r.Context(), updateProjectShareRequest.ProjectShare.ProjectID)
@@ -1236,7 +1236,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
 				decoder.Decode(&updateProjectShareRequest)
-				panic(e)
+				return
 			}
 		}
 
@@ -1255,7 +1255,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				decoder.Decode(&updateProjectShareRequest)
-				panic(e)
+				return
 			}
 			return
 		}
@@ -1267,9 +1267,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
 				decoder.Decode(&updateProjectShareRequest)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 	}))
 
@@ -1291,9 +1291,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				getUserIDFromSessionIDResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(getUserIDFromSessionIDResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		userID, err := ppmkDB.GetUserIDFromSessionID(r.Context(), getUserIDFromSessionIDRequest.SessionID)
@@ -1304,9 +1304,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				getUserIDFromSessionIDResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(getUserIDFromSessionIDResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		getUserIDFromSessionIDResponse.UserID = userID
@@ -1316,7 +1316,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		if err != nil {
 			getUserIDFromSessionIDResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder.Encode(getUserIDFromSessionIDResponse)
-			panic(err)
+			return
 		}
 	}))
 
@@ -1338,9 +1338,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(getUserNameByUserIDResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		_, err = ppmkDB.GetUserIDFromSessionID(r.Context(), getUserNameByUserIDRequest.SessionID)
@@ -1351,9 +1351,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(getUserNameByUserIDResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		user, err := ppmkDB.GetUser(r.Context(), getUserNameByUserIDRequest.UserID)
@@ -1364,9 +1364,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			if e != nil {
 				getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
 				encoder.Encode(getUserNameByUserIDResponse)
-				panic(e)
+				return
 			}
-			panic(err)
+			return
 		}
 
 		getUserNameByUserIDResponse.UserName = user.UserName
@@ -1376,7 +1376,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		if err != nil {
 			getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder.Encode(getUserNameByUserIDResponse)
-			panic(err)
+			return
 		}
 	}))
 }

@@ -386,7 +386,7 @@ import generateUUID from '@/uuid'
 import { Histories } from './History'
 import Settings from './Settings'
 import TagListViewMode from './TagListViewMode'
-import API, { ServerStatus } from '@/view/login_system/api'
+import API, { GetProjectDataResponse, ServerStatus } from '@/view/login_system/api'
 import Project, { clone_project, PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
 import ProjectSummariesList from '@/view/login_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
@@ -783,6 +783,30 @@ export default class PutPullMockRootPage extends Vue {
                 }
             })
         }
+
+        // 卒制ここから
+        let wm_id = this.$route.query["wm_id"]
+        let version_id = this.$route.query["version_id"]
+        if (wm_id != "" && wm_id && version_id != "" && version_id) {
+            const request = {
+                wm_id: wm_id,
+                version_id: version_id,
+            }
+            fetch("/ppmk_server/get_wm_data", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(request),
+            }).then(res => {
+                return res.json()
+            }).then((json) => {
+                const project: Project = json
+                project.ppmk_project_data = JSON.parse(JSON.stringify(json.ppmk_project_data), deserialize)
+                this.project = project
+            })
+        }
+        // 卒制ここまで
     }
 
     get page_css_view_style(): any {
@@ -815,6 +839,8 @@ export default class PutPullMockRootPage extends Vue {
             this.append_history()
             this.is_show_readin_dialog = false
             this.save_project_to_localstorage()
+            this.flush_message = "プロジェクトが読み込まれました"
+            this.is_show_flush_message = true
         })
         reader.readAsText(file)
     }
@@ -1250,6 +1276,8 @@ export default class PutPullMockRootPage extends Vue {
         })
         this.is_show_readin_dialog = false
         this.save_project_to_localstorage()
+        this.flush_message = "プロジェクトが読み込まれました"
+        this.is_show_flush_message = true
     }
 
     show_save_to_server_dialog() {
@@ -1267,14 +1295,18 @@ export default class PutPullMockRootPage extends Vue {
         await this.api.preparate_save_ppmk_project(this.project)
         let update_project_response = await this.api.update_project(this.project)
         if (update_project_response.error) {
-            this.flush_message = "プロジェクトを保存しました"
+            this.flush_message = update_project_response.error
             this.is_show_flush_message = true
+            return
         }
         let save_project_data_response = await this.api.save_project_data(this.project)
         if (save_project_data_response.error) {
-            this.flush_message = "プロジェクトデータを保存しました"
+            this.flush_message = save_project_data_response.error
             this.is_show_flush_message = true
+            return
         }
+        this.flush_message = "プロジェクトを保存しました"
+        this.is_show_flush_message = true
     }
 
     @Watch('project')

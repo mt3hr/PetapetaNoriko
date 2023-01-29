@@ -44,7 +44,7 @@ var (
 	proxy        = ""
 	loginSystem  = false
 	dbfilename   = "ppmk.db"
-	register     = true
+	register     = false
 	serverStatus = ServerStatus{}
 
 	serverCmd = &cobra.Command{
