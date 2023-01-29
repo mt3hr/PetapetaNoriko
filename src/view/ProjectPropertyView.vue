@@ -13,7 +13,7 @@
                         @keydown="update_project_info" />
                 </td>
             </tr>
-            <tr class="share_link" v-if="enable_share_view && session_id">
+            <tr class="share_link" v-if="enable_share_view && session_id" v-show="false">
                 <td>
                     共有
                 </td>
