@@ -3,11 +3,9 @@
         <div v-if="!sent_reset_password_mail">
             <input type="email" v-model="email" placeholder="メールアドレス"><br />
             <v-btn @click.once="reset_password" :disabled="!enable_reset_password_button">{{ reset_password_button_text }}</v-btn><br />
-            <a @click="$router.back()">戻る</a><br />
         </div>
         <div v-else>
             <p>パスワードリセットメールを送信しました</p><br />
-            <a @click="$router.back()">戻る</a><br />
         </div>
         <v-snackbar v-model="show_error_message_snackbar">{{ error_message }}</v-snackbar>
     </div>

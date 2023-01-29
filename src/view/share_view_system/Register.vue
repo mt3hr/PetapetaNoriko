@@ -6,12 +6,10 @@
             <input type="password" v-model="password" placeholder="パスワード" name="password"><br />
             <input type="password" v-model="password_retype" placeholder="パスワード（再入力）"><br />
             <v-btn @click.once="register">登録</v-btn><br />
-            <a @click="$router.back()">戻る</a><br />
             <v-snackbar v-model="show_error_message_snackbar">{{ error_message }}</v-snackbar>
         </div>
         <div v-else>
             <p>登録完了</p>
-            <a @click="$router.push('/login')">ログイン画面</a>
         </div>
     </div>
 </template>
@@ -49,10 +47,6 @@ export default class Login extends Vue {
                     this.registed = true
                 }
             })
-    }
-
-    reset_password() {
-        this.$router.push('/reset_password')
     }
 }
 </script>
