@@ -1539,8 +1539,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			} else {
 				project.PPMKProjectData = &PPMKProjectData{}
 			}
-			sharedProjects[request.ProjectID] = project
 		}
+		sharedProjects[request.ProjectID] = project
+		websocket.JSON.Send(ws, sharedProjects[request.ProjectID])
 
 		for err == nil {
 			confirmConnectionMessage := &WatchSharedProjectViewMessage{}
