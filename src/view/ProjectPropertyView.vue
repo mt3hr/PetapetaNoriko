@@ -12,15 +12,27 @@
                     <input type="text" :readonly="!editor_mode" v-model="project_name" @keydown="update_project_info" />
                 </td>
             </tr>
-            <tr class="share_link" v-if="login_view && session_id" v-show="false">
+            <tr class="share_link" v-if="login_view && session_id">
                 <td>
                     共有
                 </td>
                 <td>
-                    <v-btn @click="share_view(true)">管理</v-btn>
+                    <v-btn @click="is_show_manage_share_dialog = true">管理</v-btn>
                 </td>
             </tr>
         </table>
+        <v-dialog v-model="is_show_manage_share_dialog">
+            <v-card class="pa-5">
+                <v-card-title>共有管理</v-card-title>
+                <v-checkbox v-model="is_shared_view" :label="'共有'" />
+                <input type="url" readonly v-model="share_link" />
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_manage_share_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -38,6 +50,18 @@ export default class ProjectPropertyView extends Vue {
     is_shared_view = false
     login_view = false
     session_id: string
+    share_link = ""
+
+    is_show_manage_share_dialog = false
+
+    @Watch('is_shared_view')
+    update_share_link() {
+        if (this.is_shared_view) {
+            this.share_link = this.generate_share_view_link()
+        } else {
+            this.share_link = ""
+        }
+    }
 
     updated_project() {
         this.project_name = this.project.ppmk_project.project_name
@@ -77,7 +101,7 @@ export default class ProjectPropertyView extends Vue {
     }
 
     generate_share_view_link() {
-        new API().generate_share_view_link(this.project.clone())
+        return location.protocol + "//" + location.host + "?shared_project_id=" + this.project.ppmk_project.project_id
     }
 }
 </script>

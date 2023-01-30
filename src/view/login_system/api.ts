@@ -8,25 +8,26 @@ import TagListViewMode from "../TagListViewMode"
 // const host = "http://localhost:51520"
 const host = ""
 
-export const status_address = host + "/ppmk_server/status"
-export const login_address = host + "/ppmk_server/login"
-export const logout_address = host + "/ppmk_server/logout"
-export const reset_password_address = host + "/ppmk_server/reset_password"
-export const register_address = host + "/ppmk_server/register"
-export const list_project_summaries_address = host + "/ppmk_server/list_project_summaries"
-export const get_project_address = host + "/ppmk_server/get_project"
-export const get_project_data_address = host + "/ppmk_server/get_project_data"
-export const save_project_data_address = host + "/ppmk_server/save_project_data"
-export const delete_project_data_address = host + "/ppmk_server/delete_project_data"
-export const update_project_data_address = host + "/ppmk_server/update_project_data"
-export const delete_project_address = host + "/ppmk_server/delete_project"
-export const update_project_address = host + "/ppmk_server/update_project"
-export const addProjectShareAddress = host + "/ppmk_server/add_project_share"
-export const deleteProjectShareAddress = host + "/ppmk_server/delete_project_share"
-export const updateProjectShareAddress = host + "/ppmk_server/update_project_share"
-export const share_view_address = host + "/ppmk/share_view"
-export const get_user_id_from_session_id_address = host + "/ppmk_server/get_user_id_from_session_id"
-export const get_user_name_from_user_id_address = host + "/ppmk_server/get_user_name_from_user_id"
+export const status_address = "/ppmk_server/status"
+export const login_address = "/ppmk_server/login"
+export const logout_address = "/ppmk_server/logout"
+export const reset_password_address = "/ppmk_server/reset_password"
+export const register_address = "/ppmk_server/register"
+export const list_project_summaries_address = "/ppmk_server/list_project_summaries"
+export const get_project_address = "/ppmk_server/get_project"
+export const get_project_data_address = "/ppmk_server/get_project_data"
+export const save_project_data_address = "/ppmk_server/save_project_data"
+export const delete_project_data_address = "/ppmk_server/delete_project_data"
+export const update_project_data_address = "/ppmk_server/update_project_data"
+export const delete_project_address = "/ppmk_server/delete_project"
+export const update_project_address = "/ppmk_server/update_project"
+export const addProjectShareAddress = "/ppmk_server/add_project_share"
+export const deleteProjectShareAddress = "/ppmk_server/delete_project_share"
+export const updateProjectShareAddress = "/ppmk_server/update_project_share"
+export const get_user_id_from_session_id_address = "/ppmk_server/get_user_id_from_session_id"
+export const get_user_name_from_user_id_address = "/ppmk_server/get_user_name_from_user_id"
+export const share_view_websocket_address = "ws://" + location.host + "/ppmk_server/share_view_ws"
+export const watch_share_view_websocket_address = "ws://" + location.host + "/ppmk_server/watch_share_view_ws"
 
 export class GetUserIDBySessionIDRequest {
     session_id: string
@@ -180,6 +181,28 @@ export class UpdateProjectShareResponse {
     error: string
 }
 
+export enum WatchSharedProjectViewMessageType {
+    CONFIRM_CONNECTION = 0,
+    ERROR = 1,
+    UPDATE_PROJECT = 2,
+    FINISH_SHARE = 3,
+}
+
+export class WatchSharedProjectViewMessage {
+    message_type: WatchSharedProjectViewMessageType
+    project: Project
+    error: string
+}
+
+export class WatchSharedProjectViewConnectionRequest {
+    project_id: string
+}
+
+export class ShareViewMessage {
+    message_type: WatchSharedProjectViewMessageType
+    project: Project
+}
+
 export default class API {
     async get_user_id_by_session_id(): Promise<GetUserIDBySessionIDResponse> {
         try {
@@ -229,10 +252,6 @@ export default class API {
         project.ppmk_project_data.author = user_id
         project.ppmk_project_data.project_data_id = generateUUID()
         project.ppmk_project_data.saved_time = new Date().toISOString()
-    }
-
-    generate_share_view_link(project: Project) {
-        return share_view_address + "?project_id=" + project.project_id
     }
 
     save_settings_to_cookie(settings: Settings) {

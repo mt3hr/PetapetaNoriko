@@ -386,7 +386,7 @@ import generateUUID from '@/uuid'
 import { Histories } from './History'
 import Settings from './Settings'
 import TagListViewMode from './TagListViewMode'
-import API, { GetProjectDataResponse, ServerStatus } from '@/view/login_system/api'
+import API, { GetProjectDataResponse, ServerStatus, share_view_websocket_address, WatchSharedProjectViewMessage, WatchSharedProjectViewMessageType, ShareViewMessage, watch_share_view_websocket_address, WatchSharedProjectViewConnectionRequest } from '@/view/login_system/api'
 import Project, { clone_project, PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
 import ProjectSummariesList from '@/view/login_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
@@ -475,6 +475,9 @@ export default class PutPullMockRootPage extends Vue {
     flush_message = ""
     is_show_flush_message = false
 
+    share_socket: WebSocket
+    receive_socket: WebSocket
+
     @Watch('export_base64_image')
     @Watch('export_head')
     @Watch('export_position_css')
@@ -555,6 +558,13 @@ export default class PutPullMockRootPage extends Vue {
     mounted(): void {
         this.session_id = undefined
         let project: Project
+
+        window.addEventListener("onclose", () => {
+            let message = new ShareViewMessage()
+            message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
+            this.share_socket.send(JSON.stringify(message))
+            this.share_socket.close()
+        })
         try {
             project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
         } catch (e) {
@@ -783,6 +793,50 @@ export default class PutPullMockRootPage extends Vue {
                 }
             })
         }
+
+        let shared_project_id = this.$route.query["shared_project_id"]
+        if (shared_project_id != "" && shared_project_id) {
+            this.editor_mode = false
+            this.receive_socket = new WebSocket(watch_share_view_websocket_address)
+            window.addEventListener("onclose", () => {
+                this.receive_socket.close()
+            })
+            this.receive_socket.onopen = () => {
+                let request = new WatchSharedProjectViewConnectionRequest()
+                request.project_id = String(shared_project_id)
+                this.receive_socket.send(JSON.stringify(request))
+            }
+            this.receive_socket.onmessage = (m) => {
+                const message: WatchSharedProjectViewMessage = JSON.parse(m.data)
+                switch (message.message_type) {
+                    case WatchSharedProjectViewMessageType.CONFIRM_CONNECTION: {
+                        break
+                    }
+                    case WatchSharedProjectViewMessageType.ERROR: {
+                        this.flush_message = message.error
+                        this.is_show_flush_message = true
+                        break
+                    }
+                    case WatchSharedProjectViewMessageType.UPDATE_PROJECT: {
+                        let project_any: any = message.project
+                        project_any.ppmk_project_data = JSON.parse(JSON.stringify(project_any.ppmk_project_data), deserialize)
+                        let project: Project = project_any
+                        this.project = project
+                        this.update_project(project)
+                        this.$nextTick(() => {
+                            this.show_page(project.ppmk_project_data.project_data[this.page_list_view.selected_index])
+                        })
+                        break
+                    }
+                    case WatchSharedProjectViewMessageType.FINISH_SHARE: {
+                        this.receive_socket.close()
+                        break
+                    }
+                }
+            }
+        }
+
+
 
         // 卒制ここから
         let wm_id = this.$route.query["wm_id"]
@@ -1205,6 +1259,30 @@ export default class PutPullMockRootPage extends Vue {
             this.histories.page_index[this.histories.index] = this.page_list_view.selected_index
         }
         this.histories.index++
+
+        // 共有送信
+        if (this.share_socket && this.project.ppmk_project.is_shared_view) {
+            //TODO 共有終了メッセージ
+        }
+        if (this.project.ppmk_project.is_shared_view) {
+            if (!this.share_socket) {
+                this.share_socket = new WebSocket(share_view_websocket_address)
+                this.share_socket.onmessage = (e) => {
+                    return
+                }
+                this.share_socket.onopen = () => {
+                    let message = new ShareViewMessage()
+                    message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
+                    message.project = this.project
+                    this.share_socket.send(JSON.stringify(message))
+                }
+            } else {
+                let message = new ShareViewMessage()
+                message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
+                message.project = this.project
+                this.share_socket.send(JSON.stringify(message))
+            }
+        }
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {

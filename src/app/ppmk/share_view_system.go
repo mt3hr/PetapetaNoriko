@@ -18,7 +18,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/net/websocket"
 )
+
+var watchShareViewSockets = map[string][]*websocket.Conn{}
+var shareViewSockets = map[string][]*websocket.Conn{}
+var sharedProjects = map[string]*Project{}
 
 type GetUserIDFromSessionIDRequest struct {
 	SessionID string `json:"session_id"`
@@ -162,26 +167,52 @@ type UpdateProjectShareResponse struct {
 	Error string `json:"error"`
 }
 
+type WatchSharedProjectViewMessageType int
+
+const (
+	CONFIRM_CONNECTION WatchSharedProjectViewMessageType = 0
+	ERROR                                                = 1
+	UPDATE_PROJECT                                       = 2
+	FINISH_SHARE                                         = 3
+)
+
+type WatchSharedProjectViewMessage struct {
+	MessageType WatchSharedProjectViewMessageType `json:"message_type"`
+	Project     *Project                          `json:"project"`
+	Error       string                            `json:"error"`
+}
+
+type WatchSharedProjectViewConnectionRequest struct {
+	ProjectID string `json:"project_id"`
+}
+
+type ShareViewMessage struct {
+	MessageType WatchSharedProjectViewMessageType `json:"message_type"`
+	Project     *Project                          `json:"project"`
+}
+
 const (
 	TimeLayout = time.RFC3339
 
-	statusAddress                 = "/ppmk_server/status"
-	loginAddress                  = "/ppmk_server/login"
-	logoutAddress                 = "/ppmk_server/logout"
-	resetPasswordAddress          = "/ppmk_server/reset_password"
-	registerAddress               = "/ppmk_server/register"
-	listProjectSummariesAddress   = "/ppmk_server/list_project_summaries"
-	getProjectDataAddress         = "/ppmk_server/get_project_data"
-	saveProjectDataAddress        = "/ppmk_server/save_project_data"
-	deleteProjectDataAddress      = "/ppmk_server/delete_project_data"
-	updateProjectDataAddress      = "/ppmk_server/update_project_data"
-	deleteProjectAddress          = "/ppmk_server/delete_project"
-	updateProjectAddress          = "/ppmk_server/update_project"
-	addProjectShareAddress        = "/ppmk_server/add_project_share"
-	deleteProjectShareAddress     = "/ppmk_server/delete_project_share"
-	updateProjectShareAddress     = "/ppmk_server/update_project_share"
-	getUserIDFromSessionIDAddress = "/ppmk_server/get_user_id_from_session_id"
-	getUserNameFromUserIDAddress  = "/ppmk_server/get_user_name_from_user_id"
+	statusAddress                  = "/ppmk_server/status"
+	loginAddress                   = "/ppmk_server/login"
+	logoutAddress                  = "/ppmk_server/logout"
+	resetPasswordAddress           = "/ppmk_server/reset_password"
+	registerAddress                = "/ppmk_server/register"
+	listProjectSummariesAddress    = "/ppmk_server/list_project_summaries"
+	getProjectDataAddress          = "/ppmk_server/get_project_data"
+	saveProjectDataAddress         = "/ppmk_server/save_project_data"
+	deleteProjectDataAddress       = "/ppmk_server/delete_project_data"
+	updateProjectDataAddress       = "/ppmk_server/update_project_data"
+	deleteProjectAddress           = "/ppmk_server/delete_project"
+	updateProjectAddress           = "/ppmk_server/update_project"
+	addProjectShareAddress         = "/ppmk_server/add_project_share"
+	deleteProjectShareAddress      = "/ppmk_server/delete_project_share"
+	updateProjectShareAddress      = "/ppmk_server/update_project_share"
+	getUserIDFromSessionIDAddress  = "/ppmk_server/get_user_id_from_session_id"
+	getUserNameFromUserIDAddress   = "/ppmk_server/get_user_name_from_user_id"
+	shareViewWebsocketAddress      = "/ppmk_server/share_view_ws"
+	watchShareViewWebsocketAddress = "/ppmk_server/watch_share_view_ws"
 )
 
 var (
@@ -1378,6 +1409,157 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			encoder.Encode(getUserNameByUserIDResponse)
 			return
 		}
+	}))
+
+	router.PathPrefix(shareViewWebsocketAddress).Handler(websocket.Handler(func(ws *websocket.Conn) {
+		defer ws.Close()
+		message := &ShareViewMessage{}
+		err := websocket.JSON.Receive(ws, message)
+		if err != nil {
+			message := &WatchSharedProjectViewMessage{}
+			message.MessageType = ERROR
+			message.Error = "サーバ内エラー"
+			websocket.JSON.Send(ws, message)
+
+			message = &WatchSharedProjectViewMessage{}
+			message.MessageType = FINISH_SHARE
+			websocket.JSON.Send(ws, message)
+			panic(err)
+			return
+		}
+
+		shareViewSockets[message.Project.PPMKProject.ProjectID] = append(shareViewSockets[message.Project.PPMKProject.ProjectID], ws)
+
+	Loop:
+		for err == nil {
+			message := &ShareViewMessage{}
+			err = websocket.JSON.Receive(ws, message)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "サーバ内エラー"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+			switch message.MessageType {
+			case CONFIRM_CONNECTION:
+			case ERROR:
+			case UPDATE_PROJECT:
+				sharedProjects[message.Project.PPMKProject.ProjectID] = message.Project
+
+				for _, watcherWS := range watchShareViewSockets[message.Project.PPMKProject.ProjectID] {
+					websocket.JSON.Send(watcherWS, &WatchSharedProjectViewMessage{
+						MessageType: UPDATE_PROJECT,
+						Project:     message.Project,
+					})
+				}
+			case FINISH_SHARE:
+				break Loop
+			}
+		}
+
+		deletedThisSocket := append(shareViewSockets[message.Project.PPMKProject.ProjectID])
+		thisIndex := -1
+		for i, socket := range deletedThisSocket {
+			if socket == ws {
+				thisIndex = i
+				break
+			}
+		}
+		deletedThisSocket = append(deletedThisSocket[:thisIndex], deletedThisSocket[thisIndex:]...)
+
+		shareViewSockets[message.Project.PPMKProject.ProjectID] = deletedThisSocket
+		delete(sharedProjects, message.Project.PPMKProject.ProjectID)
+	}))
+
+	router.PathPrefix(watchShareViewWebsocketAddress).Handler(websocket.Handler(func(ws *websocket.Conn) {
+		defer ws.Close()
+		request := &WatchSharedProjectViewConnectionRequest{}
+		err := websocket.JSON.Receive(ws, request)
+		if err != nil {
+			message := &WatchSharedProjectViewMessage{}
+			message.MessageType = ERROR
+			message.Error = "サーバ内エラー"
+			websocket.JSON.Send(ws, message)
+
+			message = &WatchSharedProjectViewMessage{}
+			message.MessageType = FINISH_SHARE
+			websocket.JSON.Send(ws, message)
+			return
+		}
+
+		watchShareViewSockets[request.ProjectID] = append(watchShareViewSockets[request.ProjectID], ws)
+
+		if sharedProjects[request.ProjectID] == nil {
+			ppmkProject, err := ppmkDB.GetProject(context.Background(), request.ProjectID)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "プロジェクトの読み込みに失敗しました"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+			if !ppmkProject.IsSharedView {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "アクセス権限がありません"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+
+			projectDatas, err := ppmkDB.GetProjectDatas(context.Background(), ppmkProject.ProjectID)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "プロジェクトデータの取得に失敗しました"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+
+			project := &Project{}
+			project.PPMKProject = ppmkProject
+			if len(projectDatas) >= 1 {
+				project.PPMKProjectData = projectDatas[0]
+			} else {
+				project.PPMKProjectData = &PPMKProjectData{}
+			}
+			sharedProjects[request.ProjectID] = project
+		}
+
+		for err == nil {
+			confirmConnectionMessage := &WatchSharedProjectViewMessage{}
+			confirmConnectionMessage.MessageType = CONFIRM_CONNECTION
+			err = websocket.JSON.Send(ws, confirmConnectionMessage)
+			time.Sleep(time.Second * 10)
+		}
+
+		deletedThisSocket := append(watchShareViewSockets[request.ProjectID])
+		thisIndex := -1
+		for i, socket := range deletedThisSocket {
+			if socket == ws {
+				thisIndex = i
+				break
+			}
+		}
+		deletedThisSocket = append(deletedThisSocket[:thisIndex], deletedThisSocket[thisIndex:]...)
+
+		watchShareViewSockets[request.ProjectID] = deletedThisSocket
 	}))
 }
 
