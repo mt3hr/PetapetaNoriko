@@ -379,20 +379,21 @@ import HTMLTagDataBase, { GenerateHTMLOptions, PositionStyle } from '@/html_tagd
 import PageData from '@/page/PageData'
 import HTMLTagStructView from './HTMLTagStructView.vue'
 import { Watch } from 'vue-property-decorator'
-import { deserialize, serializable } from '@/serializable/serializable'
+import { deserialize } from '@/serializable/serializable'
 import { head } from '@/main'
 import sample_project_json from '@/sample/ppmk_sample_project.ppmk.json'
 import generateUUID from '@/uuid'
 import { Histories } from './History'
 import Settings from './Settings'
 import TagListViewMode from './TagListViewMode'
-import API, { GetProjectDataResponse, ServerStatus, share_view_websocket_address, WatchSharedProjectViewMessage, WatchSharedProjectViewMessageType, ShareViewMessage, watch_share_view_websocket_address, WatchSharedProjectViewConnectionRequest } from '@/view/login_system/api'
+import API, { ServerStatus, share_view_websocket_address, WatchSharedProjectViewMessage, WatchSharedProjectViewMessageType, ShareViewMessage, watch_share_view_websocket_address, WatchSharedProjectViewConnectionRequest } from '@/view/login_system/api'
 import Project, { clone_project, PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
 import ProjectSummariesList from '@/view/login_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
 import Login from './login_system/Login.vue'
 import Register from './login_system/Register.vue'
 import ResetPassword from './login_system/ResetPassword.vue'
+import { Mutex } from 'async-mutex'
 
 @Options({
     components: {
@@ -478,6 +479,8 @@ export default class PutPullMockRootPage extends Vue {
     share_socket: WebSocket
     receive_socket: WebSocket
 
+    mutex = new Mutex()
+
     @Watch('export_base64_image')
     @Watch('export_head')
     @Watch('export_position_css')
@@ -559,25 +562,31 @@ export default class PutPullMockRootPage extends Vue {
         this.session_id = undefined
         let project: Project
 
+        let shared_project_id = this.$route.query["shared_project_id"]
+        if (shared_project_id != "" && shared_project_id) {
+            this.editor_mode = false
+        }
+
+        this.page_list_view = this.$refs["page_list_view"]
+        this.dropzone = this.$refs["dropzone"]
+        this.project_view = this.$refs["project_view"]
+        this.page_property_view = this.$refs["page_property_view"]
+        this.tag_property_view = this.$refs["tag_property_view"]
+        this.tag_struct_view = this.$refs["tag_struct_view"]
+
         window.addEventListener("onclose", () => {
             let message = new ShareViewMessage()
             message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
             this.share_socket.send(JSON.stringify(message))
             this.share_socket.close()
         })
+
         try {
             project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
         } catch (e) {
             // console.log(e)
         }
         this.$nextTick(() => {
-            this.page_list_view = this.$refs["page_list_view"]
-            this.dropzone = this.$refs["dropzone"]
-            this.project_view = this.$refs["project_view"]
-            this.page_property_view = this.$refs["page_property_view"]
-            this.tag_property_view = this.$refs["tag_property_view"]
-            this.tag_struct_view = this.$refs["tag_struct_view"]
-
             this.load_settings_from_cookie()
 
             this.api.status().then((server_status: ServerStatus) => {
@@ -767,18 +776,20 @@ export default class PutPullMockRootPage extends Vue {
                 let project = new Project()
                 project.ppmk_project.project_name = "About Put Pull Mock"
                 project.ppmk_project_data.project_data.push(about_ppmk_pagedata)
-                this.$nextTick(() => {
-                    this.update_project(project)
-                    this.page_list_view.clicked_page(about_ppmk_pagedata)
-                    this.save_project_to_localstorage()
-                    this.append_history()
-                })
+                if (this.editor_mode) {
+                    this.$nextTick(() => {
+                        this.update_project(project)
+                        this.page_list_view.clicked_page(about_ppmk_pagedata)
+                        this.save_project_to_localstorage()
+                        this.append_history()
+                    })
+                }
             })
         } else {
             this.$nextTick(() => {
                 this.preparated = true
                 if (this.auto_save_project_data_to_localstorage) {
-                    if (project.ppmk_project_data && project.ppmk_project_data.project_data && project.ppmk_project_data.project_data.length > 0) {
+                    if (project.ppmk_project_data && project.ppmk_project_data.project_data && project.ppmk_project_data.project_data.length > 0 && this.editor_mode) {
                         this.update_project(project)
                         this.$nextTick(() => {
                             this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
@@ -794,47 +805,47 @@ export default class PutPullMockRootPage extends Vue {
             })
         }
 
-        let shared_project_id = this.$route.query["shared_project_id"]
-        if (shared_project_id != "" && shared_project_id) {
-            this.editor_mode = false
-            this.receive_socket = new WebSocket(watch_share_view_websocket_address)
-            window.addEventListener("onclose", () => {
-                this.receive_socket.close()
-            })
-            this.receive_socket.onopen = () => {
-                let request = new WatchSharedProjectViewConnectionRequest()
-                request.project_id = String(shared_project_id)
-                this.receive_socket.send(JSON.stringify(request))
-            }
-            this.receive_socket.onmessage = (m) => {
-                const message: WatchSharedProjectViewMessage = JSON.parse(m.data)
-                switch (message.message_type) {
-                    case WatchSharedProjectViewMessageType.CONFIRM_CONNECTION: {
-                        break
-                    }
-                    case WatchSharedProjectViewMessageType.ERROR: {
-                        this.flush_message = message.error
-                        this.is_show_flush_message = true
-                        break
-                    }
-                    case WatchSharedProjectViewMessageType.UPDATE_PROJECT: {
-                        let project_any: any = message.project
-                        project_any.ppmk_project_data = JSON.parse(JSON.stringify(project_any.ppmk_project_data), deserialize)
-                        let project: Project = project_any
-                        this.project = project
-                        this.update_project(project)
-                        this.$nextTick(() => {
-                            this.show_page(project.ppmk_project_data.project_data[this.page_list_view.selected_index])
-                        })
-                        break
-                    }
-                    case WatchSharedProjectViewMessageType.FINISH_SHARE: {
-                        this.receive_socket.close()
-                        break
+        this.$nextTick(() => {
+            if (shared_project_id != "" && shared_project_id) {
+                this.receive_socket = new WebSocket(watch_share_view_websocket_address)
+                window.addEventListener("onclose", () => {
+                    this.receive_socket.close()
+                })
+                this.receive_socket.onopen = () => {
+                    let request = new WatchSharedProjectViewConnectionRequest()
+                    request.project_id = String(shared_project_id)
+                    this.receive_socket.send(JSON.stringify(request))
+                }
+                this.receive_socket.onmessage = (m) => {
+                    const message: WatchSharedProjectViewMessage = JSON.parse(m.data)
+                    switch (message.message_type) {
+                        case WatchSharedProjectViewMessageType.CONFIRM_CONNECTION: {
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.ERROR: {
+                            this.flush_message = message.error
+                            this.is_show_flush_message = true
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.UPDATE_PROJECT: {
+                            let project_any: any = message.project
+                            project_any.ppmk_project_data = JSON.parse(JSON.stringify(project_any.ppmk_project_data), deserialize)
+                            let project: Project = project_any
+                            this.project = project
+                            this.update_project(project)
+                            this.$nextTick(() => {
+                                this.show_page(project.ppmk_project_data.project_data[this.page_list_view.selected_index])
+                            })
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.FINISH_SHARE: {
+                            this.receive_socket.close()
+                            break
+                        }
                     }
                 }
             }
-        }
+        })
 
 
 
@@ -1240,13 +1251,11 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     append_history() {
+        if (!this.preparated) return
         if (!this.editor_mode) return
-        if (!this.use_undo || !this.editor_mode) {
-            return
-        }
-        if (!this.project) {
-            return
-        }
+        if (!this.use_undo) return
+        if (!this.project) return
+
         if (this.histories.histories[this.histories.index - 1]) {
             if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(this.project)) {
                 return
@@ -1262,27 +1271,33 @@ export default class PutPullMockRootPage extends Vue {
         this.histories.index++
 
         // 共有送信
-        if (this.share_socket && this.project.ppmk_project.is_shared_view) {
-            //TODO 共有終了メッセージ
+        if (this.share_socket && !this.project.ppmk_project.is_shared_view) {
+            let message = new ShareViewMessage()
+            message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
+            this.share_socket.send(JSON.stringify(message))
+            this.share_socket = undefined
         }
         if (this.project.ppmk_project.is_shared_view) {
             if (!this.share_socket) {
                 this.share_socket = new WebSocket(share_view_websocket_address)
-                this.share_socket.onmessage = (e) => {
-                    return
-                }
-                this.share_socket.onopen = () => {
-                    let message = new ShareViewMessage()
-                    message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
-                    message.project = this.project
-                    this.share_socket.send(JSON.stringify(message))
-                }
-            } else {
-                let message = new ShareViewMessage()
-                message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
-                message.project = this.project
-                this.share_socket.send(JSON.stringify(message))
+                this.share_socket.onopen = this.send_ws
+            } else if (this.share_socket.readyState == WebSocket.OPEN) {
+                this.send_ws()
             }
+        }
+    }
+
+    async send_ws() {
+        const release = await this.mutex.acquire();
+        try {
+            let message = new ShareViewMessage()
+            message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
+            message.project = this.project
+            this.api.preparate_save_ppmk_project(message.project)
+
+            this.share_socket.send(JSON.stringify(message))
+        } finally {
+            release()
         }
     }
 
