@@ -478,6 +478,9 @@ export default class PutPullMockRootPage extends Vue {
     share_socket: WebSocket
     receive_socket: WebSocket
 
+    share_ws_is_ready = false
+    receive_socket_is_ready = false
+
     @Watch('export_base64_image')
     @Watch('export_head')
     @Watch('export_position_css')
@@ -558,6 +561,11 @@ export default class PutPullMockRootPage extends Vue {
     mounted(): void {
         this.session_id = undefined
         let project: Project
+
+        let shared_project_id = this.$route.query["shared_project_id"]
+        if (shared_project_id != "" && shared_project_id) {
+            this.editor_mode = false
+        }
 
         window.addEventListener("onclose", () => {
             let message = new ShareViewMessage()
@@ -794,43 +802,46 @@ export default class PutPullMockRootPage extends Vue {
             })
         }
 
-        let shared_project_id = this.$route.query["shared_project_id"]
         if (shared_project_id != "" && shared_project_id) {
-            this.editor_mode = false
             this.receive_socket = new WebSocket(watch_share_view_websocket_address)
             window.addEventListener("onclose", () => {
                 this.receive_socket.close()
             })
-            this.receive_socket.onopen = () => {
+            let receive_socket = this.receive_socket
+            this.receive_socket.onopen = (event) => {
                 let request = new WatchSharedProjectViewConnectionRequest()
                 request.project_id = String(shared_project_id)
-                this.receive_socket.send(JSON.stringify(request))
+                receive_socket.send(JSON.stringify(request))
+                this.receive_socket_is_ready = true
             }
             this.receive_socket.onmessage = (m) => {
-                const message: WatchSharedProjectViewMessage = JSON.parse(m.data)
-                switch (message.message_type) {
-                    case WatchSharedProjectViewMessageType.CONFIRM_CONNECTION: {
-                        break
-                    }
-                    case WatchSharedProjectViewMessageType.ERROR: {
-                        this.flush_message = message.error
-                        this.is_show_flush_message = true
-                        break
-                    }
-                    case WatchSharedProjectViewMessageType.UPDATE_PROJECT: {
-                        let project_any: any = message.project
-                        project_any.ppmk_project_data = JSON.parse(JSON.stringify(project_any.ppmk_project_data), deserialize)
-                        let project: Project = project_any
-                        this.project = project
-                        this.update_project(project)
-                        this.$nextTick(() => {
-                            this.show_page(project.ppmk_project_data.project_data[this.page_list_view.selected_index])
-                        })
-                        break
-                    }
-                    case WatchSharedProjectViewMessageType.FINISH_SHARE: {
-                        this.receive_socket.close()
-                        break
+                console.log("received project")
+                if (this.receive_socket_is_ready) {
+                    const message: WatchSharedProjectViewMessage = JSON.parse(m.data)
+                    switch (message.message_type) {
+                        case WatchSharedProjectViewMessageType.CONFIRM_CONNECTION: {
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.ERROR: {
+                            this.flush_message = message.error
+                            this.is_show_flush_message = true
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.UPDATE_PROJECT: {
+                            let project_any: any = message.project
+                            project_any.ppmk_project_data = JSON.parse(JSON.stringify(project_any.ppmk_project_data), deserialize)
+                            let project: Project = project_any
+                            this.project = project
+                            this.update_project(project)
+                            this.$nextTick(() => {
+                                this.show_page(project.ppmk_project_data.project_data[this.page_list_view.selected_index])
+                            })
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.FINISH_SHARE: {
+                            this.receive_socket.close()
+                            break
+                        }
                     }
                 }
             }
@@ -1269,18 +1280,25 @@ export default class PutPullMockRootPage extends Vue {
             if (!this.share_socket) {
                 this.share_socket = new WebSocket(share_view_websocket_address)
                 this.share_socket.onmessage = (e) => {
+                    let res: any = e.data
+                    console.log(res)
                     return
                 }
-                this.share_socket.onopen = () => {
+                let share_socket = this.share_socket
+                this.share_socket.onopen = (event) => {
                     let message = new ShareViewMessage()
                     message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
+                    message.project_id = this.project.ppmk_project.project_id
                     message.project = this.project
-                    this.share_socket.send(JSON.stringify(message))
+                    share_socket.send(JSON.stringify(message))
+                    this.share_ws_is_ready = true
+                    console.log("socket opened")
                 }
-            } else {
+            } else if (this.share_ws_is_ready) {
                 let message = new ShareViewMessage()
                 message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
                 message.project = this.project
+                message.project_id = this.project.ppmk_project.project_id
                 this.share_socket.send(JSON.stringify(message))
             }
         }
