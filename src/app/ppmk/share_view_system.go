@@ -1416,7 +1416,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 
 	router.PathPrefix(shareViewWebsocketAddress).Handler(websocket.Handler(func(ws *websocket.Conn) {
 		// defer ws.Close()
-		ws.MaxPayloadBytes = math.MaxInt64
+		ws.MaxPayloadBytes = math.MaxInt
 		message := &ShareViewMessage{}
 		projectID := ""
 		first := true
@@ -1481,7 +1481,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 	}))
 
 	router.PathPrefix(watchShareViewWebsocketAddress).Handler(websocket.Handler(func(ws *websocket.Conn) {
-		ws.MaxPayloadBytes = math.MaxInt64
+		ws.MaxPayloadBytes = math.MaxInt
 		// defer ws.Close()
 		request := &WatchSharedProjectViewConnectionRequest{}
 		err := receive(ws, request)
