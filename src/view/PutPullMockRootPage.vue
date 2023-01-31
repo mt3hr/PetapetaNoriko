@@ -379,14 +379,14 @@ import HTMLTagDataBase, { GenerateHTMLOptions, PositionStyle } from '@/html_tagd
 import PageData from '@/page/PageData'
 import HTMLTagStructView from './HTMLTagStructView.vue'
 import { Watch } from 'vue-property-decorator'
-import { deserialize, serializable } from '@/serializable/serializable'
+import { deserialize } from '@/serializable/serializable'
 import { head } from '@/main'
 import sample_project_json from '@/sample/ppmk_sample_project.ppmk.json'
 import generateUUID from '@/uuid'
 import { Histories } from './History'
 import Settings from './Settings'
 import TagListViewMode from './TagListViewMode'
-import API, { GetProjectDataResponse, ServerStatus, share_view_websocket_address, WatchSharedProjectViewMessage, WatchSharedProjectViewMessageType, ShareViewMessage, watch_share_view_websocket_address, WatchSharedProjectViewConnectionRequest } from '@/view/login_system/api'
+import API, { ServerStatus, share_view_websocket_address, WatchSharedProjectViewMessage, WatchSharedProjectViewMessageType, ShareViewMessage, watch_share_view_websocket_address, WatchSharedProjectViewConnectionRequest } from '@/view/login_system/api'
 import Project, { clone_project, PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
 import ProjectSummariesList from '@/view/login_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
@@ -567,25 +567,26 @@ export default class PutPullMockRootPage extends Vue {
             this.editor_mode = false
         }
 
+        this.page_list_view = this.$refs["page_list_view"]
+        this.dropzone = this.$refs["dropzone"]
+        this.project_view = this.$refs["project_view"]
+        this.page_property_view = this.$refs["page_property_view"]
+        this.tag_property_view = this.$refs["tag_property_view"]
+        this.tag_struct_view = this.$refs["tag_struct_view"]
+
         window.addEventListener("onclose", () => {
             let message = new ShareViewMessage()
             message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
             this.share_socket.send(JSON.stringify(message))
             this.share_socket.close()
         })
+
         try {
             project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
         } catch (e) {
             // console.log(e)
         }
         this.$nextTick(() => {
-            this.page_list_view = this.$refs["page_list_view"]
-            this.dropzone = this.$refs["dropzone"]
-            this.project_view = this.$refs["project_view"]
-            this.page_property_view = this.$refs["page_property_view"]
-            this.tag_property_view = this.$refs["tag_property_view"]
-            this.tag_struct_view = this.$refs["tag_struct_view"]
-
             this.load_settings_from_cookie()
 
             this.api.status().then((server_status: ServerStatus) => {
@@ -775,18 +776,20 @@ export default class PutPullMockRootPage extends Vue {
                 let project = new Project()
                 project.ppmk_project.project_name = "About Put Pull Mock"
                 project.ppmk_project_data.project_data.push(about_ppmk_pagedata)
-                this.$nextTick(() => {
-                    this.update_project(project)
-                    this.page_list_view.clicked_page(about_ppmk_pagedata)
-                    this.save_project_to_localstorage()
-                    this.append_history()
-                })
+                if (this.editor_mode) {
+                    this.$nextTick(() => {
+                        this.update_project(project)
+                        this.page_list_view.clicked_page(about_ppmk_pagedata)
+                        this.save_project_to_localstorage()
+                        this.append_history()
+                    })
+                }
             })
         } else {
             this.$nextTick(() => {
                 this.preparated = true
                 if (this.auto_save_project_data_to_localstorage) {
-                    if (project.ppmk_project_data && project.ppmk_project_data.project_data && project.ppmk_project_data.project_data.length > 0) {
+                    if (project.ppmk_project_data && project.ppmk_project_data.project_data && project.ppmk_project_data.project_data.length > 0 && this.editor_mode) {
                         this.update_project(project)
                         this.$nextTick(() => {
                             this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
@@ -1251,13 +1254,11 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     append_history() {
+        if (!this.preparated) return
         if (!this.editor_mode) return
-        if (!this.use_undo || !this.editor_mode) {
-            return
-        }
-        if (!this.project) {
-            return
-        }
+        if (!this.use_undo) return
+        if (!this.project) return
+
         if (this.histories.histories[this.histories.index - 1]) {
             if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(this.project)) {
                 return
@@ -1273,8 +1274,11 @@ export default class PutPullMockRootPage extends Vue {
         this.histories.index++
 
         // 共有送信
-        if (this.share_socket && this.project.ppmk_project.is_shared_view) {
-            //TODO 共有終了メッセージ
+        if (this.share_socket && !this.project.ppmk_project.is_shared_view) {
+            let message = new ShareViewMessage()
+            message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
+            this.share_socket.send(JSON.stringify(message))
+            this.share_socket = undefined
         }
         if (this.project.ppmk_project.is_shared_view) {
             if (!this.share_socket) {
@@ -1299,6 +1303,7 @@ export default class PutPullMockRootPage extends Vue {
                 message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
                 message.project = this.project
                 message.project_id = this.project.ppmk_project.project_id
+                this.api.preparate_save_ppmk_project(message.project)
                 this.share_socket.send(JSON.stringify(message))
             }
         }

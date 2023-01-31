@@ -10,8 +10,8 @@ export default class Project {
 
     set project_id(project_id) {
         this.ppmk_project.project_id = project_id
-        this.ppmk_project_data.project_id = this.ppmk_project.project_id
-        this.ppmk_project_share.project_id = this.ppmk_project.project_id
+        this.ppmk_project_data.project_id = project_id
+        this.ppmk_project_share.project_id = project_id
     }
 
     constructor() {

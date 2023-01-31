@@ -11,6 +11,7 @@
     "@mdi/font": "5.9.55",
     "@types/md5": "^2.3.2",
     "@vueuse/head": "^1.0.22",
+    "async-mutex": "^0.4.0",
     "core-js": "^3.8.3",
     "md5": "^2.3.0",
     "roboto-fontface": "*",

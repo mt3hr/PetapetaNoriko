@@ -249,6 +249,158 @@ func initializeSystemVariable() {
 }
 
 func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
+	router.PathPrefix(shareViewWebsocketAddress).Handler(websocket.Handler(func(ws *websocket.Conn) {
+		ws.MaxPayloadBytes = math.MaxInt
+		defer ws.Close()
+		message := &ShareViewMessage{}
+		err := websocket.JSON.Receive(ws, message)
+		if err != nil {
+			message := &WatchSharedProjectViewMessage{}
+			message.MessageType = ERROR
+			message.Error = "サーバ内エラー"
+			websocket.JSON.Send(ws, message)
+
+			message = &WatchSharedProjectViewMessage{}
+			message.MessageType = FINISH_SHARE
+			websocket.JSON.Send(ws, message)
+			panic(err)
+		}
+
+		shareViewSockets[message.Project.PPMKProject.ProjectID] = append(shareViewSockets[message.Project.PPMKProject.ProjectID], ws)
+
+	Loop:
+		for err == nil {
+			message := &ShareViewMessage{}
+			err = websocket.JSON.Receive(ws, message)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "サーバ内エラー"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				panic(err)
+			}
+			switch message.MessageType {
+			case CONFIRM_CONNECTION:
+			case ERROR:
+			case UPDATE_PROJECT:
+				sharedProjects[message.Project.PPMKProject.ProjectID] = message.Project
+				fmt.Printf(" = %+v\n", watchShareViewSockets[message.Project.PPMKProject.ProjectID])
+				for _, watcherWS := range watchShareViewSockets[message.Project.PPMKProject.ProjectID] {
+					websocket.JSON.Send(watcherWS, &WatchSharedProjectViewMessage{
+						MessageType: UPDATE_PROJECT,
+						Project:     message.Project,
+					})
+				}
+			case FINISH_SHARE:
+				break Loop
+			}
+		}
+
+		deletedThisSocket := append(shareViewSockets[message.Project.PPMKProject.ProjectID])
+		thisIndex := -1
+		for i, socket := range deletedThisSocket {
+			if socket == ws {
+				thisIndex = i
+				break
+			}
+		}
+		deletedThisSocket = append(deletedThisSocket[:thisIndex], deletedThisSocket[thisIndex:]...)
+
+		shareViewSockets[message.Project.PPMKProject.ProjectID] = deletedThisSocket
+		delete(sharedProjects, message.Project.PPMKProject.ProjectID)
+	}))
+
+	router.PathPrefix(watchShareViewWebsocketAddress).Handler(websocket.Handler(func(ws *websocket.Conn) {
+		defer ws.Close()
+		request := &WatchSharedProjectViewConnectionRequest{}
+		err := websocket.JSON.Receive(ws, request)
+		if err != nil {
+			message := &WatchSharedProjectViewMessage{}
+			message.MessageType = ERROR
+			message.Error = "サーバ内エラー"
+			websocket.JSON.Send(ws, message)
+
+			message = &WatchSharedProjectViewMessage{}
+			message.MessageType = FINISH_SHARE
+			websocket.JSON.Send(ws, message)
+			panic(err)
+		}
+
+		watchShareViewSockets[request.ProjectID] = append(watchShareViewSockets[request.ProjectID], ws)
+
+		if sharedProjects[request.ProjectID] == nil {
+			ppmkProject, err := ppmkDB.GetProject(context.Background(), request.ProjectID)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "プロジェクトの読み込みに失敗しました"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				panic(err)
+			}
+			if !ppmkProject.IsSharedView {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "アクセス権限がありません"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				panic(err)
+			}
+
+			projectDatas, err := ppmkDB.GetProjectDatas(context.Background(), ppmkProject.ProjectID)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "プロジェクトデータの取得に失敗しました"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				panic(err)
+			}
+
+			project := &Project{}
+			project.PPMKProject = ppmkProject
+			if len(projectDatas) >= 1 {
+				project.PPMKProjectData = projectDatas[0]
+			} else {
+				project.PPMKProjectData = &PPMKProjectData{}
+			}
+			sharedProjects[request.ProjectID] = project
+		}
+		websocket.JSON.Send(ws, sharedProjects[request.ProjectID])
+
+		for err == nil {
+			confirmConnectionMessage := &WatchSharedProjectViewMessage{}
+			confirmConnectionMessage.MessageType = CONFIRM_CONNECTION
+			err = websocket.JSON.Send(ws, confirmConnectionMessage)
+			time.Sleep(time.Second * 10)
+		}
+
+		deletedThisSocket := append(watchShareViewSockets[request.ProjectID])
+		thisIndex := -1
+		for i, socket := range deletedThisSocket {
+			if socket == ws {
+				thisIndex = i
+				break
+			}
+		}
+		deletedThisSocket = append(deletedThisSocket[:thisIndex], deletedThisSocket[thisIndex:]...)
+
+		watchShareViewSockets[request.ProjectID] = deletedThisSocket
+	}))
+
 	router.PathPrefix(loginAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
@@ -1429,9 +1581,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			message.MessageType = FINISH_SHARE
 			websocket.JSON.Send(ws, message)
 			panic(err)
-			return
 		}
-
 		shareViewSockets[message.ProjectID] = append(shareViewSockets[message.ProjectID], ws)
 
 		fmt.Printf("message = %+v\n", message)
