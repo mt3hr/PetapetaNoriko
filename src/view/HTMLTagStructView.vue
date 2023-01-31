@@ -2,7 +2,7 @@
     <div class="mainside" dropzone="true" @drop.stop="drop" @dragover.prevent="dragover">
         <h2>構造</h2>
         <div class="struct_view">
-            <ul class="dropzone_wrap">
+            <ul class="dropzone_wrap tag_struct_ul">
                 <HTMLTagStructViewLi v-for="tagdata, index in html_tagdatas" :key="index" @onclick_tag="onclick_tag"
                     @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
                     :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view" :clicked_tagdata="clicked_tagdata"
@@ -378,8 +378,10 @@ export default class HTMLTagPropertyView extends Vue {
 }
 </script>
 <style scoped>
-li {
+.tag_struct_li {
     margin-left: 20px;
+}
+.tag_struct_ul{
 }
 
 .dropzone_wrap {
@@ -389,10 +391,12 @@ li {
 .struct_view {
     width: fit-content;
 }
-
 .mainside h2{
     font-family: "Roboto", sans-serif;
     font-size: 30px;
-    color: steelblue;  
+    color: steelblue; 
+}
+.mainside {
+    background:  #e6e6e6;
 }
 </style>

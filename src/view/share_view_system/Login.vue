@@ -5,7 +5,6 @@
         <v-btn @click.once="login">ログイン</v-btn><br />
         <a @click="register">新規登録</a><br />
         <a v-if="enable_reset_password" @click="reset_password">パスワードリセット</a><br />
-        <a @click="$router.back()">戻る</a><br />
         <v-snackbar v-model="show_error_message_snackbar">{{ error_message }}</v-snackbar>
     </div>
 </template>
@@ -31,17 +30,17 @@ export default class Login extends Vue {
                     this.show_error_message_snackbar = true
                     return
                 } else {
-                    this.$router.push('/')
+                    this.$emit("logined")
                 }
             })
     }
 
     reset_password() {
-        this.$router.push('/reset_password')
+        this.$emit("reset_password")
     }
 
     register() {
-        this.$router.push('/register')
+        this.$emit("register")
     }
 
     mounted(): void {

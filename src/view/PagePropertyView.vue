@@ -75,7 +75,10 @@ export default class PagePropertyView extends Vue {
 .mainside h2{
     font-family: "Roboto", sans-serif;
     font-size: 30px;
-    color: steelblue;  
+    color: steelblue; 
+}
+.mainside {
+    background:  #e6e6e6;
 }
 .textbox{
     background: white;

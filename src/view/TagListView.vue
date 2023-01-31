@@ -203,7 +203,7 @@ li {
     display: flex;
 }
 li:hover{
-    cursor: pointer;
+    cursor: grab;
     color: white;
     background: steelblue;
     border-radius: 10px;
@@ -225,6 +225,9 @@ summary:hover{
     font-family: "Roboto", sans-serif;
     font-size: 30px;
     color: steelblue; 
+}
+.mainside {
+    background:  #e6e6e6;
 }
 
 td {

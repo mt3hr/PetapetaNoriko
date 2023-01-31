@@ -1,9 +1,9 @@
 <template>
-    <div class="mainside" :style="style">
         <h2>
             ページ一覧
             <v-btn class="button" v-if="editor_mode" @click="add_page">+</v-btn>
         </h2>
+    <div class="mainside" :style="style">
         <ul>
             <PageListItem v-for="(pagedata, index) in project_data" :pagedata="pagedata" :key="pagedata.pageid"
                 :editor_mode="editor_mode" @copy_page="(pagedata) => copy_page(pagedata, index)"
@@ -153,8 +153,10 @@ export default class Page extends Vue {
     }
 }
 </script>
-<style>
-.mainside h2 {
+<style scoped>
+h2 {
+    width: 300px;
+    background: #e6e6e6;
     font-family: "Roboto", sans-serif;
     font-size: 30px;
     color: steelblue;
@@ -162,6 +164,11 @@ export default class Page extends Vue {
 
 .mainside {
     background:  #e6e6e6;
+    height: 150px;
+    overflow: scroll;
+}
+
+.mainside ul{
 }
 
 .pageitem {}
