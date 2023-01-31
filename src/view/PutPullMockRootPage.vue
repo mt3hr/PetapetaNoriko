@@ -1273,7 +1273,6 @@ export default class PutPullMockRootPage extends Vue {
         }
         this.histories.index++
 
-        // 共有送信
         if (this.share_socket && !this.project.ppmk_project.is_shared_view) {
             let message = new ShareViewMessage()
             message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
@@ -1283,6 +1282,9 @@ export default class PutPullMockRootPage extends Vue {
         if (this.project.ppmk_project.is_shared_view) {
             if (!this.share_socket) {
                 this.share_socket = new WebSocket(share_view_websocket_address)
+                this.share_socket.onclose = (e) => {
+                    console.log(e)
+                }
                 this.share_socket.onmessage = (e) => {
                     let res: any = e.data
                     console.log(res)
@@ -1293,7 +1295,8 @@ export default class PutPullMockRootPage extends Vue {
                     let message = new ShareViewMessage()
                     message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
                     message.project_id = this.project.ppmk_project.project_id
-                    message.project = this.project
+                    message.project = clone_project(this.project)
+                    this.api.preparate_save_ppmk_project(message.project)
                     share_socket.send(JSON.stringify(message))
                     this.share_ws_is_ready = true
                     console.log("socket opened")
@@ -1301,10 +1304,12 @@ export default class PutPullMockRootPage extends Vue {
             } else if (this.share_ws_is_ready) {
                 let message = new ShareViewMessage()
                 message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
-                message.project = this.project
                 message.project_id = this.project.ppmk_project.project_id
+                message.project = clone_project(this.project)
                 this.api.preparate_save_ppmk_project(message.project)
+                this.share_ws_is_ready = false
                 this.share_socket.send(JSON.stringify(message))
+                this.share_ws_is_ready = true
             }
         }
     }
