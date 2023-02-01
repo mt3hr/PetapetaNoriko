@@ -140,11 +140,14 @@ export default class HTMLTagPropertyView extends Vue {
 }
 </script>
 
-<style>
-.mainside h2 {
+<style scoped>
+.mainside h2{
     font-family: "Roboto", sans-serif;
     font-size: 30px;
-    color: steelblue;
+    color: steelblue; 
+}
+.mainside {
+    background:  #e6e6e6;
 }
 
 .textbox {

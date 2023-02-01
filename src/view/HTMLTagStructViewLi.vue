@@ -2,8 +2,8 @@
     <li ref="li" class="tag_struct_li" draggable="true" dropzone="true" @drop.prevent.stop="(e) => drop(e, tagdata)"
         @contextmenu.stop="show_contextmenu" @dragstart.stop="(e) => dragstart(e, tagdata)"
         @click.stop="() => onclick_tag(tagdata)" @dragover.prevent="dragover" :style="style">
-        <span>{{ tagdata.tagname }}:</span>
-        <span>({{ tagdata.to_string() }})</span>
+        <div class= "tag_name">{{ tagdata.tagname }}:</div>
+        <div class= "tag_content">({{ tagdata.to_string() }})</div>
         <ul v-if="tagdata.child_tagdatas.length != 0">
             <HTMLTagStructViewLi v-for="child_tagdata, index in tagdata.child_tagdatas" :key="index"
                 @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
@@ -166,7 +166,7 @@ export default class HTMLTagPropertyView extends Vue {
     @Prop() auto_scroll_tag_struct_view: boolean
     @Prop() copied_tagdata: HTMLTagDataBase
 
-    style: any = {}
+    style: any = {"width": "fit-content", "white-space": "nowrap", "overflow": "scroll", "text-overflow": "ellipsis"}
 
     @Watch('clicked_tagdata')
     update_style() {
@@ -176,11 +176,11 @@ export default class HTMLTagPropertyView extends Vue {
                 el?.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
             }
             this.style = {
-                "background-color": "lightsteelblue",
+                "background-color": "lightsteelblue", "border-radius": "10px","width": "fit-content", "white-space": "nowrap",  "overflow": "scroll", "text-overflow": "ellipsis"
             }
             return
         }
-        this.style = {}
+        this.style = {"width": "fit-content", "white-space": "nowrap", "overflow": "scroll", "text-overflow": "ellipsis"}
     }
 
     dragover(e: DragEvent) {
@@ -719,10 +719,24 @@ li {
 }
 
 .tag_struct_li {
-    width: max-content;
+
 }
 
 .init_dialog {
     width: 280px;
+}
+.tag_content{
+    display: inline-block;
+    width: 250px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tag_name{
+    display: inline-block;
+    width: fit-content; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

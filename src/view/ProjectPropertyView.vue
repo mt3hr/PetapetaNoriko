@@ -110,6 +110,14 @@ export default class ProjectPropertyView extends Vue {
 
 
 <style scoped>
+.mainside h2{
+    font-family: "Roboto", sans-serif;
+    font-size: 30px;
+    color: steelblue; 
+}
+.mainside {
+    background:  #e6e6e6;
+}
 .project_name {
     font-size: 75%;
 }

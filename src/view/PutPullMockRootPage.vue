@@ -1494,10 +1494,18 @@ export default class PutPullMockRootPage extends Vue {
     width: calc(100vw - 599px);
     overflow: scroll;
     overflow-x: scroll;
+    background:repeating-linear-gradient(
+        -45deg,
+        #ccc,
+        #ccc 5px,
+        #fff 0,
+        #fff 10px
+    );
 }
 
 .dropzone {
     width: fit-content;
+    background: white;
 }
 
 .v-container,
@@ -1561,9 +1569,9 @@ export default class PutPullMockRootPage extends Vue {
 }
 </style>
 <style>
-input,
-select,
-textarea {
+.dropzone input,
+.dropzone select,
+.dropzone textarea {
     border: solid 1px silver !important;
 }
 
@@ -1586,11 +1594,11 @@ textarea {
 }
 
 ::-webkit-scrollbar-track {
-    background-color: #e6e6e6;
+    background-color: ;
 }
 
 ::-webkit-scrollbar-corner {
-    background-color: #e6e6e6;
+    background-color: ;
 }
 
 ::-webkit-scrollbar-thumb {
