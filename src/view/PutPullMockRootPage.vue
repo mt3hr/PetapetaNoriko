@@ -1594,11 +1594,11 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 ::-webkit-scrollbar-track {
-    background-color: ;
+    /* background-color: ; */
 }
 
 ::-webkit-scrollbar-corner {
-    background-color: ;
+    /* background-color: ; */
 }
 
 ::-webkit-scrollbar-thumb {
