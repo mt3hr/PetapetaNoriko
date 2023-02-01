@@ -232,6 +232,13 @@ func launchServer() error {
 	router.PathPrefix("/").Handler(hf)
 
 	var handler http.Handler = router
+	/*
+		ln, err := net.Listen("tcp4", ":"+fmt.Sprintf("%d", port))
+		if err != nil {
+			panic(err)
+		}
+		return http.Serve(ln, handler)
+	*/
 	err = http.ListenAndServe(":"+fmt.Sprintf("%d", port), handler)
 	if err != nil {
 		err = fmt.Errorf("failed to launch server: %w", err)

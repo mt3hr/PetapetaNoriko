@@ -8,7 +8,7 @@
             <v-col cols="auto">
                 <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
             </v-col>
-            <v-col v-if="enable_system && editor_mode" cols="auto">
+            <v-col v-if="login_system && editor_mode" cols="auto">
                 <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
                 <v-btn v-else @click="logout">ログアウト</v-btn>
             </v-col>
@@ -23,8 +23,8 @@
                     <v-row>
                         <v-col cols="auto">
                             <ProjectPropertyView class="component project_view" ref="project_view" v-show="editor_mode"
-                                :editor_mode="editor_mode" @new_project="show_new_project_dialog"
-                                @updated_project_info="update_project_info" />
+                                :session_id="session_id" :login_system="login_system" :editor_mode="editor_mode"
+                                @new_project="show_new_project_dialog" @updated_project_info="update_project_info" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -129,7 +129,7 @@
                     <input type="file" @change="read_ppmk_project" />
                 </v-col>
             </v-row>
-            <v-row v-if="enable_system && session_id">
+            <v-row v-if="login_system && session_id">
                 <v-col>
                     <ProjectSummariesList v-if="session_id" @loaded_project="loaded_project" />
                 </v-col>
@@ -189,7 +189,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-col cols="auto">
                     <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
                 </v-col>
-                <v-col v-if="enable_system && session_id" cols="auto">
+                <v-col v-if="login_system && session_id" cols="auto">
                     <v-btn @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
                 </v-col>
             </v-row>
@@ -465,7 +465,7 @@ export default class PutPullMockRootPage extends Vue {
 
     project = new Project()
 
-    enable_system = false
+    login_system = false
 
     first_launch = true
 
@@ -480,6 +480,8 @@ export default class PutPullMockRootPage extends Vue {
 
     share_ws_is_ready = false
     receive_socket_is_ready = false
+
+    is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
     @Watch('export_base64_image')
     @Watch('export_head')
@@ -590,9 +592,9 @@ export default class PutPullMockRootPage extends Vue {
             this.load_settings_from_cookie()
 
             this.api.status().then((server_status: ServerStatus) => {
-                this.enable_system = server_status.login_system
+                this.login_system = server_status.login_system
             }).catch((e) => {
-                this.enable_system = false
+                this.login_system = false
             })
 
             window.onkeydown = (e: KeyboardEvent) => {
@@ -818,7 +820,6 @@ export default class PutPullMockRootPage extends Vue {
                 this.receive_socket_is_ready = true
             }
             this.receive_socket.onmessage = (m) => {
-                console.log("received project")
                 if (this.receive_socket_is_ready) {
                     const message: WatchSharedProjectViewMessage = JSON.parse(m.data)
                     switch (message.message_type) {
@@ -1279,16 +1280,28 @@ export default class PutPullMockRootPage extends Vue {
             this.share_socket.send(JSON.stringify(message))
             this.share_socket = undefined
         }
-        if (this.project.ppmk_project.is_shared_view) {
+        if (this.project.ppmk_project.is_shared_view && this.is_firefox) {
             if (!this.share_socket) {
                 this.share_socket = new WebSocket(share_view_websocket_address)
-                this.share_socket.onclose = (e) => {
-                    console.log(e)
-                }
                 this.share_socket.onmessage = (e) => {
-                    let res: any = e.data
-                    console.log(res)
-                    return
+                    let res: WatchSharedProjectViewMessage = e.data
+                    switch (res.message_type) {
+                        case WatchSharedProjectViewMessageType.CONFIRM_CONNECTION: {
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.ERROR: {
+                            this.flush_message = res.error
+                            this.is_show_flush_message = true
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.FINISH_SHARE: {
+                            this.share_socket.close()
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.UPDATE_PROJECT: {
+                            break
+                        }
+                    }
                 }
                 let share_socket = this.share_socket
                 this.share_socket.onopen = (event) => {
@@ -1299,7 +1312,6 @@ export default class PutPullMockRootPage extends Vue {
                     this.api.preparate_save_ppmk_project(message.project)
                     share_socket.send(JSON.stringify(message))
                     this.share_ws_is_ready = true
-                    console.log("socket opened")
                 }
             } else if (this.share_ws_is_ready) {
                 let message = new ShareViewMessage()

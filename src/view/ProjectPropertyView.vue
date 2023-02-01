@@ -12,7 +12,7 @@
                     <input type="text" :readonly="!editor_mode" v-model="project_name" @keydown="update_project_info" />
                 </td>
             </tr>
-            <tr class="share_link" v-if="login_view && session_id">
+            <tr class="share_link" v-if="login_system && session_id">
                 <td>
                     共有
                 </td>
@@ -24,7 +24,8 @@
         <v-dialog v-model="is_show_manage_share_dialog">
             <v-card class="pa-5">
                 <v-card-title>共有管理</v-card-title>
-                <v-checkbox v-model="is_shared_view" :label="'共有'" />
+                <p v-if="!is_firefox">FireFoxでお試しください</p>
+                <v-checkbox :readonly="!is_firefox && !is_shared_view" v-model="is_shared_view" :label="'共有'" />
                 <input type="url" readonly v-model="share_link" />
                 <v-row>
                     <v-col cols="auto">
@@ -45,14 +46,16 @@ import API from '@/view/login_system/api'
 
 export default class ProjectPropertyView extends Vue {
     @Prop() editor_mode: boolean
+    @Prop() session_id: string
+    @Prop() login_system: boolean
     project: Project = new Project()
     project_name = ""
     is_shared_view = false
-    login_view = false
-    session_id: string
     share_link = ""
 
     is_show_manage_share_dialog = false
+
+    is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
     @Watch('is_shared_view')
     update_share_link() {
@@ -69,12 +72,6 @@ export default class ProjectPropertyView extends Vue {
     }
 
     mounted() {
-        let api = new API()
-        this.session_id = api.session_id
-        api.status()
-            .then((res) => {
-                this.login_view = res.login_system
-            })
         this.project.project_id = ""
         this.updated_project()
     }

@@ -1450,7 +1450,6 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				sharedProjects[message.ProjectID] = message.Project
 
 				for _, watcherWS := range watchShareViewSockets[message.ProjectID] {
-					fmt.Printf("message.ProjectID = %+v\n", message.ProjectID)
 					err = websocket.JSON.Send(watcherWS, &WatchSharedProjectViewMessage{
 						MessageType: UPDATE_PROJECT,
 						Project:     sharedProjects[message.ProjectID],
@@ -2207,22 +2206,9 @@ func escapeSQLite(str string) string {
 }
 
 func receive(ws *websocket.Conn, v any) error {
-	return websocket.JSON.Receive(ws, v)
-	/*
-		b := ""
-		err := websocket.Message.Receive(ws, &b)
-		if err != nil {
-			panic(err)
-			return err
-		}
-		// ws.Read(b)
-		fmt.Printf("string(b) = %+v\n", string(b))
-		fmt.Printf("len(b) = %+v\n", len(b))
-		err = json.Unmarshal([]byte(b), v)
-		if err != nil {
-			panic(err)
-			return err
-		}
-		return nil
-	*/
+	err := websocket.JSON.Receive(ws, v)
+	if err != nil {
+		panic(err)
+	}
+	return nil
 }
