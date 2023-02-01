@@ -1,5 +1,5 @@
 <template>
-    <div class="mainside" :style="style">
+    <div class="mainside">
         <h2>プロジェクト
             <v-btn v-if="editor_mode" @click="new_project">+</v-btn>
         </h2>
@@ -124,5 +124,10 @@ export default class ProjectPropertyView extends Vue {
 
 .share_link {
     font-size: 75%;
+}
+.textbox{
+    background: white;
+    border-radius: 5px;
+    resize: none;
 }
 </style>

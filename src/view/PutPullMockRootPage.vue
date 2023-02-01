@@ -25,8 +25,9 @@
                             <v-col cols="auto">
                                 <ProjectPropertyView class="component project_view" ref="project_view"
                                     v-show="editor_mode" :editor_mode="editor_mode"
-                                    @new_project="show_new_project_dialog"
-                                    @updated_project_info="update_project_info" />
+                                    @new_project="show_new_project_dialog" :session_id="session_id"
+                                    :login_system="login_system" @updated_project_info="update_project_info"
+                                    @updated_share_view="update_is_share_view" />
                             </v-col>
                         </v-row>
                         <v-row>
@@ -1494,13 +1495,11 @@ export default class PutPullMockRootPage extends Vue {
     width: calc(100vw - 599px);
     overflow: scroll;
     overflow-x: scroll;
-    background:repeating-linear-gradient(
-        -45deg,
-        #ccc,
-        #ccc 5px,
-        #fff 0,
-        #fff 10px
-    );
+    background: repeating-linear-gradient(-45deg,
+            #ccc,
+            #ccc 5px,
+            #fff 0,
+            #fff 10px);
 }
 
 .dropzone {
