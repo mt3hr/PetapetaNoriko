@@ -24,7 +24,8 @@
                         <v-col cols="auto">
                             <ProjectPropertyView class="component project_view" ref="project_view" v-show="editor_mode"
                                 :session_id="session_id" :login_system="login_system" :editor_mode="editor_mode"
-                                @new_project="show_new_project_dialog" @updated_project_info="update_project_info" />
+                                @new_project="show_new_project_dialog" @updated_project_info="update_project_info"
+                                @updated_share_view="update_is_share_view" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -1448,6 +1449,11 @@ export default class PutPullMockRootPage extends Vue {
         if (!this.auto_save_project_data_to_localstorage) {
             window.localStorage.setItem("ppmk_project", "")
         }
+    }
+
+    update_is_share_view() {
+        this.api.preparate_save_ppmk_project(this.project)
+        this.api.update_project(this.project)
     }
 
     update_project_info(project_info: PPMKProject) {

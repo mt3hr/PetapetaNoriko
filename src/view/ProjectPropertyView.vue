@@ -77,15 +77,19 @@ export default class ProjectPropertyView extends Vue {
     }
 
     @Watch('project_name')
-    @Watch('is_shared_view')
     update_project_info() {
         if (this.project.project_id == "") return
         let ppmk_project = new PPMKProject()
         ppmk_project.project_id = this.project.ppmk_project.project_id
         ppmk_project.project_name = this.project_name
         ppmk_project.is_shared_view = this.is_shared_view
-
         this.$emit("updated_project_info", ppmk_project)
+    }
+
+    @Watch('is_shared_view')
+    update_is_shared_view() {
+        this.update_project_info()
+        this.$emit("update_is_share_view")
     }
 
     new_project() {

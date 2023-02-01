@@ -5,9 +5,6 @@ import md5 from "md5"
 import Settings from "../Settings"
 import TagListViewMode from "../TagListViewMode"
 
-// const host = "http://localhost:51520"
-const host = ""
-
 export const status_address = "/ppmk_server/status"
 export const login_address = "/ppmk_server/login"
 export const logout_address = "/ppmk_server/logout"
