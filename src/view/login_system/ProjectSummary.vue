@@ -27,6 +27,7 @@
                 <v-list-item @click="delete_project_data">このバージョンを削除</v-list-item>
             </v-list>
         </v-menu>
+        <v-snackbar v-model="show_error_message_snackbar">{{ error_message }}</v-snackbar>
     </div>
 </template>
 
@@ -44,13 +45,16 @@ export default class ProjectSummary extends Vue {
     y_contextmenu = 0
     context_menu_target_project_data: PPMKProjectData
 
+    error_message = ""
+    show_error_message_snackbar = false
+
     open_project_latest(e: MouseEvent) {
         this.open_project(e, this.project_summary.ppmk_project_datas[0])
     }
 
     open_project(e: MouseEvent, project_data: PPMKProjectData) {
         let api = new API()
-        api.get_project_data(api.session_id, project_data.project_data_id)
+        api.get_project_data(project_data.project_data_id)
             .then((res) => {
                 this.$emit("loaded_project", this.project_summary.ppmk_project, res.project_data)
             })
@@ -88,9 +92,11 @@ export default class ProjectSummary extends Vue {
         let delete_project = new Project()
         delete_project.ppmk_project = this.project_summary.ppmk_project
         delete_project.project_id = this.project_summary.ppmk_project.project_id
-        let res = await api.delete_project(api.session_id, delete_project)
+        let res = await api.delete_project(delete_project)
         if (res.error) {
-            //TODO
+            this.error_message = res.error
+            this.show_error_message_snackbar = true
+            return
         }
         this.$emit("deleted_project")
     }
@@ -101,9 +107,10 @@ export default class ProjectSummary extends Vue {
         delete_project.ppmk_project = this.project_summary.ppmk_project
         delete_project.ppmk_project_data = this.context_menu_target_project_data
         delete_project.project_id = this.project_summary.ppmk_project.project_id
-        let res = await api.delete_project_data(api.session_id, delete_project)
+        let res = await api.delete_project_data(delete_project)
         if (res.error) {
-            //TODO
+            this.error_message = res.error
+            this.show_error_message_snackbar = true
         }
         this.$emit("deleted_project_data")
     }

@@ -5,28 +5,26 @@ import md5 from "md5"
 import Settings from "../Settings"
 import TagListViewMode from "../TagListViewMode"
 
-// const host = "http://localhost:51520"
-const host = ""
-
-export const status_address = host + "/ppmk_server/status"
-export const login_address = host + "/ppmk_server/login"
-export const logout_address = host + "/ppmk_server/logout"
-export const reset_password_address = host + "/ppmk_server/reset_password"
-export const register_address = host + "/ppmk_server/register"
-export const list_project_summaries_address = host + "/ppmk_server/list_project_summaries"
-export const get_project_address = host + "/ppmk_server/get_project"
-export const get_project_data_address = host + "/ppmk_server/get_project_data"
-export const save_project_data_address = host + "/ppmk_server/save_project_data"
-export const delete_project_data_address = host + "/ppmk_server/delete_project_data"
-export const update_project_data_address = host + "/ppmk_server/update_project_data"
-export const delete_project_address = host + "/ppmk_server/delete_project"
-export const update_project_address = host + "/ppmk_server/update_project"
-export const addProjectShareAddress = host + "/ppmk_server/add_project_share"
-export const deleteProjectShareAddress = host + "/ppmk_server/delete_project_share"
-export const updateProjectShareAddress = host + "/ppmk_server/update_project_share"
-export const share_view_address = host + "/ppmk/share_view"
-export const get_user_id_from_session_id_address = host + "/ppmk_server/get_user_id_from_session_id"
-export const get_user_name_from_user_id_address = host + "/ppmk_server/get_user_name_from_user_id"
+export const status_address = "/ppmk_server/status"
+export const login_address = "/ppmk_server/login"
+export const logout_address = "/ppmk_server/logout"
+export const reset_password_address = "/ppmk_server/reset_password"
+export const register_address = "/ppmk_server/register"
+export const list_project_summaries_address = "/ppmk_server/list_project_summaries"
+export const get_project_address = "/ppmk_server/get_project"
+export const get_project_data_address = "/ppmk_server/get_project_data"
+export const save_project_data_address = "/ppmk_server/save_project_data"
+export const delete_project_data_address = "/ppmk_server/delete_project_data"
+export const update_project_data_address = "/ppmk_server/update_project_data"
+export const delete_project_address = "/ppmk_server/delete_project"
+export const update_project_address = "/ppmk_server/update_project"
+export const addProjectShareAddress = "/ppmk_server/add_project_share"
+export const deleteProjectShareAddress = "/ppmk_server/delete_project_share"
+export const updateProjectShareAddress = "/ppmk_server/update_project_share"
+export const get_user_id_from_session_id_address = "/ppmk_server/get_user_id_from_session_id"
+export const get_user_name_from_user_id_address = "/ppmk_server/get_user_name_from_user_id"
+export const share_view_websocket_address = "ws://" + location.host + "/ppmk_server/share_view_ws"
+export const watch_share_view_websocket_address = "ws://" + location.host + "/ppmk_server/watch_share_view_ws"
 
 export class GetUserIDBySessionIDRequest {
     session_id: string
@@ -47,8 +45,9 @@ export class GetUserNameByUserIDResponse {
 }
 
 export class ServerStatus {
-    share_view_system: boolean
+    login_system: boolean
     enable_reset_password: boolean
+    enable_register: boolean
 }
 
 export class PPMKProjectSummary {
@@ -179,11 +178,35 @@ export class UpdateProjectShareResponse {
     error: string
 }
 
+export enum WatchSharedProjectViewMessageType {
+    CONFIRM_CONNECTION = 0,
+    ERROR = 1,
+    UPDATE_PROJECT = 2,
+    FINISH_SHARE = 3,
+}
+
+export class WatchSharedProjectViewMessage {
+    project_id: string
+    message_type: WatchSharedProjectViewMessageType
+    project:PPMKProject 
+    error: string
+}
+
+export class WatchSharedProjectViewConnectionRequest {
+    project_id: string
+}
+
+export class ShareViewMessage {
+    project_id: string
+    message_type: WatchSharedProjectViewMessageType
+    project: Project
+}
+
 export default class API {
-    async get_user_id_by_session_id(session_id: string): Promise<GetUserIDBySessionIDResponse> {
+    async get_user_id_by_session_id(): Promise<GetUserIDBySessionIDResponse> {
         try {
             const get_user_id_by_session_id_request = new GetUserIDBySessionIDRequest()
-            get_user_id_by_session_id_request.session_id = session_id
+            get_user_id_by_session_id_request.session_id = this.session_id
 
             const res = await fetch(get_user_id_from_session_id_address, {
                 method: "POST",
@@ -220,20 +243,14 @@ export default class API {
 
 
     async preparate_save_ppmk_project(project: Project) {
-        const user_id = await (await this.get_user_id_by_session_id(this.session_id)).user_id
-        if (project.ppmk_project.project_id == "") {
-            project.ppmk_project.project_id = generateUUID()
+        const user_id = (await this.get_user_id_by_session_id()).user_id
+        if (project.project_id == "" || !project.project_id) {
+            project.project_id = generateUUID()
         }
-        if (project.ppmk_project.owner_user_id == "") {
-            project.ppmk_project.owner_user_id = user_id
-        }
+        project.ppmk_project.owner_user_id = user_id
         project.ppmk_project_data.author = user_id
         project.ppmk_project_data.project_data_id = generateUUID()
         project.ppmk_project_data.saved_time = new Date().toISOString()
-    }
-
-    generate_share_view_link(project: Project) {
-        return share_view_address + "?project_id=" + project.project_id
     }
 
     save_settings_to_cookie(settings: Settings) {
@@ -284,12 +301,11 @@ export default class API {
 
     logout(): Promise<any> {
         const settings = this.load_settings_from_cookie()
-        const session_id = settings.session_id
         settings.session_id = undefined
         this.save_settings_to_cookie(settings)
 
         const logout_request = new LogoutRequest()
-        logout_request.session_id = session_id
+        logout_request.session_id = this.session_id
 
         return fetch(logout_address, {
             method: "POST",
@@ -338,9 +354,9 @@ export default class API {
         return response
     }
 
-    async list_project_summaries(session_id: string): Promise<ListProjectSummariesResponse> {
+    async list_project_summaries(): Promise<ListProjectSummariesResponse> {
         const list_project_summaries_request = new ListProjectSummariesRequest()
-        list_project_summaries_request.session_id = session_id
+        list_project_summaries_request.session_id = this.session_id
 
         const res = await fetch(list_project_summaries_address, {
             method: "POST",
@@ -354,9 +370,9 @@ export default class API {
         return response
     }
 
-    async save_project_data(session_id: string, project: Project): Promise<SaveProjectDataResponse> {
+    async save_project_data(project: Project): Promise<SaveProjectDataResponse> {
         const save_project_data_request = new SaveProjectDataRequest()
-        save_project_data_request.session_id = session_id
+        save_project_data_request.session_id = this.session_id
         save_project_data_request.project = project
 
         const res = await fetch(save_project_data_address, {
@@ -371,9 +387,9 @@ export default class API {
         return response
     }
 
-    async delete_project_data(session_id: string, project: Project): Promise<DeleteProjectDataResponse> {
+    async delete_project_data(project: Project): Promise<DeleteProjectDataResponse> {
         const delete_project_data_request = new DeleteProjectDataRequest()
-        delete_project_data_request.session_id = session_id
+        delete_project_data_request.session_id = this.session_id
         delete_project_data_request.project = project
 
         const res = await fetch(delete_project_data_address, {
@@ -388,9 +404,9 @@ export default class API {
         return response
     }
 
-    async update_project_data(session_id: string, project: Project): Promise<UpdateProjectDataResponse> {
+    async update_project_data(project: Project): Promise<UpdateProjectDataResponse> {
         const update_project_data_request = new UpdateProjectDataRequest()
-        update_project_data_request.session_id = session_id
+        update_project_data_request.session_id = this.session_id
         update_project_data_request.project = project
 
         const res = await fetch(update_project_data_address, {
@@ -405,9 +421,9 @@ export default class API {
         return response
     }
 
-    async delete_project(session_id: string, project: Project): Promise<DeleteProjectResponse> {
+    async delete_project(project: Project): Promise<DeleteProjectResponse> {
         const delete_project_request = new DeleteProjectRequest()
-        delete_project_request.session_id = session_id
+        delete_project_request.session_id = this.session_id
         delete_project_request.project = project
 
         const res = await fetch(delete_project_address, {
@@ -422,9 +438,9 @@ export default class API {
         return response
     }
 
-    async update_project(session_id: string, project: Project): Promise<UpdateProjectResponse> {
+    async update_project(project: Project): Promise<UpdateProjectResponse> {
         const update_project_request = new UpdateProjectRequest()
-        update_project_request.session_id = session_id
+        update_project_request.session_id = this.session_id
         update_project_request.project = project
 
         const res = await fetch(update_project_address, {
@@ -439,9 +455,9 @@ export default class API {
         return response
     }
 
-    async get_project_data(session_id: string, project_data_id: string): Promise<GetProjectDataResponse> {
+    async get_project_data(project_data_id: string): Promise<GetProjectDataResponse> {
         const get_project_data_request = new GetProjectDataRequest()
-        get_project_data_request.session_id = session_id
+        get_project_data_request.session_id = this.session_id
         get_project_data_request.project_data_id = project_data_id
 
         const res = await fetch(get_project_data_address, {
@@ -457,9 +473,9 @@ export default class API {
         return response
     }
 
-    async add_project_share(session_id: string, project_share: PPMKProjectShare): Promise<AddProjectShareResponse> {
+    async add_project_share(project_share: PPMKProjectShare): Promise<AddProjectShareResponse> {
         const add_project_share_request = new AddProjectShareRequest()
-        add_project_share_request.session_id = session_id
+        add_project_share_request.session_id = this.session_id
         add_project_share_request.project_share = project_share
 
         const res = await fetch(save_project_data_address, {
@@ -474,9 +490,9 @@ export default class API {
         return response
     }
 
-    async delete_project_share(session_id: string, project_share: PPMKProjectShare): Promise<DeleteProjectShareResponse> {
+    async delete_project_share(project_share: PPMKProjectShare): Promise<DeleteProjectShareResponse> {
         const delete_project_share_request = new DeleteProjectShareRequest()
-        delete_project_share_request.session_id = session_id
+        delete_project_share_request.session_id = this.session_id
         delete_project_share_request.project_share = project_share
 
         const res = await fetch(delete_project_data_address, {
@@ -491,9 +507,9 @@ export default class API {
         return response
     }
 
-    async update_project_share(session_id: string, project_share: PPMKProjectShare): Promise<UpdateProjectShareResponse> {
+    async update_project_share(project_share: PPMKProjectShare): Promise<UpdateProjectShareResponse> {
         const update_project_share_request = new UpdateProjectShareRequest()
-        update_project_share_request.session_id = session_id
+        update_project_share_request.session_id = this.session_id
         update_project_share_request.project_share = project_share
 
         const res = await fetch(update_project_data_address, {

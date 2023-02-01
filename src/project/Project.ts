@@ -1,16 +1,21 @@
 import PageData, { clone_pagedata } from "@/page/PageData";
 import { serializable } from "@/serializable/serializable";
 import generateUUID from "@/uuid";
+import API from "@/view/login_system/api";
 
 export default class Project {
     ppmk_project = new PPMKProject()
     ppmk_project_data = new PPMKProjectData()
     ppmk_project_share = new PPMKProjectShare()
 
+    get project_id(): string {
+        return this.ppmk_project.project_id
+    }
+
     set project_id(project_id) {
         this.ppmk_project.project_id = project_id
-        this.ppmk_project_data.project_id = this.ppmk_project.project_id
-        this.ppmk_project_share.project_id = this.ppmk_project.project_id
+        this.ppmk_project_data.project_id = project_id
+        this.ppmk_project_share.project_id = project_id
     }
 
     constructor() {

@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import ProjectSummary from '@/view/share_view_system/ProjectSummary.vue'
+import ProjectSummary from '@/view/login_system/ProjectSummary.vue'
 import API, { PPMKProjectSummary } from './api';
 import { PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project';
 
@@ -33,7 +33,7 @@ export default class ProjectSummariesList extends Vue {
 
     reload() {
         let api = new API()
-        api.list_project_summaries(api.session_id)
+        api.list_project_summaries()
             .then((res) => {
                 if (res.error) {
                     this.error_message = res.error

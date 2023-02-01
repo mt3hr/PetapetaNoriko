@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"math"
 	"net/http"
 	"net/smtp"
 	"os"
@@ -18,7 +19,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/net/websocket"
 )
+
+var watchShareViewSockets = map[string][]*websocket.Conn{}
+var shareViewSockets = map[string][]*websocket.Conn{}
+var sharedProjects = map[string]*Project{}
 
 type GetUserIDFromSessionIDRequest struct {
 	SessionID string `json:"session_id"`
@@ -162,26 +168,54 @@ type UpdateProjectShareResponse struct {
 	Error string `json:"error"`
 }
 
+type WatchSharedProjectViewMessageType int
+
+const (
+	CONFIRM_CONNECTION WatchSharedProjectViewMessageType = 0
+	ERROR                                                = 1
+	UPDATE_PROJECT                                       = 2
+	FINISH_SHARE                                         = 3
+)
+
+type WatchSharedProjectViewMessage struct {
+	ProjectID   string                            `json:"project_id"`
+	MessageType WatchSharedProjectViewMessageType `json:"message_type"`
+	Project     *Project                          `json:"project"`
+	Error       string                            `json:"error"`
+}
+
+type WatchSharedProjectViewConnectionRequest struct {
+	ProjectID string `json:"project_id"`
+}
+
+type ShareViewMessage struct {
+	ProjectID   string                            `json:"project_id"`
+	MessageType WatchSharedProjectViewMessageType `json:"message_type"`
+	Project     *Project                          `json:"project"`
+}
+
 const (
 	TimeLayout = time.RFC3339
 
-	statusAddress                 = "/ppmk_server/status"
-	loginAddress                  = "/ppmk_server/login"
-	logoutAddress                 = "/ppmk_server/logout"
-	resetPasswordAddress          = "/ppmk_server/reset_password"
-	registerAddress               = "/ppmk_server/register"
-	listProjectSummariesAddress   = "/ppmk_server/list_project_summaries"
-	getProjectDataAddress         = "/ppmk_server/get_project_data"
-	saveProjectDataAddress        = "/ppmk_server/save_project_data"
-	deleteProjectDataAddress      = "/ppmk_server/delete_project_data"
-	updateProjectDataAddress      = "/ppmk_server/update_project_data"
-	deleteProjectAddress          = "/ppmk_server/delete_project"
-	updateProjectAddress          = "/ppmk_server/update_project"
-	addProjectShareAddress        = "/ppmk_server/add_project_share"
-	deleteProjectShareAddress     = "/ppmk_server/delete_project_share"
-	updateProjectShareAddress     = "/ppmk_server/update_project_share"
-	getUserIDFromSessionIDAddress = "/ppmk_server/get_user_id_from_session_id" //TODO
-	getUserNameFromUserIDAddress  = "/ppmk_server/get_user_name_from_user_id"  //TODO
+	statusAddress                  = "/ppmk_server/status"
+	loginAddress                   = "/ppmk_server/login"
+	logoutAddress                  = "/ppmk_server/logout"
+	resetPasswordAddress           = "/ppmk_server/reset_password"
+	registerAddress                = "/ppmk_server/register"
+	listProjectSummariesAddress    = "/ppmk_server/list_project_summaries"
+	getProjectDataAddress          = "/ppmk_server/get_project_data"
+	saveProjectDataAddress         = "/ppmk_server/save_project_data"
+	deleteProjectDataAddress       = "/ppmk_server/delete_project_data"
+	updateProjectDataAddress       = "/ppmk_server/update_project_data"
+	deleteProjectAddress           = "/ppmk_server/delete_project"
+	updateProjectAddress           = "/ppmk_server/update_project"
+	addProjectShareAddress         = "/ppmk_server/add_project_share"
+	deleteProjectShareAddress      = "/ppmk_server/delete_project_share"
+	updateProjectShareAddress      = "/ppmk_server/update_project_share"
+	getUserIDFromSessionIDAddress  = "/ppmk_server/get_user_id_from_session_id"
+	getUserNameFromUserIDAddress   = "/ppmk_server/get_user_name_from_user_id"
+	shareViewWebsocketAddress      = "/ppmk_server/share_view_ws"
+	watchShareViewWebsocketAddress = "/ppmk_server/watch_share_view_ws"
 )
 
 var (
@@ -193,7 +227,7 @@ var (
 )
 
 func initializeSystemVariable() {
-	if !shareViewSystem {
+	if !loginSystem {
 		return
 	}
 	emailhostname = os.Getenv("PPMK_EMAIL_HOSTNAME")
@@ -232,10 +266,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(loginResponse)
 			if e != nil {
 				loginResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(loginResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 		if loginResponse == nil {
@@ -250,10 +283,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(loginResponse)
 			if e != nil {
 				loginResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(loginResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 		loginResponse.SessionId = sessionID
@@ -261,7 +293,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		err = encoder.Encode(loginResponse)
 		if err != nil {
 			loginResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(err)
+			encoder.Encode(loginResponse)
 			return
 		}
 	}))
@@ -276,12 +308,10 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&logoutRequest)
 		if err != nil {
-			panic(err)
 			return
 		}
 		err = ppmkDB.Logout(r.Context(), logoutRequest.SessionId)
 		if err != nil {
-			panic(err)
 			return
 		}
 	}))
@@ -303,10 +333,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(resetPasswordResponse)
 			if e != nil {
 				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				decoder.Decode(resetPasswordResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -321,10 +350,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(resetPasswordResponse)
 			if e != nil {
 				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				decoder.Decode(resetPasswordResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -332,7 +360,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		err = encoder.Encode(resetPasswordResponse)
 		if err != nil {
 			resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(err)
+			decoder.Decode(resetPasswordResponse)
 			return
 		}
 	}))
@@ -353,10 +381,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(registerResponse)
 			if e != nil {
 				registerResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(registerResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -375,17 +402,16 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(registerResponse)
 			if e != nil {
 				registerResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(registerResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 		encoder := json.NewEncoder(w)
 		err = encoder.Encode(registerResponse)
 		if err != nil {
 			registerResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(err)
+			encoder.Encode(registerResponse)
 			return
 		}
 	}))
@@ -407,10 +433,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(listProjectSummariesResponse)
 			if e != nil {
 				listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(listProjectSummariesResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -421,36 +446,22 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(listProjectSummariesResponse)
 			if e != nil {
 				listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(listProjectSummariesResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
 		projectSummaries, err := ppmkDB.GetProjectSummaries(r.Context(), userID)
 		if err != nil {
-			if err == sql.ErrNoRows {
-				listProjectSummariesResponse.ProjectSummaries = []*PPMKProjectSummary{}
-				encoder := json.NewEncoder(w)
-				e := encoder.Encode(listProjectSummariesResponse)
-				if e != nil {
-					listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
-					panic(e)
-					return
-				}
-				return
-			}
-
 			listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
 			encoder := json.NewEncoder(w)
 			e := encoder.Encode(listProjectSummariesResponse)
 			if e != nil {
 				listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(listProjectSummariesResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 		listProjectSummariesResponse.ProjectSummaries = projectSummaries
@@ -458,7 +469,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		err = encoder.Encode(listProjectSummariesResponse)
 		if err != nil {
 			listProjectSummariesResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(err)
+			encoder.Encode(listProjectSummariesResponse)
 			return
 		}
 	}))
@@ -480,10 +491,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(getProjectDataResponse)
 			if e != nil {
 				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(getProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -494,10 +504,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(getProjectDataResponse)
 			if e != nil {
 				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(getProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -508,38 +517,20 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(getProjectDataResponse)
 			if e != nil {
 				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(getProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
 		// プロジェクトがなかったら作成する
 		project, err := ppmkDB.GetProject(r.Context(), projectData.ProjectID)
-		writable := false
-		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
-			if userID == writableUserID {
-				writable = true
-				break
-			}
-		}
-		if !writable {
-			getProjectDataResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
-			encoder := json.NewEncoder(w)
-			e := encoder.Encode(getProjectDataResponse)
-			if e != nil {
-				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
-				return
-			}
-			return
-		}
 		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
 			e := ppmkDB.AddProject(r.Context(), project) //TODO ここおかしいぞ。errがあるときはprojectはnilなはず
 			if e != nil {
 				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				panic(e)
+				encoder := json.NewEncoder(w)
+				encoder.Encode(getProjectDataResponse)
 				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), project.ProjectID)
@@ -549,19 +540,37 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				er := encoder.Encode(getProjectDataResponse)
 				if er != nil {
 					getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-					panic(er)
+					encoder.Encode(getProjectDataResponse)
 					return
 				}
-				panic(err)
+				return
+			}
+		}
+		writable := false
+		for _, writableUserID := range []string{project.OwnerUserID} { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+			if userID == writableUserID {
+				writable = true
+				break
 			}
 		}
 
+		if !writable {
+			getProjectDataResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(getProjectDataResponse)
+			if e != nil {
+				getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				encoder.Encode(getProjectDataResponse)
+				return
+			}
+			return
+		}
 		getProjectDataResponse.ProjectData = projectData
 		encoder := json.NewEncoder(w)
 		err = encoder.Encode(getProjectDataResponse)
 		if err != nil {
 			getProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(err)
+			encoder.Encode(getProjectDataResponse)
 			return
 		}
 	}))
@@ -583,10 +592,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(saveProjectDataResponse)
 			if e != nil {
 				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(saveProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -597,10 +605,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(saveProjectDataResponse)
 			if e != nil {
 				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(saveProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -610,7 +617,8 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := ppmkDB.AddProject(r.Context(), saveProjectDataRequest.Project.PPMKProject)
 			if e != nil {
 				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				panic(e)
+				encoder := json.NewEncoder(w)
+				encoder.Encode(saveProjectDataResponse)
 				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), saveProjectDataRequest.Project.PPMKProject.ProjectID)
@@ -620,26 +628,27 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				er := encoder.Encode(saveProjectDataResponse)
 				if er != nil {
 					saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-					panic(er)
+					encoder.Encode(saveProjectDataResponse)
 					return
 				}
-				panic(err)
+				return
 			}
 		}
 		writable := false
-		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+		for _, writableUserID := range []string{project.OwnerUserID} { //TODO 書き込み権限がある共有済みユーザの編集も許可して
 			if userID == writableUserID {
 				writable = true
 				break
 			}
 		}
+
 		if !writable {
 			saveProjectDataResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
 			encoder := json.NewEncoder(w)
 			e := encoder.Encode(saveProjectDataResponse)
 			if e != nil {
 				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(saveProjectDataResponse)
 				return
 			}
 			return
@@ -652,17 +661,16 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(saveProjectDataResponse)
 			if e != nil {
 				saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(saveProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 		encoder := json.NewEncoder(w)
 		e := encoder.Encode(saveProjectDataResponse)
 		if e != nil {
 			saveProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(e)
+			encoder.Encode(saveProjectDataResponse)
 			return
 		}
 
@@ -685,10 +693,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectDataResponse)
 			if e != nil {
 				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(deleteProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -699,38 +706,21 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectDataResponse)
 			if e != nil {
 				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(deleteProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
 		// プロジェクトがなかったら作成する
 		project, err := ppmkDB.GetProject(r.Context(), deleteProjectDataRequest.Project.PPMKProject.ProjectID)
-		writable := false
-		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
-			if userID == writableUserID {
-				writable = true
-				break
-			}
-		}
-		if !writable {
-			deleteProjectDataResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
-			encoder := json.NewEncoder(w)
-			e := encoder.Encode(deleteProjectDataResponse)
-			if e != nil {
-				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
-				return
-			}
-			return
-		}
+
 		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
 			e := ppmkDB.AddProject(r.Context(), deleteProjectDataRequest.Project.PPMKProject)
 			if e != nil {
 				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				panic(e)
+				encoder := json.NewEncoder(w)
+				encoder.Encode(deleteProjectDataResponse)
 				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), deleteProjectDataRequest.Project.PPMKProject.ProjectID)
@@ -740,11 +730,31 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				er := encoder.Encode(deleteProjectDataResponse)
 				if er != nil {
 					deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-					panic(er)
+					encoder.Encode(deleteProjectDataResponse)
 					return
 				}
-				panic(err)
+				return
 			}
+		}
+
+		writable := false
+		for _, writableUserID := range []string{project.OwnerUserID} { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+			if userID == writableUserID {
+				writable = true
+				break
+			}
+		}
+
+		if !writable {
+			deleteProjectDataResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(deleteProjectDataResponse)
+			if e != nil {
+				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				encoder.Encode(deleteProjectDataResponse)
+				return
+			}
+			return
 		}
 
 		err = ppmkDB.DeleteProjectData(r.Context(), deleteProjectDataRequest.Project.PPMKProjectData.ProjectDataID)
@@ -754,17 +764,16 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectDataResponse)
 			if e != nil {
 				deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(deleteProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 		encoder := json.NewEncoder(w)
 		e := encoder.Encode(deleteProjectDataResponse)
 		if e != nil {
 			deleteProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(e)
+			encoder.Encode(deleteProjectDataResponse)
 			return
 		}
 	}))
@@ -786,10 +795,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectDataResponse)
 			if e != nil {
 				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(updateProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -800,38 +808,20 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectDataResponse)
 			if e != nil {
 				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(updateProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
 		// プロジェクトがなかったら作成する
 		project, err := ppmkDB.GetProject(r.Context(), updateProjectDataRequest.Project.PPMKProject.ProjectID)
-		writable := false
-		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
-			if userID == writableUserID {
-				writable = true
-				break
-			}
-		}
-		if !writable {
-			updateProjectDataResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
-			encoder := json.NewEncoder(w)
-			e := encoder.Encode(updateProjectDataResponse)
-			if e != nil {
-				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
-				return
-			}
-			return
-		}
 		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
 			e := ppmkDB.AddProject(r.Context(), updateProjectDataRequest.Project.PPMKProject)
 			if e != nil {
 				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				panic(e)
+				encoder := json.NewEncoder(w)
+				encoder.Encode(updateProjectDataResponse)
 				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), updateProjectDataRequest.Project.PPMKProject.ProjectID)
@@ -841,11 +831,30 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				er := encoder.Encode(updateProjectDataResponse)
 				if er != nil {
 					updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-					panic(er)
+					encoder.Encode(updateProjectDataResponse)
 					return
 				}
-				panic(err)
+				return
 			}
+		}
+		writable := false
+		for _, writableUserID := range []string{project.OwnerUserID} { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+			if userID == writableUserID {
+				writable = true
+				break
+			}
+		}
+
+		if !writable {
+			updateProjectDataResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(updateProjectDataResponse)
+			if e != nil {
+				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
+				encoder.Encode(updateProjectDataResponse)
+				return
+			}
+			return
 		}
 
 		err = ppmkDB.UpdateProjectData(r.Context(), updateProjectDataRequest.Project.PPMKProjectData)
@@ -855,10 +864,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectDataResponse)
 			if e != nil {
 				updateProjectDataResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(updateProjectDataResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 	}))
@@ -880,10 +888,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectResponse)
 			if e != nil {
 				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(deleteProjectResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -894,38 +901,21 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectResponse)
 			if e != nil {
 				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(deleteProjectResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
 		// プロジェクトがなかったら作成する
 		project, err := ppmkDB.GetProject(r.Context(), deleteProjectRequest.Project.PPMKProject.ProjectID)
-		writable := false
-		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
-			if userID == writableUserID {
-				writable = true
-				break
-			}
-		}
-		if !writable {
-			deleteProjectResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
-			encoder := json.NewEncoder(w)
-			e := encoder.Encode(deleteProjectResponse)
-			if e != nil {
-				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
-				return
-			}
-			return
-		}
+
 		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
 			e := ppmkDB.AddProject(r.Context(), deleteProjectRequest.Project.PPMKProject)
 			if e != nil {
 				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				panic(e)
+				encoder := json.NewEncoder(w)
+				encoder.Encode(deleteProjectResponse)
 				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), deleteProjectRequest.Project.PPMKProject.ProjectID)
@@ -935,11 +925,31 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				er := encoder.Encode(deleteProjectResponse)
 				if er != nil {
 					deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-					panic(er)
+					encoder.Encode(deleteProjectResponse)
 					return
 				}
-				panic(err)
+				return
 			}
+		}
+
+		writable := false
+		for _, writableUserID := range []string{project.OwnerUserID} { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+			if userID == writableUserID {
+				writable = true
+				break
+			}
+		}
+
+		if !writable {
+			deleteProjectResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(deleteProjectResponse)
+			if e != nil {
+				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
+				encoder.Encode(deleteProjectResponse)
+				return
+			}
+			return
 		}
 
 		err = ppmkDB.DeleteProject(r.Context(), deleteProjectRequest.Project.PPMKProject.ProjectID)
@@ -949,17 +959,16 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectResponse)
 			if e != nil {
 				deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(deleteProjectResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 		encoder := json.NewEncoder(w)
 		e := encoder.Encode(deleteProjectResponse)
 		if e != nil {
 			deleteProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(e)
+			encoder.Encode(deleteProjectResponse)
 			return
 		}
 	}))
@@ -981,10 +990,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectResponse)
 			if e != nil {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(updateProjectResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -995,10 +1003,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectResponse)
 			if e != nil {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(updateProjectResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -1008,7 +1015,8 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := ppmkDB.AddProject(r.Context(), updateProjectRequest.Project.PPMKProject)
 			if e != nil {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				panic(e)
+				encoder := json.NewEncoder(w)
+				encoder.Encode(updateProjectResponse)
 				return
 			}
 			project, err = ppmkDB.GetProject(r.Context(), updateProjectRequest.Project.PPMKProject.ProjectID)
@@ -1018,26 +1026,28 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 				er := encoder.Encode(updateProjectResponse)
 				if er != nil {
 					updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-					panic(er)
+					encoder.Encode(updateProjectResponse)
 					return
 				}
-				panic(err)
+				return
 			}
 		}
+
 		writable := false
-		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+		for _, writableUserID := range []string{project.OwnerUserID} { //TODO 書き込み権限がある共有済みユーザの編集も許可して
 			if userID == writableUserID {
 				writable = true
 				break
 			}
 		}
+
 		if !writable {
 			updateProjectResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
 			encoder := json.NewEncoder(w)
 			e := encoder.Encode(updateProjectResponse)
 			if e != nil {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(updateProjectResponse)
 				return
 			}
 			return
@@ -1050,10 +1060,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectResponse)
 			if e != nil {
 				updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(updateProjectResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -1061,7 +1070,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		err = encoder.Encode(updateProjectResponse)
 		if err != nil {
 			updateProjectResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(err)
+			encoder.Encode(updateProjectResponse)
 			return
 		}
 	}))
@@ -1083,10 +1092,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(addProjectShareResponse)
 			if e != nil {
 				addProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(addProjectShareResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -1097,34 +1105,33 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(addProjectShareResponse)
 			if e != nil {
 				addProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(addProjectShareResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
 		project, err := ppmkDB.GetProject(r.Context(), addProjectShareRequest.ProjectShare.ProjectID)
+		if err != nil {
+			return
+		}
 		writable := false
-		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+		for _, writableUserID := range []string{project.OwnerUserID} { //TODO 書き込み権限がある共有済みユーザの編集も許可して
 			if userID == writableUserID {
 				writable = true
 				break
 			}
 		}
+
 		if !writable {
 			addProjectShareResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
 			encoder := json.NewEncoder(w)
 			e := encoder.Encode(addProjectShareResponse)
 			if e != nil {
 				addProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(addProjectShareResponse)
 				return
 			}
-			return
-		}
-		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
-			panic(err)
 			return
 		}
 
@@ -1135,10 +1142,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(addProjectShareResponse)
 			if e != nil {
 				addProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(addProjectShareResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 	}))
@@ -1160,10 +1166,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectShareResponse)
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				decoder.Decode(&deleteProjectShareRequest)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -1174,41 +1179,41 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectShareResponse)
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				decoder.Decode(&deleteProjectShareRequest)
 				return
 			}
-			panic(err)
 			return
 		}
 
 		project, err := ppmkDB.GetProject(r.Context(), deleteProjectShareRequest.ProjectShare.ProjectID)
+		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
+			e := ppmkDB.AddProject(r.Context(), project) //TODO ここおかしいぞ。errがあるときはprojectはnilなはず
+			if e != nil {
+				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
+				decoder.Decode(&deleteProjectShareRequest)
+				return
+			}
+		}
+
 		writable := false
-		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+		for _, writableUserID := range []string{project.OwnerUserID} { //TODO 書き込み権限がある共有済みユーザの編集も許可して
 			if userID == writableUserID {
 				writable = true
 				break
 			}
 		}
+
 		if !writable {
 			deleteProjectShareResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
 			encoder := json.NewEncoder(w)
 			e := encoder.Encode(deleteProjectShareResponse)
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				decoder.Decode(&deleteProjectShareRequest)
 				return
 			}
 			return
 		}
-		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
-			e := ppmkDB.AddProject(r.Context(), project) //TODO ここおかしいぞ。errがあるときはprojectはnilなはず
-			if e != nil {
-				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				panic(e)
-				return
-			}
-		}
-
 		err = ppmkDB.DeleteProjectShare(r.Context(), deleteProjectShareRequest.ProjectShare)
 		if err != nil {
 			deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクト共有設定の削除に失敗しました")
@@ -1216,10 +1221,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectShareResponse)
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				decoder.Decode(&deleteProjectShareRequest)
 				return
 			}
-			panic(err)
 			return
 		}
 	}))
@@ -1241,10 +1245,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectShareResponse)
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				decoder.Decode(&updateProjectShareRequest)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -1255,41 +1258,41 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectShareResponse)
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				decoder.Decode(&updateProjectShareRequest)
 				return
 			}
-			panic(err)
 			return
 		}
 
 		project, err := ppmkDB.GetProject(r.Context(), updateProjectShareRequest.ProjectShare.ProjectID)
+		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
+			e := ppmkDB.AddProject(r.Context(), project) //TODO ここおかしいぞ。errがあるときはprojectはnilなはず
+			if e != nil {
+				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
+				decoder.Decode(&updateProjectShareRequest)
+				return
+			}
+		}
+
 		writable := false
-		for _, writableUserID := range append([]string{project.OwnerUserID}) { //TODO 書き込み権限がある共有済みユーザの編集も許可して
+		for _, writableUserID := range []string{project.OwnerUserID} { //TODO 書き込み権限がある共有済みユーザの編集も許可して
 			if userID == writableUserID {
 				writable = true
 				break
 			}
 		}
+
 		if !writable {
 			updateProjectShareResponse.Error = fmt.Sprintf("エラー:書き込み権限がありません")
 			encoder := json.NewEncoder(w)
 			e := encoder.Encode(updateProjectShareResponse)
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				decoder.Decode(&updateProjectShareRequest)
 				return
 			}
 			return
 		}
-		if err != nil { // この部分がエラー処理のほうがあとになるのは間違えではない
-			e := ppmkDB.AddProject(r.Context(), project) //TODO ここおかしいぞ。errがあるときはprojectはnilなはず
-			if e != nil {
-				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				panic(e)
-				return
-			}
-		}
-
 		err = ppmkDB.UpdateProjectShare(r.Context(), updateProjectShareRequest.ProjectShare)
 		if err != nil {
 			updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクト共有の更新に失敗しました")
@@ -1297,10 +1300,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectShareResponse)
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				decoder.Decode(&updateProjectShareRequest)
 				return
 			}
-			panic(err)
 			return
 		}
 	}))
@@ -1322,10 +1324,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(getUserIDFromSessionIDResponse)
 			if e != nil {
 				getUserIDFromSessionIDResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(getUserIDFromSessionIDResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -1336,10 +1337,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(getUserIDFromSessionIDResponse)
 			if e != nil {
 				getUserIDFromSessionIDResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(getUserIDFromSessionIDResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -1349,7 +1349,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		err = encoder.Encode(getUserIDFromSessionIDResponse)
 		if err != nil {
 			getUserIDFromSessionIDResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(err)
+			encoder.Encode(getUserIDFromSessionIDResponse)
 			return
 		}
 	}))
@@ -1371,10 +1371,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(getUserNameByUserIDResponse)
 			if e != nil {
 				getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(getUserNameByUserIDResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -1385,10 +1384,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(getUserNameByUserIDResponse)
 			if e != nil {
 				getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(getUserNameByUserIDResponse)
 				return
 			}
-			panic(err)
 			return
 		}
 
@@ -1399,10 +1397,10 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(getUserNameByUserIDResponse)
 			if e != nil {
 				getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
-				panic(e)
+				encoder.Encode(getUserNameByUserIDResponse)
 				return
 			}
-			panic(err)
+			return
 		}
 
 		getUserNameByUserIDResponse.UserName = user.UserName
@@ -1411,9 +1409,166 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		err = encoder.Encode(getUserNameByUserIDResponse)
 		if err != nil {
 			getUserNameByUserIDResponse.Error = fmt.Sprintf("サーバ内エラー")
-			panic(err)
+			encoder.Encode(getUserNameByUserIDResponse)
 			return
 		}
+	}))
+
+	router.PathPrefix(shareViewWebsocketAddress).Handler(websocket.Handler(func(ws *websocket.Conn) {
+		// defer ws.Close()
+		ws.MaxPayloadBytes = math.MaxInt
+		message := &ShareViewMessage{}
+		projectID := ""
+		first := true
+		var err error
+	Loop:
+		for err == nil {
+			message = &ShareViewMessage{}
+			err = receive(ws, message)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "サーバ内エラー"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+
+			if first {
+				shareViewSockets[message.ProjectID] = append(shareViewSockets[message.ProjectID], ws)
+				projectID = message.ProjectID
+				first = false
+			}
+
+			switch message.MessageType {
+			case CONFIRM_CONNECTION:
+			case ERROR:
+			case UPDATE_PROJECT:
+				sharedProjects[message.ProjectID] = message.Project
+
+				for _, watcherWS := range watchShareViewSockets[message.ProjectID] {
+					err = websocket.JSON.Send(watcherWS, &WatchSharedProjectViewMessage{
+						MessageType: UPDATE_PROJECT,
+						Project:     sharedProjects[message.ProjectID],
+						ProjectID:   message.ProjectID,
+					})
+
+				}
+			case FINISH_SHARE:
+				break Loop
+			}
+		}
+		if err != nil {
+			panic(err)
+		}
+
+		deletedThisSocket := append(shareViewSockets[projectID])
+		thisIndex := -1
+		for i, socket := range deletedThisSocket {
+			if socket == ws {
+				thisIndex = i
+				break
+			}
+		}
+		deletedThisSocket = append(deletedThisSocket[:thisIndex], deletedThisSocket[thisIndex:]...)
+
+		shareViewSockets[message.ProjectID] = deletedThisSocket
+		delete(sharedProjects, message.ProjectID)
+	}))
+
+	router.PathPrefix(watchShareViewWebsocketAddress).Handler(websocket.Handler(func(ws *websocket.Conn) {
+		ws.MaxPayloadBytes = math.MaxInt
+		// defer ws.Close()
+		request := &WatchSharedProjectViewConnectionRequest{}
+		err := receive(ws, request)
+		if err != nil {
+			message := &WatchSharedProjectViewMessage{}
+			message.MessageType = ERROR
+			message.Error = "サーバ内エラー"
+			websocket.JSON.Send(ws, message)
+
+			message = &WatchSharedProjectViewMessage{}
+			message.MessageType = FINISH_SHARE
+			websocket.JSON.Send(ws, message)
+			return
+		}
+
+		watchShareViewSockets[request.ProjectID] = append(watchShareViewSockets[request.ProjectID], ws)
+
+		if sharedProjects[request.ProjectID] == nil {
+			ppmkProject, err := ppmkDB.GetProject(context.Background(), request.ProjectID)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "プロジェクトの読み込みに失敗しました"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+			if !ppmkProject.IsSharedView {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "アクセス権限がありません"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+
+			projectDatas, err := ppmkDB.GetProjectDatas(context.Background(), ppmkProject.ProjectID)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "プロジェクトデータの取得に失敗しました"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+
+			project := &Project{}
+			project.PPMKProject = ppmkProject
+			if len(projectDatas) >= 1 {
+				project.PPMKProjectData = projectDatas[0]
+			} else {
+				project.PPMKProjectData = &PPMKProjectData{}
+			}
+			sharedProjects[request.ProjectID] = project
+		}
+		websocket.JSON.Send(ws, sharedProjects[request.ProjectID])
+		projectID := request.ProjectID
+
+		for {
+			confirmConnectionMessage := &WatchSharedProjectViewMessage{}
+			confirmConnectionMessage.MessageType = CONFIRM_CONNECTION
+			err = websocket.JSON.Send(ws, confirmConnectionMessage)
+			time.Sleep(time.Second * 10)
+		}
+		if err != nil {
+			panic(err)
+		}
+
+		deletedThisSocket := append(watchShareViewSockets[projectID])
+		thisIndex := -1
+		for i, socket := range deletedThisSocket {
+			if socket == ws {
+				thisIndex = i
+				break
+			}
+		}
+		deletedThisSocket = append(deletedThisSocket[:thisIndex], deletedThisSocket[thisIndex:]...)
+
+		watchShareViewSockets[request.ProjectID] = deletedThisSocket
 	}))
 }
 
@@ -1619,7 +1774,7 @@ func (p *ppmkDBImpl) UpdateUser(ctx context.Context, user *User) error {
 }
 
 func (p *ppmkDBImpl) GetProjects(ctx context.Context, userID string) ([]*PPMKProject, error) {
-	statement := `SELECT ProjectID, OwnerUserID, ProjectName, IsSharedView FROM PPMKProject;`
+	statement := `SELECT PPMKProject.ProjectID, OwnerUserID, ProjectName, IsSharedView FROM PPMKProject LEFT OUTER JOIN ProjectShare ON PPMKProject.ProjectID = ProjectShare.ProjectID WHERE PPMKProject.OwnerUserID='` + userID + `' OR ProjectShare.UserID;`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
@@ -1778,15 +1933,20 @@ func (p *ppmkDBImpl) UpdateProject(ctx context.Context, project *PPMKProject) er
 }
 
 func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*PPMKProjectData, error) {
+	projectDatas := []*PPMKProjectData{}
 	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Author, Memo FROM PPMKProjectData;`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
-		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
-		return nil, err
+		if err == sql.ErrNoRows {
+			projectDatas = []*PPMKProjectData{}
+			return projectDatas, nil
+		} else {
+			err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
+			return nil, err
+		}
 	}
 	defer rows.Close()
 
-	projectDatas := []*PPMKProjectData{}
 	jsonProjectData := sql.NullString{}
 	for rows.Next() {
 		select {
@@ -1823,8 +1983,13 @@ func (p *ppmkDBImpl) GetProjectData(ctx context.Context, projectDataID string) (
 	jsonProjectData := sql.NullString{}
 	err := row.Scan(&projectData.ProjectDataID, &projectData.ProjectID, &timestr, &jsonProjectData, &projectData.Author, &projectData.Memo)
 	if err != nil {
-		err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
-		return nil, err
+		if err == sql.ErrNoRows {
+			projectData = &PPMKProjectData{}
+			return projectData, nil
+		} else {
+			err = fmt.Errorf("error at scan rows from %s: %w", p.filename, err)
+			return nil, err
+		}
 	}
 	t, err := time.Parse(TimeLayout, timestr)
 	if err != nil {
@@ -1878,15 +2043,20 @@ func (p *ppmkDBImpl) UpdateProjectData(ctx context.Context, projectData *PPMKPro
 }
 
 func (p *ppmkDBImpl) GetProjectShares(ctx context.Context, projectID string) ([]*PPMKProjectShare, error) {
+	projectShares := []*PPMKProjectShare{}
 	statement := `SELECT ProjectID, UserID, Writable FROM ProjectShare;`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
-		err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
-		return nil, err
+		if err == sql.ErrNoRows {
+			projectShares = []*PPMKProjectShare{}
+			return projectShares, nil
+		} else {
+			err = fmt.Errorf("error at get all db from %s: %w", p.filename, err)
+			return nil, err
+		}
 	}
 	defer rows.Close()
 
-	projectShares := []*PPMKProjectShare{}
 	for rows.Next() {
 		select {
 		case <-ctx.Done():
@@ -2033,4 +2203,12 @@ func newPPMKDB(dbFilename string) (ppmkDB, error) {
 
 func escapeSQLite(str string) string {
 	return strings.ReplaceAll(str, "'", "''")
+}
+
+func receive(ws *websocket.Conn, v any) error {
+	err := websocket.JSON.Receive(ws, v)
+	if err != nil {
+		panic(err)
+	}
+	return nil
 }

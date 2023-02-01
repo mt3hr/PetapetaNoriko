@@ -469,6 +469,7 @@ export default class HTMLTagViewBase extends Vue {
     }
 
     show_contextmenu(e: MouseEvent) {
+        if (!this.editor_mode) return
         e.preventDefault()
         this.x_contextmenu = e.clientX
         this.y_contextmenu = e.clientY

@@ -347,6 +347,7 @@ export default class HTMLTagView extends Vue {
     }
 
     show_contextmenu(e: MouseEvent) {
+        if (!this.editor_mode) return
         this.$emit('onclick_tag', this.tagdata)
         e.preventDefault()
         this.x_contextmenu = e.clientX
