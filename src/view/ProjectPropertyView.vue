@@ -12,15 +12,28 @@
                     <input type="text" :readonly="!editor_mode" v-model="project_name" @keydown="update_project_info" />
                 </td>
             </tr>
-            <tr class="share_link" v-if="enable_share_view && session_id" v-show="false">
+            <tr class="share_link" v-if="login_system && session_id">
                 <td>
                     共有
                 </td>
                 <td>
-                    <v-btn @click="share_view(true)">管理</v-btn>
+                    <v-btn @click="is_show_manage_share_dialog = true">管理</v-btn>
                 </td>
             </tr>
         </table>
+        <v-dialog v-model="is_show_manage_share_dialog">
+            <v-card class="pa-5">
+                <v-card-title>共有管理</v-card-title>
+                <p v-if="!is_firefox">FireFoxでお試しください</p>
+                <v-checkbox :readonly="!is_firefox && !is_shared_view" v-model="is_shared_view" :label="'共有'" />
+                <input type="url" readonly v-model="share_link" />
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_manage_share_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -29,15 +42,29 @@ import Project, { PPMKProject } from '@/project/Project'
 import { deserialize } from '@/serializable/serializable'
 import { Vue } from 'vue-class-component'
 import { Prop, Watch } from 'vue-property-decorator'
-import API from './share_view_system/api'
+import API from '@/view/login_system/api'
 
 export default class ProjectPropertyView extends Vue {
     @Prop() editor_mode: boolean
+    @Prop() session_id: string
+    @Prop() login_system: boolean
     project: Project = new Project()
     project_name = ""
     is_shared_view = false
-    enable_share_view = false
-    session_id: string
+    share_link = ""
+
+    is_show_manage_share_dialog = false
+
+    is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
+    @Watch('is_shared_view')
+    update_share_link() {
+        if (this.is_shared_view) {
+            this.share_link = this.generate_share_view_link()
+        } else {
+            this.share_link = ""
+        }
+    }
 
     updated_project() {
         this.project_name = this.project.ppmk_project.project_name
@@ -45,26 +72,24 @@ export default class ProjectPropertyView extends Vue {
     }
 
     mounted() {
-        let api = new API()
-        this.session_id = api.session_id
-        api.status()
-            .then((res) => {
-                this.enable_share_view = res.share_view_system
-            })
         this.project.project_id = ""
         this.updated_project()
     }
 
     @Watch('project_name')
-    @Watch('is_shared_view')
     update_project_info() {
         if (this.project.project_id == "") return
         let ppmk_project = new PPMKProject()
         ppmk_project.project_id = this.project.ppmk_project.project_id
         ppmk_project.project_name = this.project_name
         ppmk_project.is_shared_view = this.is_shared_view
-
         this.$emit("updated_project_info", ppmk_project)
+    }
+
+    @Watch('is_shared_view')
+    update_is_shared_view() {
+        this.update_project_info()
+        this.$emit("update_is_share_view")
     }
 
     new_project() {
@@ -77,7 +102,7 @@ export default class ProjectPropertyView extends Vue {
     }
 
     generate_share_view_link() {
-        new API().generate_share_view_link(this.project.clone())
+        return location.protocol + "//" + location.host + "?shared_project_id=" + this.project.ppmk_project.project_id
     }
 }
 </script>

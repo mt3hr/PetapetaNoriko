@@ -8,7 +8,7 @@
             <v-col cols="auto">
                 <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
             </v-col>
-            <v-col v-if="enable_system" cols="auto">
+            <v-col v-if="login_system && editor_mode" cols="auto">
                 <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
                 <v-btn v-else @click="logout">ログアウト</v-btn>
             </v-col>
@@ -23,8 +23,9 @@
                     <v-row>
                         <v-col cols="auto">
                             <ProjectPropertyView class="component project_view" ref="project_view" v-show="editor_mode"
-                                :editor_mode="editor_mode" @new_project="show_new_project_dialog"
-                                @updated_project_info="update_project_info" />
+                                :session_id="session_id" :login_system="login_system" :editor_mode="editor_mode"
+                                @new_project="show_new_project_dialog" @updated_project_info="update_project_info"
+                                @updated_share_view="update_is_share_view" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -129,7 +130,7 @@
                     <input type="file" @change="read_ppmk_project" />
                 </v-col>
             </v-row>
-            <v-row v-if="enable_system && session_id">
+            <v-row v-if="login_system && session_id">
                 <v-col>
                     <ProjectSummariesList v-if="session_id" @loaded_project="loaded_project" />
                 </v-col>
@@ -189,7 +190,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-col cols="auto">
                     <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
                 </v-col>
-                <v-col v-if="enable_system && session_id" cols="auto">
+                <v-col v-if="login_system && session_id" cols="auto">
                     <v-btn @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
                 </v-col>
             </v-row>
@@ -362,13 +363,11 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
         </v-card>
     </v-dialog>
-
+    <v-snackbar v-model="is_show_flush_message">{{ flush_message }}</v-snackbar>
 </template>
 
 <script lang="ts">
 // グローバルナビゲーション 横並びリストはCSSに3行追加すればいいだけだから実装しなくていいか
-//TODO サーバからのプロジェクトデータの削除
-//TODO サーバからのプロジェクトの削除
 //TODO 卒業制作用POSTからProjectDataを読み込むやつ
 //TODO 卒業制作用サーバにデータを保存するやつ。
 import { Vue, Options } from 'vue-class-component'
@@ -381,20 +380,20 @@ import HTMLTagDataBase, { GenerateHTMLOptions, PositionStyle } from '@/html_tagd
 import PageData from '@/page/PageData'
 import HTMLTagStructView from './HTMLTagStructView.vue'
 import { Watch } from 'vue-property-decorator'
-import { deserialize, serializable } from '@/serializable/serializable'
+import { deserialize } from '@/serializable/serializable'
 import { head } from '@/main'
 import sample_project_json from '@/sample/ppmk_sample_project.ppmk.json'
 import generateUUID from '@/uuid'
 import { Histories } from './History'
 import Settings from './Settings'
 import TagListViewMode from './TagListViewMode'
-import API, { ServerStatus } from './share_view_system/api'
+import API, { ServerStatus, share_view_websocket_address, WatchSharedProjectViewMessage, WatchSharedProjectViewMessageType, ShareViewMessage, watch_share_view_websocket_address, WatchSharedProjectViewConnectionRequest } from '@/view/login_system/api'
 import Project, { clone_project, PPMKProject, PPMKProjectData, PPMKProjectShare } from '@/project/Project'
-import ProjectSummariesList from '@/view/share_view_system/ProjectSummariesList.vue'
+import ProjectSummariesList from '@/view/login_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
-import Login from './share_view_system/Login.vue'
-import Register from './share_view_system/Register.vue'
-import ResetPassword from './share_view_system/ResetPassword.vue'
+import Login from './login_system/Login.vue'
+import Register from './login_system/Register.vue'
+import ResetPassword from './login_system/ResetPassword.vue'
 
 @Options({
     components: {
@@ -423,7 +422,7 @@ export default class PutPullMockRootPage extends Vue {
     TagListViewMode = TagListViewMode
     api = new API()
     width_dropzone = window.innerWidth - 300 - 300 - 19
-    height_dropzone = window.innerHeight - 159
+    height_dropzone = window.innerHeight - 159 + 18
 
     is_show_css_dialog = false
     is_show_writeout_dialog = false
@@ -467,12 +466,23 @@ export default class PutPullMockRootPage extends Vue {
 
     project = new Project()
 
-    enable_system = false
+    login_system = false
 
     first_launch = true
 
     preparated = false
     project_data_memo = ""
+
+    flush_message = ""
+    is_show_flush_message = false
+
+    share_socket: WebSocket
+    receive_socket: WebSocket
+
+    share_ws_is_ready = false
+    receive_socket_is_ready = false
+
+    is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
     @Watch('export_base64_image')
     @Watch('export_head')
@@ -554,26 +564,38 @@ export default class PutPullMockRootPage extends Vue {
     mounted(): void {
         this.session_id = undefined
         let project: Project
+
+        let shared_project_id = this.$route.query["shared_project_id"]
+        if (shared_project_id != "" && shared_project_id) {
+            this.editor_mode = false
+        }
+
+        this.page_list_view = this.$refs["page_list_view"]
+        this.dropzone = this.$refs["dropzone"]
+        this.project_view = this.$refs["project_view"]
+        this.page_property_view = this.$refs["page_property_view"]
+        this.tag_property_view = this.$refs["tag_property_view"]
+        this.tag_struct_view = this.$refs["tag_struct_view"]
+
+        window.addEventListener("onclose", () => {
+            let message = new ShareViewMessage()
+            message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
+            this.share_socket.send(JSON.stringify(message))
+            this.share_socket.close()
+        })
+
         try {
             project = JSON.parse(window.localStorage.getItem("ppmk_project"), deserialize)
         } catch (e) {
             // console.log(e)
         }
         this.$nextTick(() => {
-            this.page_list_view = this.$refs["page_list_view"]
-            this.dropzone = this.$refs["dropzone"]
-            this.project_view = this.$refs["project_view"]
-            this.page_property_view = this.$refs["page_property_view"]
-            this.tag_property_view = this.$refs["tag_property_view"]
-            this.tag_struct_view = this.$refs["tag_struct_view"]
-
             this.load_settings_from_cookie()
 
-            let api = new API()
-            api.status().then((server_status: ServerStatus) => {
-                this.enable_system = server_status.share_view_system
+            this.api.status().then((server_status: ServerStatus) => {
+                this.login_system = server_status.login_system
             }).catch((e) => {
-                this.enable_system = false
+                this.login_system = false
             })
 
             window.onkeydown = (e: KeyboardEvent) => {
@@ -757,18 +779,20 @@ export default class PutPullMockRootPage extends Vue {
                 let project = new Project()
                 project.ppmk_project.project_name = "About Put Pull Mock"
                 project.ppmk_project_data.project_data.push(about_ppmk_pagedata)
-                this.$nextTick(() => {
-                    this.update_project(project)
-                    this.page_list_view.clicked_page(about_ppmk_pagedata)
-                    this.save_project_to_localstorage()
-                    this.append_history()
-                })
+                if (this.editor_mode) {
+                    this.$nextTick(() => {
+                        this.update_project(project)
+                        this.page_list_view.clicked_page(about_ppmk_pagedata)
+                        this.save_project_to_localstorage()
+                        this.append_history()
+                    })
+                }
             })
         } else {
             this.$nextTick(() => {
                 this.preparated = true
                 if (this.auto_save_project_data_to_localstorage) {
-                    if (project.ppmk_project_data && project.ppmk_project_data.project_data && project.ppmk_project_data.project_data.length > 0) {
+                    if (project.ppmk_project_data && project.ppmk_project_data.project_data && project.ppmk_project_data.project_data.length > 0 && this.editor_mode) {
                         this.update_project(project)
                         this.$nextTick(() => {
                             this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
@@ -783,6 +807,76 @@ export default class PutPullMockRootPage extends Vue {
                 }
             })
         }
+
+        if (shared_project_id != "" && shared_project_id) {
+            this.receive_socket = new WebSocket(watch_share_view_websocket_address)
+            window.addEventListener("onclose", () => {
+                this.receive_socket.close()
+            })
+            let receive_socket = this.receive_socket
+            this.receive_socket.onopen = (event) => {
+                let request = new WatchSharedProjectViewConnectionRequest()
+                request.project_id = String(shared_project_id)
+                receive_socket.send(JSON.stringify(request))
+                this.receive_socket_is_ready = true
+            }
+            this.receive_socket.onmessage = (m) => {
+                if (this.receive_socket_is_ready) {
+                    const message: WatchSharedProjectViewMessage = JSON.parse(m.data)
+                    switch (message.message_type) {
+                        case WatchSharedProjectViewMessageType.CONFIRM_CONNECTION: {
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.ERROR: {
+                            this.flush_message = message.error
+                            this.is_show_flush_message = true
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.UPDATE_PROJECT: {
+                            let project_any: any = message.project
+                            project_any.ppmk_project_data = JSON.parse(JSON.stringify(project_any.ppmk_project_data), deserialize)
+                            let project: Project = project_any
+                            this.project = project
+                            this.update_project(project)
+                            this.$nextTick(() => {
+                                this.show_page(project.ppmk_project_data.project_data[this.page_list_view.selected_index])
+                            })
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.FINISH_SHARE: {
+                            this.receive_socket.close()
+                            break
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        // 卒制ここから
+        let wm_id = this.$route.query["wm_id"]
+        let version_id = this.$route.query["version_id"]
+        if (wm_id != "" && wm_id && version_id != "" && version_id) {
+            const request = {
+                wm_id: wm_id,
+                version_id: version_id,
+            }
+            fetch("/ppmk_server/get_wm_data", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(request),
+            }).then(res => {
+                return res.json()
+            }).then((json) => {
+                const project: Project = json
+                project.ppmk_project_data = JSON.parse(JSON.stringify(json.ppmk_project_data), deserialize)
+                this.project = project
+            })
+        }
+        // 卒制ここまで
     }
 
     get page_css_view_style(): any {
@@ -800,7 +894,14 @@ export default class PutPullMockRootPage extends Vue {
         let file: File = e.target.files[0]
         let reader = new FileReader()
         reader.addEventListener('load', (e) => {
-            let project: Project = JSON.parse(e.target.result.toString(), deserialize)
+            let project: Project
+            try {
+                project = JSON.parse(e.target.result.toString(), deserialize)
+            } catch (e) {
+                this.flush_message = "ppmk.jsonファイルを選択してください"
+                this.is_show_flush_message = true
+                return
+            }
             this.update_project(project)
             this.$nextTick(() => {
                 this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
@@ -808,6 +909,8 @@ export default class PutPullMockRootPage extends Vue {
             this.append_history()
             this.is_show_readin_dialog = false
             this.save_project_to_localstorage()
+            this.flush_message = "プロジェクトが読み込まれました"
+            this.is_show_flush_message = true
         })
         reader.readAsText(file)
     }
@@ -951,10 +1054,7 @@ export default class PutPullMockRootPage extends Vue {
             this.dropzone.html_tagdatas = null
 
             this.width_dropzone = window.innerWidth - 300 - 300 - 19
-            this.height_dropzone = window.innerHeight - 159
-
-
-
+            this.height_dropzone = window.innerHeight - 159 + 18
             return
         }
         let html_tagdatas = pagedata.html_tagdatas
@@ -1156,12 +1256,11 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     append_history() {
-        if (!this.use_undo || !this.editor_mode) {
-            return
-        }
-        if (!this.project) {
-            return
-        }
+        if (!this.preparated) return
+        if (!this.editor_mode) return
+        if (!this.use_undo) return
+        if (!this.project) return
+
         if (this.histories.histories[this.histories.index - 1]) {
             if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(this.project)) {
                 return
@@ -1175,6 +1274,57 @@ export default class PutPullMockRootPage extends Vue {
             this.histories.page_index[this.histories.index] = this.page_list_view.selected_index
         }
         this.histories.index++
+
+        if (this.share_socket && !this.project.ppmk_project.is_shared_view) {
+            let message = new ShareViewMessage()
+            message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
+            this.share_socket.send(JSON.stringify(message))
+            this.share_socket = undefined
+        }
+        if (this.project.ppmk_project.is_shared_view && this.is_firefox) {
+            if (!this.share_socket) {
+                this.share_socket = new WebSocket(share_view_websocket_address)
+                this.share_socket.onmessage = (e) => {
+                    let res: WatchSharedProjectViewMessage = e.data
+                    switch (res.message_type) {
+                        case WatchSharedProjectViewMessageType.CONFIRM_CONNECTION: {
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.ERROR: {
+                            this.flush_message = res.error
+                            this.is_show_flush_message = true
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.FINISH_SHARE: {
+                            this.share_socket.close()
+                            break
+                        }
+                        case WatchSharedProjectViewMessageType.UPDATE_PROJECT: {
+                            break
+                        }
+                    }
+                }
+                let share_socket = this.share_socket
+                this.share_socket.onopen = (event) => {
+                    let message = new ShareViewMessage()
+                    message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
+                    message.project_id = this.project.ppmk_project.project_id
+                    message.project = clone_project(this.project)
+                    this.api.preparate_save_ppmk_project(message.project)
+                    share_socket.send(JSON.stringify(message))
+                    this.share_ws_is_ready = true
+                }
+            } else if (this.share_ws_is_ready) {
+                let message = new ShareViewMessage()
+                message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
+                message.project_id = this.project.ppmk_project.project_id
+                message.project = clone_project(this.project)
+                this.api.preparate_save_ppmk_project(message.project)
+                this.share_ws_is_ready = false
+                this.share_socket.send(JSON.stringify(message))
+                this.share_ws_is_ready = true
+            }
+        }
     }
 
     copy_tag(tagdata: HTMLTagDataBase) {
@@ -1191,7 +1341,7 @@ export default class PutPullMockRootPage extends Vue {
         this.onclick_tag(null)
 
         this.width_dropzone = window.innerWidth - 300 - 300 - 19
-        this.height_dropzone = window.innerHeight - 159
+        this.height_dropzone = window.innerHeight - 159 + 18
 
         this.save_project_to_localstorage()
     }
@@ -1225,6 +1375,11 @@ export default class PutPullMockRootPage extends Vue {
         api.logout().then(() => {
             let api = new API()
             this.session_id = api.load_settings_from_cookie().session_id
+            this.flush_message = "ログアウトしました"
+            this.is_show_flush_message = true
+        }).catch((e) => {
+            this.flush_message = "ログアウトに失敗しました"
+            this.is_show_flush_message = true
         })
     }
 
@@ -1241,6 +1396,8 @@ export default class PutPullMockRootPage extends Vue {
         })
         this.is_show_readin_dialog = false
         this.save_project_to_localstorage()
+        this.flush_message = "プロジェクトが読み込まれました"
+        this.is_show_flush_message = true
     }
 
     show_save_to_server_dialog() {
@@ -1256,11 +1413,20 @@ export default class PutPullMockRootPage extends Vue {
     async save_ppmk_project_to_server() {
         this.is_show_save_to_server_dialog = false
         await this.api.preparate_save_ppmk_project(this.project)
-        let api = new API()
-        let project: Project = this.project
-        project.ppmk_project_data.project_data_id = generateUUID()
-        let update_project_response = await api.update_project(api.session_id, project)
-        let save_project_data_response = await api.save_project_data(api.session_id, project)
+        let update_project_response = await this.api.update_project(this.project)
+        if (update_project_response.error) {
+            this.flush_message = update_project_response.error
+            this.is_show_flush_message = true
+            return
+        }
+        let save_project_data_response = await this.api.save_project_data(this.project)
+        if (save_project_data_response.error) {
+            this.flush_message = save_project_data_response.error
+            this.is_show_flush_message = true
+            return
+        }
+        this.flush_message = "プロジェクトを保存しました"
+        this.is_show_flush_message = true
     }
 
     @Watch('project')
@@ -1285,10 +1451,17 @@ export default class PutPullMockRootPage extends Vue {
         }
     }
 
+    update_is_share_view() {
+        this.api.preparate_save_ppmk_project(this.project)
+        this.api.update_project(this.project)
+    }
+
     update_project_info(project_info: PPMKProject) {
         let project = this.project
         project.ppmk_project = project_info
         this.update_project(project)
+        this.save_project_to_localstorage()
+        this.append_history()
     }
 
     update_pagedatas(pagedatas: Array<PageData>) {
@@ -1301,6 +1474,8 @@ export default class PutPullMockRootPage extends Vue {
         let api = new API()
         this.session_id = api.load_settings_from_cookie().session_id
         this.is_show_login_dialog = false
+        this.flush_message = "ログインしました"
+        this.is_show_flush_message = true
     }
 }
 </script>
