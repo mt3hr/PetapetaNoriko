@@ -8,6 +8,10 @@ export default class Project {
     ppmk_project_data = new PPMKProjectData()
     ppmk_project_share = new PPMKProjectShare()
 
+    get project_id(): string {
+        return this.ppmk_project.project_id
+    }
+
     set project_id(project_id) {
         this.ppmk_project.project_id = project_id
         this.ppmk_project_data.project_id = project_id
