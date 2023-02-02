@@ -5,6 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed",
+    "install_app": "rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed && cd src/app && go install -ldflags \"-H windowsgui\"",
+    "install_server": "rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed && cd src/app/ppmk/ppmk_server && go install -tags=\"server\"",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
