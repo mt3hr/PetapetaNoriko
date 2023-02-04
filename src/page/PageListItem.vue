@@ -1,5 +1,5 @@
 <template>
-    <li @contextmenu.prevent="show_contextmenu" @click="clicked_page" @drop.stop="drop" @dragover.prevent="dragover"
+    <li ref="li" @contextmenu.prevent="show_contextmenu" @click="clicked_page" @drop.stop="drop" @dragover.prevent="dragover"
         :style="style" draggable="true" @dragstart.stop="on_drag_start">
         {{ pagedata.pagename }}</li>
     <v-menu v-model="is_show_contextmenu" :style="contextmenu_style" v-if="editor_mode">
@@ -23,6 +23,15 @@ export default class PageListItem extends Vue {
     is_show_contextmenu = false
     x_contextmenu = 0
     y_contextmenu = 0
+
+    mounted() {
+        this.scrollToThis()
+    }
+
+    scrollToThis() {
+        const el = this.$refs['li'] as HTMLElement;
+        el?.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
+    }
 
     get style(): any {
         if (this.selected) {
