@@ -1,7 +1,11 @@
 <template>
     <div class="mainside">
         <h2>プロジェクト
-            <v-btn v-if="editor_mode" @click="new_project">+</v-btn>
+    <v-btn icon class="mx-2" fab color="primary" v-if="editor_mode" @click="new_project">
+        <v-icon dark>
+            mdi-plus
+        </v-icon>
+    </v-btn>
         </h2>
         <table>
             <tr>
@@ -129,5 +133,12 @@ export default class ProjectPropertyView extends Vue {
     background: white;
     border-radius: 5px;
     resize: none;
+}
+.textbox:hover {
+    opacity: 0.8;
+}
+
+.textbox:focus {
+    outline: solid 2px steelblue;
 }
 </style>

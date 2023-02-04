@@ -1,7 +1,11 @@
 <template>
         <h2>
             ページ一覧
-            <v-btn class="button" v-if="editor_mode" @click="add_page">+</v-btn>
+        <v-btn icon class="mx-2" fab color="primary"  v-if="editor_mode" @click="add_page">
+        <v-icon dark>
+            mdi-plus
+        </v-icon>
+        </v-btn>
         </h2>
     <div class="mainside" :style="style">
         <ul>
@@ -155,7 +159,7 @@ export default class Page extends Vue {
 </script>
 <style scoped>
 h2 {
-    width: 300px;
+    width: 298px;
     background: #e6e6e6;
     font-family: "Roboto", sans-serif;
     font-size: 30px;
@@ -165,6 +169,7 @@ h2 {
 .mainside {
     background:  #e6e6e6;
     height: 150px;
+    width: 298px;
     overflow: scroll;
 }
 

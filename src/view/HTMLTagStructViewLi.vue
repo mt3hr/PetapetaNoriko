@@ -718,10 +718,6 @@ li {
     margin-left: 20px;
 }
 
-.tag_struct_li {
-
-}
-
 .init_dialog {
     width: 280px;
 }

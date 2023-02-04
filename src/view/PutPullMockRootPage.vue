@@ -7,13 +7,17 @@
                 </v-col>
                 <v-spacer />
                 <v-col cols="auto">
-                    <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
+                    <v-checkbox class="checkbox white_box" v-if="editor_mode" v-model="show_border" >
+                    <template v-slot:label>
+                        <span class="checkboxLabel">境界を表示</span>
+                    </template>
+                    </v-checkbox>
                 </v-col>
                 <v-col v-if="login_system" cols="auto">
-                    <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
-                    <v-btn v-else @click="logout">ログアウト</v-btn>
+                    <v-btn color="primary" v-if="!session_id" @click="login">ログイン</v-btn>
+                    <v-btn color="primary" v-else @click="logout">ログアウト</v-btn>
                 </v-col>
-                <v-btn icon v-if="editor_mode" @click="show_options_dialog">
+                <v-btn class="setting" icon v-if="editor_mode" @click="show_options_dialog">
                     <v-icon>mdi-cog</v-icon>
                 </v-btn>
             </v-row>
@@ -90,13 +94,13 @@
             </v-row>
             <v-row class="ppmk_row" v-if="editor_mode">
                 <v-col cols="auto">
-                    <input type="button" value="CSS" @click="is_show_css_dialog = true">
-                    <v-btn @click="is_show_webfont_dialog = true">WebFont</v-btn>
+                    <v-btn color="primary" @click="is_show_css_dialog = true">CSS</v-btn>
+                    <v-btn color="primary" @click="is_show_webfont_dialog = true">WebFont</v-btn>
                 </v-col>
                 <v-spacer />
                 <v-col cols="auto">
-                    <v-btn @click="show_readin_dialog">読み込み</v-btn>
-                    <v-btn @click="show_writeout_dialog">書き出し</v-btn>
+                    <v-btn color="primary" @click="show_readin_dialog">読み込み</v-btn>
+                    <v-btn color="primary" @click="show_writeout_dialog">書き出し</v-btn>
                 </v-col>
             </v-row>
         </v-container>
@@ -110,7 +114,7 @@
                         </v-col>
                         <v-spacer />
                         <v-col cols="auto">
-                            <v-checkbox class="checkbox" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
+                            <v-checkbox class="checkbox" color="#4682b4" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
                         </v-col>
                     </v-row>
                 </v-card-title>
@@ -120,7 +124,7 @@
 }"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" @click="is_show_css_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -139,7 +143,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_readin_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" @click="is_show_readin_dialog = false">閉じる</v-btn>
                     </v-col>
                     <v-spacer />
                 </v-row>
@@ -153,7 +157,7 @@
 https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" @click="is_show_webfont_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -163,37 +167,37 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-card-title>ページHTML</v-card-title>
                 <v-row>
                     <v-col>
-                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
                     </v-col>
                     <v-col>
-                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_base64_image"
                             :label="'埋め込み画像'" />
                     </v-col>
                     <v-col>
-                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_position_css"
                             :label="'位置情報'" />
                     </v-col>
                 </v-row>
                 <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
                 <v-row>
-                    <v-col cols="auto">
-                        <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
+                    <v-col cols="auto" class="btn_margin">
+                        <v-btn color="primary" class="btn_margin" @click="is_show_writeout_dialog = false">閉じる</v-btn>
                     </v-col>
                     <v-spacer />
-                    <v-col cols="auto">
-                        <v-btn @click="print_this_page">このページを印刷する</v-btn>
+                    <v-col cols="auto" class="btn_margin">
+                        <v-btn color="primary" class="btn_margin" @click="print_this_page">このページを印刷する</v-btn>
                     </v-col>
-                    <v-col cols="auto">
-                        <v-btn @click="save_ppmk_html_css_this_page">このページをHTMLファイルに保存</v-btn>
+                    <v-col cols="auto" class="btn_margin">
+                        <v-btn color="primary" class="btn_margin" @click="save_ppmk_html_css_this_page">このページをHTMLファイルに保存</v-btn>
                     </v-col>
-                    <v-col cols="auto">
-                        <v-btn @click="save_ppmk_html_css_all_pages">すべてのページをHTMLファイルに保存</v-btn>
+                    <v-col cols="auto" class="btn_margin">
+                        <v-btn color="primary" class="btn_margin" @click="save_ppmk_html_css_all_pages">すべてのページをHTMLファイルに保存</v-btn>
                     </v-col>
-                    <v-col cols="auto">
-                        <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
+                    <v-col cols="auto" class="btn_margin">
+                        <v-btn color="primary" class="btn_margin" @click="save_ppmk_project">プロジェクトを保存</v-btn>
                     </v-col>
-                    <v-col v-if="login_system && session_id" cols="auto">
-                        <v-btn @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
+                    <v-col v-if="login_system && session_id" cols="auto" class="btn_margin">
+                        <v-btn color="primary" class="btn_margin" @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -205,11 +209,11 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-textarea v-model="project_data_memo" placeholder="メモ" />
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" @click="is_show_writeout_dialog = false">閉じる</v-btn>
                     </v-col>
                     <v-spacer />
                     <v-col cols="auto">
-                        <v-btn @click="() => { apply_project_data_memo(); save_ppmk_project_to_server() }">保存</v-btn>
+                        <v-btn color="primary" @click="() => { apply_project_data_memo(); save_ppmk_project_to_server() }">保存</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -222,11 +226,11 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <p>注: 保存されていない作業は破棄されます</p>
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_new_project_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" @click="is_show_new_project_dialog = false">閉じる</v-btn>
                     </v-col>
                     <v-spacer />
                     <v-col cols="auto">
-                        <v-btn @click="new_project">新規作成</v-btn>
+                        <v-btn color="primary" @click="new_project">新規作成</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -242,37 +246,37 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" v-model="show_border" :label="'境界を表示'" />
+                        <v-checkbox class="checkbox" color="#4682b4" v-model="show_border" :label="'境界を表示'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" v-model="auto_save_project_data_to_localstorage" :label="'自動保存'" />
+                        <v-checkbox class="checkbox" color="#4682b4" v-model="auto_save_project_data_to_localstorage" :label="'自動保存'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" v-model="use_undo" :label="'Undo機能'" />
+                        <v-checkbox class="checkbox" color="#4682b4" v-model="use_undo" :label="'Undo機能'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" v-model="auto_focus_tag_property_view"
+                        <v-checkbox class="checkbox" color="#4682b4" v-model="auto_focus_tag_property_view"
                             :label="'プロパティビューオートフォーカス'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" v-model="auto_scroll_tag_struct_view" :label="'構造ビュー自動スクロール'" />
+                        <v-checkbox class="checkbox" color="#4682b4" v-model="auto_scroll_tag_struct_view" :label="'構造ビュー自動スクロール'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
                         <v-text>HTML要素一覧の表示</v-text>
                         <v-radio-group v-model="tag_list_view_mode">
-                            <v-radio :label="'タグ名と画像'" :value="TagListViewMode.TextAndImage" />
-                            <v-radio :label="'タグ名'" :value="TagListViewMode.Text" />
-                            <v-radio :label="'画像'" :value="TagListViewMode.Image" />
+                            <v-radio :color="'#4682b4'" :label="'タグ名と画像'" :value="TagListViewMode.TextAndImage" />
+                            <v-radio :color="'#4682b4'" :label="'タグ名'" :value="TagListViewMode.Text" />
+                            <v-radio :color="'#4682b4'" :label="'画像'" :value="TagListViewMode.Image" />
                         </v-radio-group>
                     </v-col>
                 </v-row>
@@ -284,7 +288,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
+                        <v-checkbox class="checkbox" color="#4682b4" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -294,24 +298,24 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_base64_image"
                             :label="'埋め込み画像'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_position_css"
                             :label="'位置情報'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_options_dialog = false">閉じる</v-btn>
+                        <v-btn  :color="'primary'" @click="is_show_options_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -329,7 +333,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
 
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_oversize_localstorage_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" @click="is_show_oversize_localstorage_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -341,7 +345,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                     @register="() => { is_show_login_dialog; is_show_register_dialog = true }" @logined="logined" />
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_login_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" @click="is_show_login_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -351,7 +355,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <ResetPassword />
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_reset_password_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" @click="is_show_reset_password_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -361,7 +365,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <Register />
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_register_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" @click="is_show_register_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -424,8 +428,8 @@ export default class PutPullMockRootPage extends Vue {
 
     TagListViewMode = TagListViewMode
     api = new API()
-    width_dropzone = window.innerWidth - 300 - 300 - 19
-    height_dropzone = window.innerHeight - 159 + 18
+    width_dropzone = window.innerWidth - 300 - 300 - 19 + 6
+    height_dropzone = window.innerHeight - 159 + 18 - 22
 
     is_show_css_dialog = false
     is_show_writeout_dialog = false
@@ -1056,8 +1060,8 @@ export default class PutPullMockRootPage extends Vue {
             this.page_property_view.page_data = null
             this.dropzone.html_tagdatas = null
 
-            this.width_dropzone = window.innerWidth - 300 - 300 - 19
-            this.height_dropzone = window.innerHeight - 159 + 18
+            this.width_dropzone = window.innerWidth - 300 - 300 - 19 + 6
+            this.height_dropzone = window.innerHeight - 159 + 18 - 22
             return
         }
         let html_tagdatas = pagedata.html_tagdatas
@@ -1343,8 +1347,8 @@ export default class PutPullMockRootPage extends Vue {
         this.update_struct_view(null)
         this.onclick_tag(null)
 
-        this.width_dropzone = window.innerWidth - 300 - 300 - 19
-        this.height_dropzone = window.innerHeight - 159 + 18
+        this.width_dropzone = window.innerWidth - 300 - 300 - 19 + 6
+        this.height_dropzone = window.innerHeight - 159 + 18 - 22
 
         this.save_project_to_localstorage()
     }
@@ -1520,7 +1524,7 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .html_tag_list_view {
-    height: calc(100vh - 387px);
+    height: calc(100vh - 436px);
     overflow-y: scroll;
 }
 
@@ -1608,5 +1612,37 @@ export default class PutPullMockRootPage extends Vue {
 .header_bar {
     background: steelblue;
     border-radius: 0 0 15px 15px;
+}
+.white_box {
+    height: 75px;
+    color: white;
+    font-size: 20px;
+     opacity: unset;
+}
+
+.checkboxLabel{
+    color: white;
+    font-size: 20px;
+    opacity: unset;
+}
+.checkbox .v-label,
+.checkbox .v-label--clickable {
+    opacity: unset;
+}
+.v-radio .v-label,
+.v-radio .v-label--clickable {
+    opacity: unset;
+}
+.setting{
+    margin-left: 20px;
+}
+.v-btn{
+    margin:  0px 0px 0px 10px;
+}
+.v-btn:first-child {
+    margin:  0px 0px 0px 0px;
+}
+.btn_margin{
+    margin:  10px 10px 10px 10px;
 }
 </style>
