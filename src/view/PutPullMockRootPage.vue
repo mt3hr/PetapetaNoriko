@@ -168,7 +168,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-row>
                     <v-col>
                         <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
-                    </v-col>
+                    </v-col>このページ
                     <v-col>
                         <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_base64_image"
                             :label="'埋め込み画像'" />
@@ -185,16 +185,16 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                     </v-col>
                     <v-spacer />
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" @click="print_this_page">このページを印刷する</v-btn>
+                        <v-btn color="primary" class="btn_margin" title="印刷" @click="print_this_page"><v-icon>mdi-printer</v-icon></v-btn>
                     </v-col>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" @click="save_ppmk_html_css_this_page">このページをHTMLファイルに保存</v-btn>
+                        <v-btn color="primary" class="btn_margin" title="このページをHTMLファイルに保存" @click="save_ppmk_html_css_this_page"><v-icon>mdi-content-save</v-icon></v-btn>
                     </v-col>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" @click="save_ppmk_html_css_all_pages">すべてのページをHTMLファイルに保存</v-btn>
+                        <v-btn color="primary" class="btn_margin" title="すべてのページをHTMLファイルに保存" @click="save_ppmk_html_css_all_pages"><v-icon>mdi-content-save-all</v-icon></v-btn>
                     </v-col>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" @click="save_ppmk_project">プロジェクトを保存</v-btn>
+                        <v-btn color="primary" class="btn_margin" title="プロジェクトを保存" @click="save_ppmk_project"><v-icon>mid-folder-check</v-icon></v-btn>
                     </v-col>
                     <v-col v-if="login_system && session_id" cols="auto" class="btn_margin">
                         <v-btn color="primary" class="btn_margin" @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
