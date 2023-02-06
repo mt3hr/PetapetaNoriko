@@ -380,6 +380,7 @@ export default class HTMLTagPropertyView extends Vue {
 <style scoped>
 .tag_struct_li {
     margin-left: 20px;
+    padding: 0px;
 }
 .tag_struct_ul{
 }
