@@ -187,6 +187,10 @@ li {
     margin-left: 20px;
 }
 
+li:active {
+    cursor: grabbing;
+}
+
 td {
     min-height: fit-content !important;
 }
