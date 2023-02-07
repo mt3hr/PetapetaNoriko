@@ -1,7 +1,7 @@
 <template>
         <h2>
             ページ一覧
-        <v-btn icon class="mx-2" fab color="primary"  v-if="editor_mode" @click="add_page">
+        <v-btn icon class="mx-2" fab color="primary" title="新規ページ追加" v-if="editor_mode" @click="add_page">
         <v-icon dark>
             mdi-plus
         </v-icon>

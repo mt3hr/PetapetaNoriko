@@ -1,9 +1,12 @@
 <template>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Righteous&family=Teko:wght@600&display=swap" rel="stylesheet">
     <div class="main_page">
         <v-container>
             <v-row class="ppmk_row header_bar">
                 <v-col cols="auto">
-                    <h1><a @click="to_toppage" :style="title_style">PutPullMock</a></h1>
+                    <h1 class="logo"><a @click="to_toppage" :style="title_style">PutPullMock</a></h1>
                 </v-col>
                 <v-spacer />
                 <v-col cols="auto">
@@ -133,7 +136,10 @@
             <v-card class="pa-5">
                 <v-row>
                     <v-col>
+                    <div class="file_btn">
+                        ファイルを選択
                         <input type="file" @change="read_ppmk_project" />
+                    </div>
                     </v-col>
                 </v-row>
                 <v-row v-if="login_system && session_id">
@@ -168,7 +174,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-row>
                     <v-col>
                         <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
-                    </v-col>このページ
+                    </v-col>
                     <v-col>
                         <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_base64_image"
                             :label="'埋め込み画像'" />
@@ -194,7 +200,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                         <v-btn color="primary" class="btn_margin" title="すべてのページをHTMLファイルに保存" @click="save_ppmk_html_css_all_pages"><v-icon>mdi-content-save-all</v-icon></v-btn>
                     </v-col>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" title="プロジェクトを保存" @click="save_ppmk_project"><v-icon>mid-folder-check</v-icon></v-btn>
+                        <v-btn color="primary" class="btn_margin" title="プロジェクトを保存" @click="save_ppmk_project"><v-icon>mdi-folder-download</v-icon></v-btn>
                     </v-col>
                     <v-col v-if="login_system && session_id" cols="auto" class="btn_margin">
                         <v-btn color="primary" class="btn_margin" @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
@@ -1369,7 +1375,7 @@ export default class PutPullMockRootPage extends Vue {
     }
     get title_style(): any {
         if (this.editor_mode) {
-            return { 'color': 'white', 'text-decoration': 'none', 'font-family': "Roboto", 'font-size': '50px', 'cursor': 'pointer' }
+            return { 'color': 'white', 'text-decoration': 'none', 'font-family': 'Righteous' , 'font-size': '50px', 'cursor': 'pointer' }
         } else {
             return { 'color': 'white', 'text-decoration': 'none' }
         }
@@ -1612,6 +1618,7 @@ export default class PutPullMockRootPage extends Vue {
 .header_bar {
     background: steelblue;
     border-radius: 0 0 15px 15px;
+    font-family: 'Teko', sans-serif;
 }
 .white_box {
     height: 75px;
@@ -1642,7 +1649,37 @@ export default class PutPullMockRootPage extends Vue {
 .v-btn:first-child {
     margin:  0px 0px 0px 0px;
 }
-.btn_margin{
-    margin:  10px 10px 10px 10px;
+.btn_margin:first-child {
+    margin-left: 0px !important;
 }
+.btn_margin {
+    margin-left: 10px !important;
+}
+.file_btn{
+    display: inline-block;
+    overflow: hidden;
+    position: relative;
+    padding: 5px 30px 5px 30px;
+    border-radius: 5px;
+    background: #808080;
+    color: white;
+    transition: 0.2s;
+}
+.file_btn:hover{
+    opacity:0.8;
+}
+.file_btn input[type="file"]{
+    opacity: 0;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 0;
+    font-size: 100px;
+    cursor: pointer;
+}
+.logo {
+    font-family: 'Teko', sans-serif;
+}
+
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div class="mainside">
         <h2>プロジェクト
-    <v-btn icon class="mx-2" fab color="primary" v-if="editor_mode" @click="new_project">
+    <v-btn icon class="mx-2" fab color="primary" title="新規プロジェクト作成" v-if="editor_mode" @click="new_project">
         <v-icon dark>
             mdi-plus
         </v-icon>
