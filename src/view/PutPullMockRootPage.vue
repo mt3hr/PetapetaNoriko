@@ -412,6 +412,7 @@ import ResetPassword from './login_system/ResetPassword.vue'
 })
 
 export default class PutPullMockRootPage extends Vue {
+    jec_jy_graduationwork = true //TODO
     page_list_view: any
     dropzone: any
     project_view: any
