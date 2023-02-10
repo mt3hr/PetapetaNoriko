@@ -1,7 +1,7 @@
 <template>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Righteous&family=Teko:wght@600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Teko:wght@600&display=swap" rel="stylesheet">
     <div class="main_page">
         <v-container>
             <v-row class="ppmk_row header_bar">
@@ -10,10 +10,10 @@
                 </v-col>
                 <v-spacer />
                 <v-col cols="auto">
-                    <v-checkbox class="checkbox white_box" v-if="editor_mode" v-model="show_border" >
-                    <template v-slot:label>
-                        <span class="checkboxLabel">境界を表示</span>
-                    </template>
+                    <v-checkbox class="checkbox white_box" v-if="editor_mode" v-model="show_border">
+                        <template v-slot:label>
+                            <span class="checkboxLabel">境界を表示</span>
+                        </template>
                     </v-checkbox>
                 </v-col>
                 <v-col v-if="login_system" cols="auto">
@@ -54,7 +54,6 @@
                         </v-row>
                     </v-container>
                 </v-col>
-
                 <!--ドロップゾーン-->
                 <v-col cols="auto" class="dropzone_wrap">
                     <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
@@ -117,7 +116,8 @@
                         </v-col>
                         <v-spacer />
                         <v-col cols="auto">
-                            <v-checkbox class="checkbox" color="#4682b4" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
+                            <v-checkbox class="checkbox" color="#4682b4" v-model="transparent_page_css_view"
+                                :label="'透過'"></v-checkbox>
                         </v-col>
                     </v-row>
                 </v-card-title>
@@ -136,10 +136,10 @@
             <v-card class="pa-5">
                 <v-row>
                     <v-col>
-                    <div class="file_btn">
-                        ファイルを選択
-                        <input type="file" @change="read_ppmk_project" />
-                    </div>
+                        <div class="file_btn">
+                            ファイルを選択
+                            <input type="file" @change="read_ppmk_project" />
+                        </div>
                     </v-col>
                 </v-row>
                 <v-row v-if="login_system && session_id">
@@ -173,15 +173,16 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-card-title>ページHTML</v-card-title>
                 <v-row>
                     <v-col>
-                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_head"
+                            :label="'ヘッダ'" />
                     </v-col>
                     <v-col>
-                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_base64_image"
-                            :label="'埋め込み画像'" />
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html"
+                            v-model="export_base64_image" :label="'埋め込み画像'" />
                     </v-col>
                     <v-col>
-                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_position_css"
-                            :label="'位置情報'" />
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html"
+                            v-model="export_position_css" :label="'位置情報'" />
                     </v-col>
                 </v-row>
                 <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
@@ -191,19 +192,24 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                     </v-col>
                     <v-spacer />
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" title="印刷" @click="print_this_page"><v-icon>mdi-printer</v-icon></v-btn>
+                        <v-btn color="primary" class="btn_margin" title="印刷"
+                            @click="print_this_page"><v-icon>mdi-printer</v-icon></v-btn>
                     </v-col>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" title="このページをHTMLファイルに保存" @click="save_ppmk_html_css_this_page"><v-icon>mdi-content-save</v-icon></v-btn>
+                        <v-btn color="primary" class="btn_margin" title="このページをHTMLファイルに保存"
+                            @click="save_ppmk_html_css_this_page"><v-icon>mdi-content-save</v-icon></v-btn>
                     </v-col>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" title="すべてのページをHTMLファイルに保存" @click="save_ppmk_html_css_all_pages"><v-icon>mdi-content-save-all</v-icon></v-btn>
+                        <v-btn color="primary" class="btn_margin" title="すべてのページをHTMLファイルに保存"
+                            @click="save_ppmk_html_css_all_pages"><v-icon>mdi-content-save-all</v-icon></v-btn>
                     </v-col>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" title="プロジェクトを保存" @click="save_ppmk_project"><v-icon>mdi-folder-download</v-icon></v-btn>
+                        <v-btn color="primary" class="btn_margin" title="プロジェクトを保存"
+                            @click="save_ppmk_project"><v-icon>mdi-folder-download</v-icon></v-btn>
                     </v-col>
                     <v-col v-if="login_system && session_id" cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
+                        <v-btn color="primary" class="btn_margin"
+                            @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -219,7 +225,8 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                     </v-col>
                     <v-spacer />
                     <v-col cols="auto">
-                        <v-btn color="primary" @click="() => { apply_project_data_memo(); save_ppmk_project_to_server() }">保存</v-btn>
+                        <v-btn color="primary"
+                            @click="() => { apply_project_data_memo(); save_ppmk_project_to_server() }">保存</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -257,7 +264,8 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" color="#4682b4" v-model="auto_save_project_data_to_localstorage" :label="'自動保存'" />
+                        <v-checkbox class="checkbox" color="#4682b4" v-model="auto_save_project_data_to_localstorage"
+                            :label="'自動保存'" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -273,7 +281,8 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" color="#4682b4" v-model="auto_scroll_tag_struct_view" :label="'構造ビュー自動スクロール'" />
+                        <v-checkbox class="checkbox" color="#4682b4" v-model="auto_scroll_tag_struct_view"
+                            :label="'構造ビュー自動スクロール'" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -294,7 +303,8 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" color="#4682b4" v-model="transparent_page_css_view" :label="'透過'"></v-checkbox>
+                        <v-checkbox class="checkbox" color="#4682b4" v-model="transparent_page_css_view"
+                            :label="'透過'"></v-checkbox>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -304,24 +314,25 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_head"
+                            :label="'ヘッダ'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_base64_image"
-                            :label="'埋め込み画像'" />
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html"
+                            v-model="export_base64_image" :label="'埋め込み画像'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_position_css"
-                            :label="'位置情報'" />
+                        <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html"
+                            v-model="export_position_css" :label="'位置情報'" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn  :color="'primary'" @click="is_show_options_dialog = false">閉じる</v-btn>
+                        <v-btn :color="'primary'" @click="is_show_options_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -425,6 +436,7 @@ import ResetPassword from './login_system/ResetPassword.vue'
 })
 
 export default class PutPullMockRootPage extends Vue {
+    jec_jy_graduationwork = true //TODO
     page_list_view: any
     dropzone: any
     project_view: any
@@ -1375,7 +1387,7 @@ export default class PutPullMockRootPage extends Vue {
     }
     get title_style(): any {
         if (this.editor_mode) {
-            return { 'color': 'white', 'text-decoration': 'none', 'font-family': 'Righteous' , 'font-size': '50px', 'cursor': 'pointer' }
+            return { 'color': 'white', 'text-decoration': 'none', 'font-family': 'Righteous', 'font-size': '50px', 'cursor': 'pointer' }
         } else {
             return { 'color': 'white', 'text-decoration': 'none' }
         }
@@ -1577,19 +1589,15 @@ export default class PutPullMockRootPage extends Vue {
     top: -7px;
 }
 </style>
+
 <style>
+.textbox,
 .dropzone input,
 .dropzone select,
-.dropzone textarea {
+.dropzone textarea { 
     border: solid 1px silver !important;
 }
 
-/* body {
-    overflow: scroll !important;
-} */
-</style>
-
-<style>
 .main_page {
     background: white;
     font-family: "Roboto", sans-serif;
@@ -1620,42 +1628,51 @@ export default class PutPullMockRootPage extends Vue {
     border-radius: 0 0 15px 15px;
     font-family: 'Teko', sans-serif;
 }
+
 .white_box {
     height: 75px;
     color: white;
     font-size: 20px;
-     opacity: unset;
+    opacity: unset;
 }
 
-.checkboxLabel{
+.checkboxLabel {
     color: white;
     font-size: 20px;
     opacity: unset;
 }
+
 .checkbox .v-label,
 .checkbox .v-label--clickable {
     opacity: unset;
 }
+
 .v-radio .v-label,
 .v-radio .v-label--clickable {
     opacity: unset;
 }
-.setting{
+
+.setting {
     margin-left: 20px;
 }
-.v-btn{
-    margin:  0px 0px 0px 10px;
+
+.v-btn {
+    margin: 0px 0px 0px 10px;
 }
+
 .v-btn:first-child {
-    margin:  0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
 }
+
 .btn_margin:first-child {
     margin-left: 0px !important;
 }
+
 .btn_margin {
     margin-left: 10px !important;
 }
-.file_btn{
+
+.file_btn {
     display: inline-block;
     overflow: hidden;
     position: relative;
@@ -1665,10 +1682,12 @@ export default class PutPullMockRootPage extends Vue {
     color: white;
     transition: 0.2s;
 }
-.file_btn:hover{
-    opacity:0.8;
+
+.file_btn:hover {
+    opacity: 0.8;
 }
-.file_btn input[type="file"]{
+
+.file_btn input[type="file"] {
     opacity: 0;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     position: absolute;
@@ -1678,8 +1697,8 @@ export default class PutPullMockRootPage extends Vue {
     font-size: 100px;
     cursor: pointer;
 }
+
 .logo {
     font-family: 'Teko', sans-serif;
 }
-
 </style>
