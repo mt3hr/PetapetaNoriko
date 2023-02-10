@@ -9,7 +9,7 @@
                     プロジェクト名:
                 </td>
                 <td>
-                    <input type="text" :readonly="!editor_mode" v-model="project_name" @keydown="update_project_info" />
+                    <input class="textbox" type="text" :readonly="!editor_mode" v-model="project_name" @keydown="update_project_info" />
                 </td>
             </tr>
             <tr class="share_link" v-if="login_system && session_id">

@@ -1556,9 +1556,10 @@ export default class PutPullMockRootPage extends Vue {
 }
 </style>
 <style>
-input,
-select,
-textarea {
+.textbox,
+.dropzone input,
+.dropzone select,
+.dropzone textarea {
     border: solid 1px silver !important;
 }
 

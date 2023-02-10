@@ -5,13 +5,13 @@
             <tr v-for="property, index in properties" :key="index" :style="generate_style(property)">
                 <td>{{ get_property_name_jp(property.name) }}:</td>
                 <td>
-                    <input :ref="'input_' + property.name" v-if="use_checkbox(property)" type="checkbox"
+                    <input class="textbox" :ref="'input_' + property.name" v-if="use_checkbox(property)" type="checkbox"
                         v-model="property.value" :disabled="is_editable_property(property)"
                         @change="(e) => updated_property_value(e, property)" />
-                    <textarea v-else-if="use_textarea(property)" :ref="'input_' + property.name"
+                    <textarea class="textbox" v-else-if="use_textarea(property)" :ref="'input_' + property.name"
                         v-model="property.value" :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)"></textarea>
-                    <input v-else type="text" :ref="'input_' + property.name" v-model="property.value"
+                    <input class="textbox" v-else type="text" :ref="'input_' + property.name" v-model="property.value"
                         :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)" />
                 </td>

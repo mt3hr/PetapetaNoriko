@@ -4,7 +4,7 @@
         <table>
             <tr v-for="property, index in properties" :key="index">
                 <td>{{ get_property_name_jp(property.name) }}:</td>
-                <td><input type="text" :value="property.value"
+                <td><input class="textbox" type="text" :value="property.value"
                         @keyup="(e) => updated_property_value(e, property.name)" /> </td>
             </tr>
         </table>
