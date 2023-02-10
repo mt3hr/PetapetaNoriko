@@ -230,6 +230,10 @@ summary:hover{
     background:  #e6e6e6;
 }
 
+li:active {
+    cursor: grabbing;
+}
+
 td {
     min-height: fit-content !important;
 }

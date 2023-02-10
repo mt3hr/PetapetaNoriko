@@ -1,11 +1,11 @@
 <template>
     <div class="mainside">
         <h2>プロジェクト
-    <v-btn icon class="mx-2" fab color="primary" title="新規プロジェクト作成" v-if="editor_mode" @click="new_project">
-        <v-icon dark>
-            mdi-plus
-        </v-icon>
-    </v-btn>
+            <v-btn icon class="mx-2" fab color="primary" title="新規プロジェクト作成" v-if="editor_mode" @click="new_project">
+                <v-icon dark>
+                    mdi-plus
+                </v-icon>
+            </v-btn>
         </h2>
         <table>
             <tr>
@@ -114,14 +114,16 @@ export default class ProjectPropertyView extends Vue {
 
 
 <style scoped>
-.mainside h2{
+.mainside h2 {
     font-family: "Roboto", sans-serif;
     font-size: 30px;
-    color: steelblue; 
+    color: steelblue;
 }
+
 .mainside {
-    background:  #e6e6e6;
+    background: #e6e6e6;
 }
+
 .project_name {
     font-size: 75%;
 }
@@ -129,11 +131,13 @@ export default class ProjectPropertyView extends Vue {
 .share_link {
     font-size: 75%;
 }
-.textbox{
+
+.textbox {
     background: white;
     border-radius: 5px;
     resize: none;
 }
+
 .textbox:hover {
     opacity: 0.8;
 }
