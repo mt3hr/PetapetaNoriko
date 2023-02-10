@@ -1,5 +1,6 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class FileTagData extends HTMLTagDataBase {
@@ -9,6 +10,8 @@ export default class FileTagData extends HTMLTagDataBase {
     accept = ""
     multiple = false
     required = false
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "file"
@@ -50,6 +53,8 @@ export default class FileTagData extends HTMLTagDataBase {
         c.accept = this.accept
         c.multiple = this.multiple
         c.required = this.required
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 }

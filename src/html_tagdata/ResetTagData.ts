@@ -1,9 +1,12 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class ResetTagData extends HTMLTagDataBase {
     value = "リセット"
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "reset"
@@ -37,6 +40,8 @@ export default class ResetTagData extends HTMLTagDataBase {
         c.selected_this_tag = this.selected_this_tag
         c.focus_property_name = this.focus_property_name
         c.value = this.value
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 }

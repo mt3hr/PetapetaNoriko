@@ -1,5 +1,6 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class ImageTagData extends HTMLTagDataBase {
@@ -14,6 +15,8 @@ export default class ImageTagData extends HTMLTagDataBase {
     formmethod = ""
     formnovalidate = true
     formtarget = ""
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "image"
@@ -74,6 +77,8 @@ export default class ImageTagData extends HTMLTagDataBase {
         c.formmethod = this.formmethod
         c.formnovalidate = this.formnovalidate
         c.formtarget = this.formtarget
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 }

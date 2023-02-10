@@ -11,6 +11,12 @@
                     <textarea class="textbox" v-else-if="use_textarea(property)" :ref="'input_' + property.name"
                         v-model="property.value" :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)"></textarea>
+                    <select class="textbox" v-else-if="property.type == 'label_type'"
+                        @change="(e) => updated_label_type(e, property)">
+                        <option :value="LabelType.None">なし</option>
+                        <option :value="LabelType.Before">前置</option>
+                        <option :value="LabelType.After">後置</option>
+                    </select>
                     <input class="textbox" v-else type="text" :ref="'input_' + property.name" v-model="property.value"
                         :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)" />
@@ -21,6 +27,7 @@
 </template>
 <script lang="ts">
 import HTMLTagDataBase from '@/html_tagdata/HTMLTagDataBase';
+import { LabelType } from '@/html_tagdata/LabelType';
 import { deserialize } from '@/serializable/serializable';
 import { Vue } from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
@@ -32,6 +39,7 @@ class Property {
 }
 
 export default class HTMLTagPropertyView extends Vue {
+    LabelType = LabelType
     html_tagdata: HTMLTagDataBase = new HTMLTagDataBase()
     properties: Array<Property> = new Array<Property>()
     @Prop() auto_focus_tag_property_view: boolean
@@ -52,6 +60,8 @@ export default class HTMLTagPropertyView extends Vue {
             if (html_tagdata[key] !== undefined) {
                 if (typeof (html_tagdata[key]) == "boolean") {
                     property.type = "boolean"
+                } else if (key == "label_type") {
+                    property.type = "label_type"
                 } else {
                     property.type = "string"
                 }
@@ -77,10 +87,14 @@ export default class HTMLTagPropertyView extends Vue {
     }
 
     updated_property_value(payload: any, property: Property) {
-        // cloneだるいから一度JSONにまるめてしまおう
         let html_tagdata = this.html_tagdata.clone()
         html_tagdata[property.name] = property.value
+        this.$emit('updated_html_tag_property', html_tagdata)
+    }
 
+    updated_label_type(payload: any, property: Property) {
+        let html_tagdata = this.html_tagdata.clone()
+        html_tagdata["label_type"] = payload.target.value
         this.$emit('updated_html_tag_property', html_tagdata)
     }
 

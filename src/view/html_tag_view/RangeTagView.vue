@@ -1,15 +1,28 @@
 <template>
-    <input type="range" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
-        :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
+    <input v-if="label_type == LabelType.None" type="range" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
+        :value="value" :class="tagclass" :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max"
+        :min="min" :step="step">
+    <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        <input type="range" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+             @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
+            :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
+    </label>
+    <label :style="position_css" v-else-if="label_type == LabelType.After">
+        <input type="range" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+             @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
+            :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
+    </label>
 </template>
 
 <script lang="ts">
 import RangeTagData from '@/html_tagdata/RangeTagData';
+import { LabelType } from '@/html_tagdata/LabelType';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
 export default class RangeTagView extends HTMLTagViewBase {
+    LabelType = LabelType
     name: string
     value: string
     autocomplete: string
@@ -18,6 +31,8 @@ export default class RangeTagView extends HTMLTagViewBase {
     min: string
     step: string
     tagclass: string
+    label_type: LabelType
+    label: string
 
     @Watch('name')
     @Watch('value')
@@ -27,6 +42,8 @@ export default class RangeTagView extends HTMLTagViewBase {
     @Watch('min')
     @Watch('step')
     @Watch('tagclass')
+    @Watch('label')
+    @Watch('label_type')
     update_tagdata() {
         let tagdata: RangeTagData = new RangeTagData()
         tagdata.tagid = this.tagdata.tagid
@@ -38,6 +55,8 @@ export default class RangeTagView extends HTMLTagViewBase {
         tagdata.max = this.max
         tagdata.min = this.min
         tagdata.step = this.step
+        tagdata.label_type = this.label_type
+        tagdata.label = this.label
         this.$emit("updated_tagdata", tagdata)
     }
 
@@ -53,6 +72,8 @@ export default class RangeTagView extends HTMLTagViewBase {
         this.max = this.tagdata_typed.max
         this.min = this.tagdata_typed.min
         this.step = this.tagdata_typed.step
+        this.label = this.tagdata_typed.label
+        this.label_type = this.tagdata_typed.label_type
     }
 
     created(): void {
