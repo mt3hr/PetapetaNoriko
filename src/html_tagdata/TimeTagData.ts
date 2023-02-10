@@ -21,6 +21,8 @@ export default class TimeTagData extends HTMLTagDataBase {
     override generate_html(options: GenerateHTMLOptions, indent: string): string {
         let html = ""
         html += indent
+        if (this.label_type != LabelType.None) html += "<label>"
+        if (this.label_type == LabelType.Before) html += this.label
         html += "<input type=\"time\""
         if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
@@ -33,6 +35,8 @@ export default class TimeTagData extends HTMLTagDataBase {
         if (this.required) html += " required"
         if (this.step != "") html += " =\"" + this.step + "\""
         html += ">"
+        if (this.label_type == LabelType.After) html += this.label
+        if (this.label_type != LabelType.None) html += "</label>"
         return html
     }
     override to_string(): string {
