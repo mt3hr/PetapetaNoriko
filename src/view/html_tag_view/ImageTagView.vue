@@ -1,16 +1,33 @@
 <template>
-    <input type="image" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :src="src" :alt="alt"
-        :class="tagclass" :id="tagdata.tagid" :height="height" :width="width" :formaciton="formaciton"
-        :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate" :formtarget="formtarget">
+    <input v-if="label_type == LabelType.None" type="image" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
+        :value="value" :src="src" :alt="alt" :class="tagclass" :id="tagdata.tagid" :height="height" :width="width"
+        :formaciton="formaciton" :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
+        :formtarget="formtarget">
+    <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        <input type="image" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+             @click.prevent.stop="onclick_tag" :name="name" :value="value" :src="src" :alt="alt"
+            :class="tagclass" :id="tagdata.tagid" :height="height" :width="width" :formaciton="formaciton"
+            :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
+            :formtarget="formtarget">
+    </label>
+    <label :style="position_css" v-else-if="label_type == LabelType.After">
+        <input type="image" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+             @click.prevent.stop="onclick_tag" :name="name" :value="value" :src="src" :alt="alt"
+            :class="tagclass" :id="tagdata.tagid" :height="height" :width="width" :formaciton="formaciton"
+            :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
+            :formtarget="formtarget">
+    </label>
 </template>
 
 <script lang="ts">
 import ImageTagData from '@/html_tagdata/ImageTagData';
+import { LabelType } from '@/html_tagdata/LabelType';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
 export default class TagView extends HTMLTagViewBase {
+    LabelType = LabelType
     name: string
     value: string
     src: string
@@ -23,6 +40,8 @@ export default class TagView extends HTMLTagViewBase {
     formnovalidate: boolean
     formtarget: string
     tagclass: string
+    label_type: LabelType
+    label: string
 
     @Watch('name')
     @Watch('value')
@@ -36,6 +55,8 @@ export default class TagView extends HTMLTagViewBase {
     @Watch('formnovalidate')
     @Watch('formtarget')
     @Watch('tagclass')
+    @Watch('label')
+    @Watch('label_type')
     update_tagdata() {
         let tagdata: ImageTagData = new ImageTagData()
         tagdata.tagid = this.tagdata.tagid
@@ -50,6 +71,8 @@ export default class TagView extends HTMLTagViewBase {
         tagdata.formenctype = this.formenctype
         tagdata.formnovalidate = this.formnovalidate
         tagdata.formtarget = this.formtarget
+        tagdata.label_type = this.label_type
+        tagdata.label = this.label
         this.$emit("updated_tagdata", tagdata)
     }
 
@@ -69,6 +92,8 @@ export default class TagView extends HTMLTagViewBase {
         this.formmethod = this.tagdata_typed.formmethod
         this.formnovalidate = this.tagdata_typed.formnovalidate
         this.formtarget = this.tagdata_typed.formtarget
+        this.label = this.tagdata_typed.label
+        this.label_type = this.tagdata_typed.label_type
     }
 
     created(): void {

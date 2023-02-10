@@ -1,11 +1,14 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class CheckBoxTagData extends HTMLTagDataBase {
     name = ""
     value = ""
     checked = false
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "checkbox"
@@ -43,6 +46,8 @@ export default class CheckBoxTagData extends HTMLTagDataBase {
         c.name = this.name
         c.value = this.value
         c.checked = this.checked
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 }

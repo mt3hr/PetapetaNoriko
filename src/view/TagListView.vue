@@ -1,86 +1,99 @@
 <template>
     <div>
         <h2>HTML要素一覧</h2>
-        <h3>基本</h3>
-        <ul>
-            <li v-for="basic_component_name, index in basic_component_names" :key="index" draggable="true"
-                :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, basic_component_name)">
-                <table>
-                    <tr>
-                        <td :style="tagname_style"> {{ basic_component_name }} </td>
-                    </tr>
-                    <tr>
-                        <td :style="tagimage_style"><img :alt="basic_component_name"
-                                :src="require('@/resource/image/' + basic_component_name + '.png')" /></td>
-                    </tr>
-                </table>
-            </li>
-        </ul>
-        <h3>見出し</h3>
-        <ul>
-            <li v-for="headline_component_name, index in headline_component_names" :key="index" draggable="true"
-                :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, headline_component_name)">
-                <table>
-                    <tr>
-                        <td :style="tagname_style"> {{ headline_component_name }}</td>
-                    </tr>
-                    <tr>
-                        <td :style="tagimage_style"><img :alt="headline_component_name"
-                                :src="require('@/resource/image/' + headline_component_name + '.png')" />
-                        </td>
-                    </tr>
-                </table>
-            </li>
-        </ul>
+        <details>
+            <summary>基本</summary>
+            <ul>
+                <li v-for="basic_component_name, index in basic_component_names" :key="index" draggable="true"
+                    :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, basic_component_name)">
+                    <table>
+                        <tr>
+                            <td :style="tagname_style"> {{ basic_component_name }} </td>
+                        </tr>
+                        <tr>
+                            <td :style="tagimage_style"><img :alt="basic_component_name"
+                                    :src="require('@/resource/image/' + basic_component_name + '.png')" /></td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+        </details>
 
-        <h3>構造</h3>
-        <ul>
-            <li v-for="struct_component_name, index in struct_component_names" :key="index" draggable="true"
-                :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, struct_component_name)">
-                <table>
-                    <tr>
-                        <td :style="tagname_style"> {{ struct_component_name }}</td>
-                    </tr>
-                    <tr>
-                        <td :style="tagimage_style"><img :alt="struct_component_name"
-                                :src="require('@/resource/image/' + struct_component_name + '.png')" />
-                        </td>
-                    </tr>
-                </table>
-            </li>
-        </ul>
-        <h3>フォーム/input</h3>
-        <ul>
-            <li v-for="form_input_component_name, index in form_imput_component_names" :key="index" draggable="true"
-                :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, form_input_component_name)">
-                <table>
-                    <tr>
-                        <td :style="tagname_style"> {{ form_input_component_name }}</td>
-                    </tr>
-                    <tr>
-                        <td :style="tagimage_style"><img :alt="form_input_component_name"
-                                :src="require('@/resource/image/' + form_input_component_name + '.png')" />
-                        </td>
-                    </tr>
-                </table>
-            </li>
-        </ul>
-        <h3>その他</h3>
-        <ul>
-            <li v-for="othor_component_name, index in othor_component_names" :key="index" draggable="true"
-                :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, othor_component_name)">
-                <table>
-                    <tr>
-                        <td :style="tagname_style"> {{ othor_component_name }}</td>
-                    </tr>
-                    <tr>
-                        <td :style="tagimage_style"><img :alt="othor_component_name"
-                                :src="require('@/resource/image/' + othor_component_name + '.png')" />
-                        </td>
-                    </tr>
-                </table>
-            </li>
-        </ul>
+        <details>
+            <summary>見出し</summary>
+            <ul>
+                <li v-for="headline_component_name, index in headline_component_names" :key="index" draggable="true"
+                    :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, headline_component_name)">
+                    <table>
+                        <tr>
+                            <td :style="tagname_style"> {{ headline_component_name }}</td>
+                        </tr>
+                        <tr>
+                            <td :style="tagimage_style"><img :alt="headline_component_name"
+                                    :src="require('@/resource/image/' + headline_component_name + '.png')" />
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>構造</summary>
+            <ul>
+                <li v-for="struct_component_name, index in struct_component_names" :key="index" draggable="true"
+                    :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, struct_component_name)">
+                    <table>
+                        <tr>
+                            <td :style="tagname_style"> {{ struct_component_name }}</td>
+                        </tr>
+                        <tr>
+                            <td :style="tagimage_style"><img :alt="struct_component_name"
+                                    :src="require('@/resource/image/' + struct_component_name + '.png')" />
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>フォーム/input</summary>
+            <ul>
+                <li v-for="form_input_component_name, index in form_imput_component_names" :key="index" draggable="true"
+                    :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, form_input_component_name)">
+                    <table>
+                        <tr>
+                            <td :style="tagname_style"> {{ form_input_component_name }}</td>
+                        </tr>
+                        <tr>
+                            <td :style="tagimage_style"><img :alt="form_input_component_name"
+                                    :src="require('@/resource/image/' + form_input_component_name + '.png')" />
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>その他</summary>
+            <ul>
+                <li v-for="othor_component_name, index in othor_component_names" :key="index" draggable="true"
+                    :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, othor_component_name)">
+                    <table>
+                        <tr>
+                            <td :style="tagname_style"> {{ othor_component_name }}</td>
+                        </tr>
+                        <tr>
+                            <td :style="tagimage_style"><img :alt="othor_component_name"
+                                    :src="require('@/resource/image/' + othor_component_name + '.png')" />
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+        </details>
     </div>
 </template>
 
@@ -185,6 +198,40 @@ export default class TagListView extends Vue {
 <style scoped>
 li {
     margin-left: 20px;
+    transition: all 0.1s ease;
+    list-style: none;
+    display: flex;
+}
+li:hover{
+    cursor: grab;
+    color: white;
+    background: steelblue;
+    border-radius: 10px;
+}
+
+summary{
+    font-family: "Roboto", sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: steelblue;
+    transition: 0.2s; 
+}
+summary:hover{
+    cursor: pointer;
+    opacity:0.8;
+}
+
+.mainside h2{
+    font-family: "Roboto", sans-serif;
+    font-size: 30px;
+    color: steelblue; 
+}
+.mainside {
+    background:  #e6e6e6;
+}
+
+li:active {
+    cursor: grabbing;
 }
 
 td {

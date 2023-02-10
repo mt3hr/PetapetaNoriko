@@ -1,5 +1,6 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class RangeTagData extends HTMLTagDataBase {
@@ -10,6 +11,8 @@ export default class RangeTagData extends HTMLTagDataBase {
     max = ""
     min = ""
     step = ""
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "range"
@@ -54,6 +57,8 @@ export default class RangeTagData extends HTMLTagDataBase {
         c.max = this.max
         c.min = this.min
         c.step = this.step
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 

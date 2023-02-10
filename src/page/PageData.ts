@@ -6,8 +6,8 @@ import generateUUID from "@/uuid"
 export default class PageData {
     pageid = generateUUID()
     pagename = "ページ"
-    width = window.innerWidth - 300 - 300 - 19
-    height = window.innerHeight - 159 + 18
+    width = window.innerWidth - 300 - 300 - 19 + 6
+    height = window.innerHeight - 159 + 18 - 22
     html_tagdatas = new Array<HTMLTagDataBase>()
     css = ""
     webfonts = new Array<string>()

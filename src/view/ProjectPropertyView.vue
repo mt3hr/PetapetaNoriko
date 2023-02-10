@@ -1,7 +1,11 @@
 <template>
-    <div>
+    <div class="mainside">
         <h2>プロジェクト
-            <v-btn v-if="editor_mode" @click="new_project">+</v-btn>
+            <v-btn icon class="mx-2" fab color="primary" title="新規プロジェクト作成" v-if="editor_mode" @click="new_project">
+                <v-icon dark>
+                    mdi-plus
+                </v-icon>
+            </v-btn>
         </h2>
         <table>
             <tr>
@@ -9,7 +13,8 @@
                     プロジェクト名:
                 </td>
                 <td>
-                    <input type="text" :readonly="!editor_mode" v-model="project_name" @keydown="update_project_info" />
+                    <input class="textbox" type="text" :readonly="!editor_mode" v-model="project_name"
+                        @keydown="update_project_info" />
                 </td>
             </tr>
             <tr class="share_link" v-if="login_system && session_id">
@@ -109,11 +114,35 @@ export default class ProjectPropertyView extends Vue {
 
 
 <style scoped>
+.mainside h2 {
+    font-family: "Roboto", sans-serif;
+    font-size: 30px;
+    color: steelblue;
+}
+
+.mainside {
+    background: #e6e6e6;
+}
+
 .project_name {
     font-size: 75%;
 }
 
 .share_link {
     font-size: 75%;
+}
+
+.textbox {
+    background: white;
+    border-radius: 5px;
+    resize: none;
+}
+
+.textbox:hover {
+    opacity: 0.8;
+}
+
+.textbox:focus {
+    outline: solid 2px steelblue;
 }
 </style>

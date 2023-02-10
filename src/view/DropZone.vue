@@ -3,7 +3,7 @@
         <component :is="'style'">
             {{ style_user_edited_fixed }}
         </component>
-        <h2 v-if="editor_mode">ドロップゾーン</h2>
+        <h2 v-if="editor_mode"><font color="#4682b4">ドロップゾーン</font></h2>
         <h2 v-else>画面</h2>
         <div id="dropzone" class="dropzone" @click="onclick" @drop.stop.prevent="on_drop"
             @dragover.prevent="on_dragover" :style="dropzone_style" @contextmenu="show_contextmenu">
@@ -11,7 +11,7 @@
             <body id="dropzone_body" class="page" :style="dropzone_style">
                 <div v-if="html_tagdatas == null"
                     :style="{ 'text-align': 'center', 'vertical-align': 'middle', 'height': '-webkit-fill-available' }">
-                    <v-btn @click="add_page"
+                    <v-btn color="primary" @click="add_page"
                         :style="{ 'margin': 'auto', 'position': 'rerative', 'top': '45%' }">ページを追加</v-btn>
                 </div>
                 <HTMLTagView v-for="tagdata, index in html_tagdatas" :key="index" :tagdatas_root="html_tagdatas"
@@ -40,21 +40,21 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">行数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_table" type="number" v-model="table_rows"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_table" type="number" v-model="table_rows"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">列数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_table" type="number" v-model="table_cols"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_table" type="number" v-model="table_cols"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">
-                            <v-btn @click="is_show_table_initialize_dialog = false">閉じる</v-btn>
+                            <v-btn color="primary" @click="is_show_table_initialize_dialog = false">閉じる</v-btn>
                         </v-col>
                         <v-spacer />
                         <v-col cols="auto">
-                            <v-btn @click="initialize_table">作成</v-btn>
+                            <v-btn color="primary" @click="initialize_table">作成</v-btn>
                         </v-col>
                     </v-row>
                 </v-card>
@@ -71,16 +71,16 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">アイテム数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_ul" type="number" v-model="ul_items"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_ul" type="number" v-model="ul_items"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">
-                            <v-btn @click="is_show_ul_initialize_dialog = false">閉じる</v-btn>
+                            <v-btn color="primary" @click="is_show_ul_initialize_dialog = false">閉じる</v-btn>
                         </v-col>
                         <v-spacer />
                         <v-col cols="auto">
-                            <v-btn @click="initialize_ul">作成</v-btn>
+                            <v-btn color="primary" @click="initialize_ul">作成</v-btn>
                         </v-col>
                     </v-row>
                 </v-card>
@@ -97,16 +97,16 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">アイテム数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_ol" type="number" v-model="ol_items"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_ol" type="number" v-model="ol_items"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">
-                            <v-btn @click="is_show_ol_initialize_dialog = false">閉じる</v-btn>
+                            <v-btn color="primary" @click="is_show_ol_initialize_dialog = false">閉じる</v-btn>
                         </v-col>
                         <v-spacer />
                         <v-col cols="auto">
-                            <v-btn @click="initialize_ol">作成</v-btn>
+                            <v-btn color="primary" @click="initialize_ol">作成</v-btn>
                         </v-col>
                     </v-row>
                 </v-card>
@@ -123,16 +123,16 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">URL</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_img" type="url" v-model="img_src"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_img" type="url" v-model="img_src"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">
-                            <v-btn @click="is_show_img_initialize_dialog = false">閉じる</v-btn>
+                            <v-btn color="primary" @click="is_show_img_initialize_dialog = false">閉じる</v-btn>
                         </v-col>
                         <v-spacer />
                         <v-col cols="auto">
-                            <v-btn @click="initialize_img">作成</v-btn>
+                            <v-btn color="primary" @click="initialize_img">作成</v-btn>
                         </v-col>
                     </v-row>
                 </v-card>

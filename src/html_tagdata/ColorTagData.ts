@@ -1,11 +1,14 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class ColorTagData extends HTMLTagDataBase {
     name = ""
     value = ""
     autocomplete = ""
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "color"
@@ -42,6 +45,8 @@ export default class ColorTagData extends HTMLTagDataBase {
         c.name = this.name
         c.value = this.value
         c.autocomplete = this.autocomplete
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 }

@@ -2,8 +2,8 @@
     <li ref="li" class="tag_struct_li" draggable="true" dropzone="true" @drop.prevent.stop="(e) => drop(e, tagdata)"
         @contextmenu.stop="show_contextmenu" @dragstart.stop="(e) => dragstart(e, tagdata)"
         @click.stop="() => onclick_tag(tagdata)" @dragover.prevent="dragover" :style="style">
-        <span>{{ tagdata.tagname }}:</span>
-        <span>({{ tagdata.to_string() }})</span>
+        <div class="tag_name">{{ tagdata.tagname }}:</div>
+        <div class="tag_content">({{ tagdata.to_string() }})</div>
         <ul v-if="tagdata.child_tagdatas.length != 0">
             <HTMLTagStructViewLi v-for="child_tagdata, index in tagdata.child_tagdatas" :key="index"
                 @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
@@ -36,12 +36,12 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">行数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_table" type="number" v-model="table_rows"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_table" type="number" v-model="table_rows"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">列数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_table" type="number" v-model="table_cols"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_table" type="number" v-model="table_cols"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
@@ -67,7 +67,7 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">アイテム数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_ul" type="number" v-model="ul_items"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_ul" type="number" v-model="ul_items"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
@@ -93,7 +93,7 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">アイテム数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_ol" type="number" v-model="ol_items"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_ol" type="number" v-model="ol_items"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
@@ -119,7 +119,7 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">URL</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_img" type="url" v-model="img_src"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_img" type="url" v-model="img_src"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
@@ -166,7 +166,7 @@ export default class HTMLTagPropertyView extends Vue {
     @Prop() auto_scroll_tag_struct_view: boolean
     @Prop() copied_tagdata: HTMLTagDataBase
 
-    style: any = {}
+    style: any = { "width": "fit-content", "white-space": "nowrap", "text-overflow": "ellipsis" }
 
     @Watch('clicked_tagdata')
     update_style() {
@@ -176,11 +176,11 @@ export default class HTMLTagPropertyView extends Vue {
                 el?.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
             }
             this.style = {
-                "background-color": "lightsteelblue",
+                "background-color": "lightsteelblue", "border-radius": "10px", "width": "fit-content", "white-space": "nowrap", "text-overflow": "ellipsis",
             }
             return
         }
-        this.style = {}
+        this.style = { "width": "fit-content", "white-space": "nowrap", "text-overflow": "ellipsis" }
     }
 
     dragover(e: DragEvent) {
@@ -718,11 +718,27 @@ li {
     margin-left: 20px;
 }
 
-.tag_struct_li {
-    width: max-content;
-}
-
 .init_dialog {
     width: 280px;
+}
+
+.tag_content {
+    position: relative;
+    top: 3.5px;
+    display: inline-block;
+    width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tag_name {
+    position: relative;
+    top: 3.5px;
+    display: inline-block;
+    width: fit-content;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

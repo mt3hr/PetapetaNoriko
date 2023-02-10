@@ -31,12 +31,12 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">行数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_table" type="number" v-model="table_rows"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_table" type="number" v-model="table_rows"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">列数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_table" type="number" v-model="table_cols"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_table" type="number" v-model="table_cols"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
@@ -62,7 +62,7 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">アイテム数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_ul" type="number" v-model="ul_items"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_ul" type="number" v-model="ul_items"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
@@ -88,7 +88,7 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">アイテム数</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_ol" type="number" v-model="ol_items"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_ol" type="number" v-model="ol_items"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
@@ -114,7 +114,7 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">URL</v-col>
-                        <v-col cols="auto"><input @keypress.enter="initialize_img" type="url" v-model="img_src"
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_img" type="url" v-model="img_src"
                                 default="1" /></v-col>
                     </v-row>
                     <v-row>
