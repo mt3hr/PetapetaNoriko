@@ -1,5 +1,6 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class WeekTagData extends HTMLTagDataBase {
@@ -12,6 +13,8 @@ export default class WeekTagData extends HTMLTagDataBase {
     readonly = false
     required = false
     step = ""
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "week"
@@ -60,6 +63,8 @@ export default class WeekTagData extends HTMLTagDataBase {
         c.readonly = this.readonly
         c.required = this.required
         c.step = this.step
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 

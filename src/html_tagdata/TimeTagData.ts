@@ -1,5 +1,6 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class TimeTagData extends HTMLTagDataBase {
@@ -11,6 +12,8 @@ export default class TimeTagData extends HTMLTagDataBase {
     min = ""
     required = false
     step = ""
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "time"
@@ -57,6 +60,8 @@ export default class TimeTagData extends HTMLTagDataBase {
         c.min = this.min
         c.required = this.required
         c.step = this.step
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 }

@@ -1,5 +1,6 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class EmailTagData extends HTMLTagDataBase {
@@ -13,6 +14,8 @@ export default class EmailTagData extends HTMLTagDataBase {
     placeholder = ""
     readonly = false
     required = false
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "email"
@@ -63,6 +66,8 @@ export default class EmailTagData extends HTMLTagDataBase {
         c.placeholder = this.placeholder
         c.readonly = this.readonly
         c.required = this.required
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 }

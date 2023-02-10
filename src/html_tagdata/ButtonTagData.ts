@@ -1,10 +1,13 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class ButtonTagData extends HTMLTagDataBase {
     name = ""
     value = "ボタン"
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "button"
@@ -40,6 +43,8 @@ export default class ButtonTagData extends HTMLTagDataBase {
         c.focus_property_name = this.focus_property_name
         c.name = this.name
         c.value = this.value
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 }

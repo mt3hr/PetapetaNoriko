@@ -1,15 +1,30 @@
 <template>
-    <input type="time" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :autocomplete="autocomplete"
-        :list="list" :max="max" :min="min" :required="required" :class="tagclass" :id="tagdata.tagid" :step="step">
+    <input v-if="label_type == LabelType.None" type="time" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
+        :value="value" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required"
+        :class="tagclass" :id="tagdata.tagid" :step="step">
+    <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        <input type="time" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+             @click.prevent.stop="onclick_tag" :name="name" :value="value"
+            :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required" :class="tagclass"
+            :id="tagdata.tagid" :step="step">
+    </label>
+    <label :style="position_css" v-else-if="label_type == LabelType.After">
+        <input type="time" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+             @click.prevent.stop="onclick_tag" :name="name" :value="value"
+            :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required" :class="tagclass"
+            :id="tagdata.tagid" :step="step">
+    </label>
 </template>
 
 <script lang="ts">
 import TimeTagData from '@/html_tagdata/TimeTagData';
+import { LabelType } from '@/html_tagdata/LabelType';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
 export default class TimeTagView extends HTMLTagViewBase {
+    LabelType = LabelType
     name: string
     value: string
     autocomplete: string
@@ -19,6 +34,8 @@ export default class TimeTagView extends HTMLTagViewBase {
     required: boolean
     step: string
     tagclass: string
+    label_type: LabelType
+    label: string
 
     @Watch('name')
     @Watch('value')
@@ -29,6 +46,8 @@ export default class TimeTagView extends HTMLTagViewBase {
     @Watch('required')
     @Watch('step')
     @Watch('tagclass')
+    @Watch('label')
+    @Watch('label_type')
     update_tagdata() {
         let tagdata: TimeTagData = new TimeTagData()
         tagdata.tagid = this.tagdata.tagid
@@ -41,6 +60,8 @@ export default class TimeTagView extends HTMLTagViewBase {
         tagdata.min = this.min
         tagdata.required = this.required
         tagdata.step = this.step
+        tagdata.label_type = this.label_type
+        tagdata.label = this.label
         this.$emit("updated_tagdata", tagdata)
     }
 
@@ -57,6 +78,8 @@ export default class TimeTagView extends HTMLTagViewBase {
         this.min = this.tagdata_typed.min
         this.required = this.tagdata_typed.required
         this.step = this.tagdata_typed.step
+        this.label = this.tagdata_typed.label
+        this.label_type = this.tagdata_typed.label_type
     }
 
     created(): void {

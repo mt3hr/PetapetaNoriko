@@ -1,5 +1,6 @@
 import { serializable } from "@/serializable/serializable";
 import HTMLTagDataBase, { GenerateHTMLOptions } from "./HTMLTagDataBase";
+import { LabelType } from "./LabelType";
 
 @serializable
 export default class RadioTagData extends HTMLTagDataBase {
@@ -7,6 +8,8 @@ export default class RadioTagData extends HTMLTagDataBase {
     value = ""
     checked = false
     required = false
+    label_type: LabelType = LabelType.None
+    label = ""
     constructor() {
         super()
         this.tagname = "radio"
@@ -46,6 +49,8 @@ export default class RadioTagData extends HTMLTagDataBase {
         c.value = this.value
         c.checked = this.checked
         c.required = this.required
+        c.label = this.label
+        c.label_type = this.label_type
         return c
     }
 }

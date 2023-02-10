@@ -1,16 +1,30 @@
 <template>
-    <input type="password" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
-        :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder"
-        :class="tagclass" :id="tagdata.tagid" :required="required">
+    <input v-if="label_type == LabelType.None" type="password" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
+        :value="value" :size="size" :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern"
+        :placeholder="placeholder" :class="tagclass" :id="tagdata.tagid" :required="required">
+    <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        <input type="password" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+             @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
+            :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder"
+            :class="tagclass" :id="tagdata.tagid" :required="required">
+    </label>
+    <label :style="position_css" v-else-if="label_type == LabelType.After">
+        <input type="password" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+             @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
+            :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder"
+            :class="tagclass" :id="tagdata.tagid" :required="required">
+    </label>
 </template>
 
 <script lang="ts">
 import PasswordTagData from '@/html_tagdata/PasswordTagData';
+import { LabelType } from '@/html_tagdata/LabelType';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
 export default class PasswordTagView extends HTMLTagViewBase {
+    LabelType = LabelType
     name: string
     value: string
     size: string
@@ -21,6 +35,8 @@ export default class PasswordTagView extends HTMLTagViewBase {
     readonly: boolean
     required: boolean
     tagclass: string
+    label_type: LabelType
+    label: string
 
     @Watch('name')
     @Watch('value')
@@ -32,6 +48,8 @@ export default class PasswordTagView extends HTMLTagViewBase {
     @Watch('readonly')
     @Watch('required')
     @Watch('tagclass')
+    @Watch('label')
+    @Watch('label_type')
     update_tagdata() {
         let tagdata: PasswordTagData = new PasswordTagData()
         tagdata.tagid = this.tagdata.tagid
@@ -45,6 +63,8 @@ export default class PasswordTagView extends HTMLTagViewBase {
         tagdata.placeholder = this.placeholder
         tagdata.readonly = this.readonly
         tagdata.required = this.required
+        tagdata.label_type = this.label_type
+        tagdata.label = this.label
         this.$emit("updated_tagdata", tagdata)
     }
 
@@ -62,6 +82,8 @@ export default class PasswordTagView extends HTMLTagViewBase {
         this.placeholder = this.tagdata_typed.placeholder
         this.readonly = this.tagdata_typed.readonly
         this.required = this.tagdata_typed.required
+        this.label = this.tagdata_typed.label
+        this.label_type = this.tagdata_typed.label_type
     }
 
     created(): void {
