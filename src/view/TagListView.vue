@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mainside">
         <h2>HTML要素一覧</h2>
         <details>
             <summary>基本</summary>
