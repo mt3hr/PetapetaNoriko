@@ -56,6 +56,8 @@ var (
 					AppName:            "ppmk",
 					VersionAstilectron: "0.51.0",
 					VersionElectron:    "22.0.0",
+					AppIconDefaultPath: "C:/Users/yamat/Git/PutPullMock/src/app/ppmk/favicon.png",
+					AppIconDarwinPath: "C:/Users/yamat/Git/PutPullMock/src/app/ppmk/favicon.ico",
 				})
 				if err != nil {
 					log.Fatal(err)
