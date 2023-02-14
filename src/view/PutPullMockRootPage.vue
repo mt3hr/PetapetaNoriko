@@ -20,6 +20,16 @@
                     <v-btn color="primary" v-if="!session_id" @click="login">ログイン</v-btn>
                     <v-btn color="primary" v-else @click="logout">ログアウト</v-btn>
                 </v-col>
+
+            <v-col v-if="is_jec_jy_graduationwork" cols="auto">
+                <v-btn color="primary" v-if="php_sessid == ''" @click="location.href = '/1index.php'">ログイン</v-btn>
+                <v-btn  color="primary" v-else @click="location.href = '/10logout.php'">ログアウト</v-btn>
+            </v-col>
+            <v-col v-if="login_system && editor_mode" cols="auto">
+                <v-btn color="primary" v-if="!session_id" @click="login">ログイン</v-btn>
+                <v-btn color="primary" v-else @click="logout">ログアウト</v-btn>
+            </v-col>
+ 
                 <v-btn class="setting" icon v-if="editor_mode" @click="show_options_dialog">
                     <v-icon>mdi-cog</v-icon>
                 </v-btn>
@@ -63,7 +73,8 @@
                         @copy_tag="copy_tag" @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 </v-col>
 
-                <!--プロパティビュー-->
+
+               <!--プロパティビュー-->
                 <v-col cols="auto" class="propertyview" v-show="editor_mode">
                     <v-container>
                         <v-row>
@@ -508,6 +519,9 @@ export default class PutPullMockRootPage extends Vue {
     receive_socket_is_ready = false
 
     is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    is_jec_jy_graduationwork = false
+    php_sessid = ""
+    location = location
 
     @Watch('export_base64_image')
     @Watch('export_head')
@@ -880,6 +894,10 @@ export default class PutPullMockRootPage extends Vue {
 
 
         // 卒制ここから
+        this.api.status().then(server_status => {
+            this.is_jec_jy_graduationwork = server_status.jec_jy_graduationwork
+        })
+        this.php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID')).split('=')[1];
         let wm_id = this.$route.query["wm_id"]
         let version_id = this.$route.query["version_id"]
         if (wm_id != "" && wm_id && version_id != "" && version_id) {
