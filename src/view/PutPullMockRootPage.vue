@@ -515,7 +515,10 @@ export default class PutPullMockRootPage extends Vue {
         settings.use_undo = this.use_undo
         settings.auto_focus_tag_property_view = this.auto_focus_tag_property_view
         settings.first_launch = this.first_launch
-        document.cookie = JSON.stringify(settings)
+        let php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID')).split('=')[1];
+        document.cookie =
+            "ppmk_setting=" + JSON.stringify(settings) + "; " +
+            "PHPSESSID=" + php_sessid + "; "
     }
 
     load_settings_from_cookie(): Settings {
@@ -528,7 +531,8 @@ export default class PutPullMockRootPage extends Vue {
             settings = JSON.parse(document.cookie, deserialize)
         } catch (e) {
             this.save_settings_to_cookie()
-            settings = JSON.parse(document.cookie, deserialize)
+            let ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_settings')).split('=')[1];
+            settings = JSON.parse(ppmk_settings, deserialize)
         }
 
         this.export_base64_image = settings.export_base64_image

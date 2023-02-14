@@ -189,7 +189,7 @@ export enum WatchSharedProjectViewMessageType {
 export class WatchSharedProjectViewMessage {
     project_id: string
     message_type: WatchSharedProjectViewMessageType
-    project:PPMKProject 
+    project: PPMKProject
     error: string
 }
 
@@ -255,7 +255,10 @@ export default class API {
     }
 
     save_settings_to_cookie(settings: Settings) {
-        document.cookie = JSON.stringify(settings)
+        let php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID')).split('=')[1];
+        document.cookie =
+            "ppmk_setting=" + JSON.stringify(settings) + "; " +
+            "PHPSESSID=" + php_sessid + "; "
     }
 
     load_settings_from_cookie(): Settings {
@@ -265,7 +268,8 @@ export default class API {
         } catch (e) {
             let settings = new Settings()
             this.save_settings_to_cookie(settings)
-            settings = JSON.parse(document.cookie, deserialize)
+            let ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_settings')).split('=')[1];
+            settings = JSON.parse(ppmk_settings, deserialize)
         }
         return settings
     }
