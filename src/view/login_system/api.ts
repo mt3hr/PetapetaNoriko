@@ -189,7 +189,7 @@ export enum WatchSharedProjectViewMessageType {
 export class WatchSharedProjectViewMessage {
     project_id: string
     message_type: WatchSharedProjectViewMessageType
-    project:PPMKProject 
+    project: PPMKProject
     error: string
 }
 
