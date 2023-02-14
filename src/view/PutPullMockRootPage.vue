@@ -515,10 +515,11 @@ export default class PutPullMockRootPage extends Vue {
         settings.use_undo = this.use_undo
         settings.auto_focus_tag_property_view = this.auto_focus_tag_property_view
         settings.first_launch = this.first_launch
-        let php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID')).split('=')[1];
+        let php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
+        let php_sessid_value = php_sessid ? php_sessid.split('=')[1] : "";
         document.cookie =
             "ppmk_setting=" + JSON.stringify(settings) + "; " +
-            "PHPSESSID=" + php_sessid + "; "
+            "PHPSESSID=" + php_sessid_value + "; "
     }
 
     load_settings_from_cookie(): Settings {
@@ -531,8 +532,9 @@ export default class PutPullMockRootPage extends Vue {
             settings = JSON.parse(document.cookie, deserialize)
         } catch (e) {
             this.save_settings_to_cookie()
-            let ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_settings')).split('=')[1];
-            settings = JSON.parse(ppmk_settings, deserialize)
+            let ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_settings'))
+            let ppmk_settings_value = ppmk_settings ? ppmk_settings.split('=')[1] : JSON.stringify(new Settings())
+            settings = JSON.parse(ppmk_settings_value, deserialize)
         }
 
         this.export_base64_image = settings.export_base64_image
@@ -871,7 +873,8 @@ export default class PutPullMockRootPage extends Vue {
         this.api.status().then(server_status => {
             this.is_jec_jy_graduationwork = server_status.jec_jy_graduationwork
         })
-        this.php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID')).split('=')[1];
+        let php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
+        this.php_sessid = php_sessid ? php_sessid.split('=')[1] : "";
         let wm_id = this.$route.query["wm_id"]
         let version_id = this.$route.query["version_id"]
         if (wm_id != "" && wm_id && version_id != "" && version_id) {
