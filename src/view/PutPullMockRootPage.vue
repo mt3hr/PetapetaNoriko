@@ -912,7 +912,7 @@ export default class PutPullMockRootPage extends Vue {
                 wm_id: wm_id,
                 version_id: version_id,
             }
-            fetch("/ppmk_server/get_wm_data", {
+            fetch("/get_wm_data.php", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
@@ -924,6 +924,7 @@ export default class PutPullMockRootPage extends Vue {
                 const project: Project = json
                 project.ppmk_project_data = JSON.parse(JSON.stringify(json.ppmk_project_data), deserialize)
                 this.project = project
+                this.update_project(project)
             })
         }
         // 卒制ここまで
