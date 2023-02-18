@@ -36,9 +36,9 @@
                     <v-row>
                         <!--ページリストビュー。ここをクリックしてページを選択する-->
                         <v-col cols="auto">
-                            <PageListView class="component page_list_view" ref="page_list_view"
-                                @deleted_page="deleted_page" @updated_pagedatas="update_pagedatas"
-                                :editor_mode="editor_mode" @clicked_page="show_page" />
+                            <PageListView class="component page_list_view" ref="page_list_view" @deleted_page="deleted_page"
+                                @updated_pagedatas="update_pagedatas" :editor_mode="editor_mode"
+                                @clicked_page="show_page" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -53,9 +53,8 @@
 
             <!--ドロップゾーン-->
             <v-col cols="auto" class="dropzone_wrap">
-                <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
-                    :editor_mode="editor_mode" :clicked_tagdata="clicked_tagdata"
-                    @updated_tagdatas_root="updated_htmltagdatas" @add_page="add_page"
+                <DropZone :show_border="show_border" class="component dropzone" ref="dropzone" :editor_mode="editor_mode"
+                    :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_htmltagdatas" @add_page="add_page"
                     @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata" @copy_tag="copy_tag"
                     @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
             </v-col>
@@ -84,8 +83,8 @@
                             <HTMLTagStructView @onclick_tag="onclick_tag" class="component struct_view"
                                 @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
                                 :clicked_tagdata="clicked_tagdata" @copy_tag="copy_tag" ref="tag_struct_view"
-                                :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view"
-                                @delete_tagdata="delete_tagdata" @updated_html_tagdatas="updated_htmltagdatas" />
+                                :auto_scroll_tag_struct_view="auto_scroll_tag_struct_view" @delete_tagdata="delete_tagdata"
+                                @updated_html_tagdatas="updated_htmltagdatas" />
                         </v-col>
                     </v-row>
                 </v-container>
@@ -118,9 +117,9 @@
                 </v-row>
             </v-card-title>
             <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-  width: 200px;
-  height: auto;
-}"></v-textarea>
+                      width: 200px;
+                      height: auto;
+                    }"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -153,7 +152,7 @@
             <v-card-title>ページウェブフォント</v-card-title>
             <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
             <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+                    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -173,8 +172,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                         :label="'埋め込み画像'" />
                 </v-col>
                 <v-col>
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
-                        :label="'位置情報'" />
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css" :label="'位置情報'" />
                 </v-col>
             </v-row>
             <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
@@ -197,6 +195,9 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 </v-col>
                 <v-col v-if="login_system && session_id" cols="auto">
                     <v-btn @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
+                </v-col>
+                <v-col v-if="php_sessid != ''" cols="auto">
+                    <v-btn @click="save_to_server_jec_jy_graduationwork">プロジェクトをサーバに保存</v-btn>
                 </v-col>
             </v-row>
         </v-card>
@@ -307,8 +308,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             </v-row>
             <v-row>
                 <v-col cols="auto">
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
-                        :label="'位置情報'" />
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css" :label="'位置情報'" />
                 </v-col>
             </v-row>
             <v-row>
@@ -417,7 +417,7 @@ import ResetPassword from './login_system/ResetPassword.vue'
 })
 
 export default class PutPullMockRootPage extends Vue {
-    jec_jy_graduationwork = true //TODO
+    jec_jy_graduationwork = true
     page_list_view: any
     dropzone: any
     project_view: any
@@ -1493,6 +1493,18 @@ export default class PutPullMockRootPage extends Vue {
         this.is_show_login_dialog = false
         this.flush_message = "ログインしました"
         this.is_show_flush_message = true
+    }
+
+    save_to_server_jec_jy_graduationwork() {
+        //TODO
+        let version_id = this.$route.query["version_id"]
+        this.api.preparate_save_ppmk_project(this.project)
+        let data = {
+            wm_id: this.$route.query["wm_id"],
+            wm_name: this.project.ppmk_project.project_name,
+            register_date_time: this.project.ppmk_project_data.saved_time,
+            html_with_id: this.project.ppmk_project_data.project_data,
+        }
     }
 }
 </script>
