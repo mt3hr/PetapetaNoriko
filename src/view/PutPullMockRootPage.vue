@@ -128,9 +128,9 @@
                     </v-row>
                 </v-card-title>
                 <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-              width: 200px;
-              height: auto;
-            }"></v-textarea>
+                          width: 200px;
+                          height: auto;
+                        }"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
                         <v-btn color="primary" @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -166,7 +166,7 @@
                 <v-card-title>ページウェブフォント</v-card-title>
                 <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
                 <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-            https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+                        https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
                         <v-btn color="primary" @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -235,7 +235,82 @@
                 </v-row>
             </v-card>
         </v-dialog>
-
+        <v-dialog v-model="is_show_readin_dialog" width="unset">
+            <v-card class="pa-5">
+                <v-row>
+                    <v-col>
+                        <input type="file" @change="read_ppmk_project" />
+                    </v-col>
+                </v-row>
+                <v-row v-if="login_system && session_id">
+                    <v-col>
+                        <ProjectSummariesList v-if="session_id" @loaded_project="loaded_project" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_readin_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="is_show_webfont_dialog">
+            <v-card class="pa-5">
+                <v-card-title>ページウェブフォント</v-card-title>
+                <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
+                <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
+    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
+        <v-dialog id="writeout_dialog" v-model="is_show_writeout_dialog">
+            <v-card class="pa-5">
+                <v-card-title>ページHTML</v-card-title>
+                <v-row>
+                    <v-col>
+                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
+                    </v-col>
+                    <v-col>
+                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
+                            :label="'埋め込み画像'" />
+                    </v-col>
+                    <v-col>
+                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
+                            :label="'位置情報'" />
+                    </v-col>
+                </v-row>
+                <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
+                <v-row>
+                    <v-col cols="auto">
+                        <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
+                    </v-col>
+                    <v-spacer />
+                    <v-col cols="auto">
+                        <v-btn @click="print_this_page">このページを印刷する</v-btn>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn @click="save_ppmk_html_css_this_page">このページをHTMLファイルに保存</v-btn>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn @click="save_ppmk_html_css_all_pages">すべてのページをHTMLファイルに保存</v-btn>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
+                    </v-col>
+                    <v-col v-if="login_system && session_id" cols="auto">
+                        <v-btn @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
+                    </v-col>
+                    <v-col v-if="php_sessid != ''" cols="auto">
+                        <v-btn @click="save_to_server_jec_jy_graduationwork">プロジェクトをサーバに保存</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
         <v-dialog v-model="is_show_new_project_dialog" width="unset">
             <v-card class="pa-5">
                 <v-card-title>プロジェクト新規作成</v-card-title>
@@ -524,6 +599,7 @@ export default class PutPullMockRootPage extends Vue {
     @Watch('auto_scroll_tag_struct_view')
     @Watch('tag_list_view_mode')
     @Watch('use_undo')
+    @Watch('session_id')
     save_settings_to_cookie() {
         let settings = new Settings()
         settings.export_base64_image = this.export_base64_image
@@ -537,6 +613,7 @@ export default class PutPullMockRootPage extends Vue {
         settings.use_undo = this.use_undo
         settings.auto_focus_tag_property_view = this.auto_focus_tag_property_view
         settings.first_launch = this.first_launch
+        settings.session_id = this.session_id
         let php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
         let php_sessid_value = php_sessid ? php_sessid.split('=')[1] : "";
         document.cookie =
@@ -551,7 +628,9 @@ export default class PutPullMockRootPage extends Vue {
             return settings
         }
         try {
-            settings = JSON.parse(document.cookie, deserialize)
+            const ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_setting'))
+            const ppmk_settings_value = ppmk_settings ? ppmk_settings.split('=')[1] : JSON.stringify(new Settings())
+            settings = JSON.parse(ppmk_settings_value, deserialize)
         } catch (e) {
             this.save_settings_to_cookie()
             let ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_setting'))
@@ -1514,8 +1593,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     logined() {
-        let api = new API()
-        this.session_id = api.load_settings_from_cookie().session_id
+        this.session_id = this.api.session_id
         this.is_show_login_dialog = false
         this.flush_message = "ログインしました"
         this.is_show_flush_message = true
@@ -1524,7 +1602,6 @@ export default class PutPullMockRootPage extends Vue {
     save_to_server_jec_jy_graduationwork() {
         this.api.preparate_save_ppmk_project(this.project)
         let wm_id = this.$route.query["wm_id"] ? this.$route.query["wm_id"] : this.project.ppmk_project.project_id
-        console.log(wm_id)
         let data = {
             "wm_id": wm_id,
             "wm_name": this.project.ppmk_project.project_name,
@@ -1711,6 +1788,7 @@ export default class PutPullMockRootPage extends Vue {
     margin-left: 10px !important;
 }
 
+/* さいとうさんへ。結合したらスタイルが適用されなくなってしまいました。しばらくコードを見ていたのですが解決しなかったので、次回以降見てほしいです。 */
 .file_btn {
     display: inline-block;
     overflow: hidden;
