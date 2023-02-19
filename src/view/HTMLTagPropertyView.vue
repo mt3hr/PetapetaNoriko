@@ -94,7 +94,8 @@ export default class HTMLTagPropertyView extends Vue {
 
     updated_label_type(payload: any, property: Property) {
         let html_tagdata = this.html_tagdata.clone()
-        html_tagdata["label_type"] = payload.target.value
+        html_tagdata[property.name] = payload.target.value as number as LabelType
+        console.log(html_tagdata)
         this.$emit('updated_html_tag_property', html_tagdata)
     }
 

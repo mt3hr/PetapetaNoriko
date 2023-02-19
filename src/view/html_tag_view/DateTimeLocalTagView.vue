@@ -1,19 +1,19 @@
 <template>
     <input v-if="label_type == LabelType.None" type="datetime-local" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
-        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
-        :value="value" :class="tagclass" :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max"
-        :min="min" :required="required" :step="step">
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value"
+        :class="tagclass" :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min"
+        :required="required" :step="step">
     <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        {{ label }}
         <input type="datetime-local" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
-            :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required"
-            :step="step">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass" :id="tagdata.tagid"
+            :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required" :step="step">
     </label>
     <label :style="position_css" v-else-if="label_type == LabelType.After">
         <input type="datetime-local" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
-            :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required"
-            :step="step">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass" :id="tagdata.tagid"
+            :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required" :step="step">
+        {{ label }}
     </label>
 </template>
 
@@ -35,8 +35,8 @@ export default class DateTimeLocalTagView extends HTMLTagViewBase {
     required: boolean
     step: string
     tagclass: string
-    label_type: LabelType
-    label: string
+    label_type = LabelType.None
+    label = ""
 
     @Watch('name')
     @Watch('value')

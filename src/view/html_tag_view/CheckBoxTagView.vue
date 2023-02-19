@@ -28,8 +28,8 @@ export default class CHeckBoxTagView extends HTMLTagViewBase {
     value: string
     checked: boolean
     tagclass: string
-    label_type: LabelType
-    label: string
+    label_type = LabelType.None
+    label = ""
 
     @Watch('name')
     @Watch('value')

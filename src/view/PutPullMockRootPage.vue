@@ -118,9 +118,9 @@
                 </v-row>
             </v-card-title>
             <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-                                                              width: 200px;
-                                                              height: auto;
-                                                            }"></v-textarea>
+                                                                  width: 200px;
+                                                                  height: auto;
+                                                                }"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -154,7 +154,7 @@
             <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
             <v-textarea v-model="page_webfont" :rows="20"
                 placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-                                                            https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+                                                                https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -1133,7 +1133,7 @@ export default class PutPullMockRootPage extends Vue {
             this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
         }
         this.tag_property_view.html_tagdata = updated_tagdata
-        this.page_list_view.save_pagedatas_to_localstorage()
+        this.save_project_to_localstorage()
     }
     updated_page_property(page_data: PageData) {
         for (let i = 0; i < this.project.ppmk_project_data.project_data.length; i++) {
@@ -1147,7 +1147,7 @@ export default class PutPullMockRootPage extends Vue {
         })
         if (this.project.ppmk_project_data.project_data[this.page_list_view.selected_index]) {
             this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
-            this.page_list_view.save_pagedatas_to_localstorage()
+            this.save_project_to_localstorage()
         }
     }
 
