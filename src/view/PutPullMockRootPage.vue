@@ -21,16 +21,17 @@
                     <v-btn color="primary" v-else @click="logout">ログアウト</v-btn>
                 </v-col>
 
-            <v-col v-if="is_jec_jy_graduationwork" cols="auto">
-                <v-btn v-if="php_sessid == ''" @click="location.href = '/1index.php'">ログイン</v-btn>
-                <v-btn v-if="php_sessid != ''" @click="location.href = '/11MenuK.php'">メニュー</v-btn>
-                <v-btn v-if="php_sessid != ''" @click="location.href = '/10logout.php'">ログアウト</v-btn>
-            </v-col>
-            <v-col v-if="login_system && editor_mode" cols="auto">
-                <v-btn color="primary" v-if="!session_id" @click="login">ログイン</v-btn>
-                <v-btn color="primary" v-else @click="logout">ログアウト</v-btn>
-            </v-col>
- 
+                <v-col v-if="is_jec_jy_graduationwork" cols="auto">
+                    <v-btn v-if="php_sessid == ''" @click="location.href = '/1index.php'">ログイン</v-btn>
+                    <v-btn v-if="php_sessid != ''" @click="location.href = '/11MenuK.php'">メニュー</v-btn>
+                    <v-btn v-if="php_sessid != ''" @click="location.href = '/10logout.php'">ログアウト</v-btn>
+                </v-col>
+                <v-col v-if="login_system && editor_mode" cols="auto">
+                    <v-btn color="primary" v-if="!session_id" @click="login">ログイン</v-btn>
+                    <v-btn color="primary" v-else @click="logout">ログアウト</v-btn>
+                    <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
+                    <v-btn v-else @click="logout">ログアウト</v-btn>
+                </v-col>
                 <v-btn class="setting" icon v-if="editor_mode" @click="show_options_dialog">
                     <v-icon>mdi-cog</v-icon>
                 </v-btn>
@@ -41,10 +42,10 @@
                     <v-container>
                         <v-row>
                             <v-col cols="auto">
-                                <ProjectPropertyView class="component project_view" ref="project_view"
-                                    v-show="editor_mode" :editor_mode="editor_mode"
-                                    @new_project="show_new_project_dialog" :session_id="session_id"
-                                    :login_system="login_system" @updated_project_info="update_project_info"
+                                <ProjectPropertyView class="component project_view" ref="project_view" v-show="editor_mode"
+                                    :editor_mode="editor_mode" @new_project="show_new_project_dialog"
+                                    :session_id="session_id" :login_system="login_system"
+                                    @updated_project_info="update_project_info"
                                     @updated_share_view="update_is_share_view" />
                             </v-col>
                         </v-row>
@@ -70,12 +71,11 @@
                     <DropZone :show_border="show_border" class="component dropzone" ref="dropzone"
                         :editor_mode="editor_mode" :clicked_tagdata="clicked_tagdata"
                         @updated_tagdatas_root="updated_htmltagdatas" @add_page="add_page"
-                        @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata"
-                        @copy_tag="copy_tag" @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
+                        @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata" @copy_tag="copy_tag"
+                        @onclick_tag="onclick_tag" :dropzone_style="dropzone_style" />
                 </v-col>
 
-
-               <!--プロパティビュー-->
+                <!--プロパティビュー-->
                 <v-col cols="auto" class="propertyview" v-show="editor_mode">
                     <v-container>
                         <v-row>
@@ -134,9 +134,9 @@
                     </v-row>
                 </v-card-title>
                 <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-  width: 200px;
-  height: auto;
-}"></v-textarea>
+      width: 200px;
+      height: auto;
+    }"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
                         <v-btn color="primary" @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -172,7 +172,7 @@
                 <v-card-title>ページウェブフォント</v-card-title>
                 <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
                 <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
                         <v-btn color="primary" @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -220,13 +220,11 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                             @click="save_ppmk_project"><v-icon>mdi-folder-download</v-icon></v-btn>
                     </v-col>
                     <v-col v-if="login_system && session_id" cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin"
-                            @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
+                        <v-btn color="primary" class="btn_margin" @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
         </v-dialog>
-
         <v-dialog v-model="is_show_save_to_server_dialog">
             <v-card class="pa-5">
                 <v-card-title>サーバに保存</v-card-title>
@@ -359,7 +357,6 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                     自動保存機能を無効化します。
                     （書き出しはできます）
                 </v-card-text>
-
                 <v-row>
                     <v-col cols="auto">
                         <v-btn color="primary" @click="is_show_oversize_localstorage_dialog = false">閉じる</v-btn>
@@ -448,7 +445,7 @@ import ResetPassword from './login_system/ResetPassword.vue'
 })
 
 export default class PutPullMockRootPage extends Vue {
-    jec_jy_graduationwork = true //TODO
+    jec_jy_graduationwork = true
     page_list_view: any
     dropzone: any
     project_view: any
@@ -1529,6 +1526,27 @@ export default class PutPullMockRootPage extends Vue {
         this.flush_message = "ログインしました"
         this.is_show_flush_message = true
     }
+
+    save_to_server_jec_jy_graduationwork() {
+        this.api.preparate_save_ppmk_project(this.project)
+        let wm_id = this.$route.query["wm_id"] ? this.$route.query["wm_id"] : this.project.ppmk_project.project_id
+        console.log(wm_id)
+        let data = {
+            "wm_id": wm_id,
+            "wm_name": this.project.ppmk_project.project_name,
+            "register_date_time": this.project.ppmk_project_data.saved_time,
+            "html_with_id": this.project,
+        }
+        fetch("/save_wm_data.php", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        }).then(res => {
+            this.is_show_writeout_dialog = false
+        })
+    }
 }
 </script>
 <style scoped>
@@ -1621,7 +1639,7 @@ export default class PutPullMockRootPage extends Vue {
 .textbox,
 .dropzone input,
 .dropzone select,
-.dropzone textarea { 
+.dropzone textarea {
     border: solid 1px silver !important;
 }
 
