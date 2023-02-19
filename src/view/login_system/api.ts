@@ -255,7 +255,8 @@ export default class API {
     }
 
     save_settings_to_cookie(settings: Settings) {
-        const php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID')).split('=')[1];
+        let php_sessid_cookie = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
+        const php_sessid = php_sessid_cookie ? php_sessid_cookie.split('=')[1] : "";
         document.cookie =
             "ppmk_setting=" + JSON.stringify(settings) + "; " +
             "PHPSESSID=" + php_sessid + "; "
