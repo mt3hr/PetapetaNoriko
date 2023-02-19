@@ -17,20 +17,14 @@
                     </v-checkbox>
                 </v-col>
                 <v-col v-if="login_system" cols="auto">
-                    <v-btn color="primary" v-if="!session_id" @click="login">ログイン</v-btn>
-                    <v-btn color="primary" v-else @click="logout">ログアウト</v-btn>
+                    <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
+                    <v-btn v-else @click="logout">ログアウト</v-btn>
                 </v-col>
 
                 <v-col v-if="is_jec_jy_graduationwork" cols="auto">
                     <v-btn v-if="php_sessid == ''" @click="location.href = '/1index.php'">ログイン</v-btn>
                     <v-btn v-if="php_sessid != ''" @click="location.href = '/11MenuK.php'">メニュー</v-btn>
                     <v-btn v-if="php_sessid != ''" @click="location.href = '/10logout.php'">ログアウト</v-btn>
-                </v-col>
-                <v-col v-if="login_system && editor_mode" cols="auto">
-                    <v-btn color="primary" v-if="!session_id" @click="login">ログイン</v-btn>
-                    <v-btn color="primary" v-else @click="logout">ログアウト</v-btn>
-                    <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
-                    <v-btn v-else @click="logout">ログアウト</v-btn>
                 </v-col>
                 <v-btn class="setting" icon v-if="editor_mode" @click="show_options_dialog">
                     <v-icon>mdi-cog</v-icon>
@@ -134,9 +128,9 @@
                     </v-row>
                 </v-card-title>
                 <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-      width: 200px;
-      height: auto;
-    }"></v-textarea>
+              width: 200px;
+              height: auto;
+            }"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
                         <v-btn color="primary" @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -172,7 +166,7 @@
                 <v-card-title>ページウェブフォント</v-card-title>
                 <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
                 <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+            https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
                         <v-btn color="primary" @click="is_show_webfont_dialog = false">閉じる</v-btn>
