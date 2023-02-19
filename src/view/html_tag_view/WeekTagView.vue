@@ -1,19 +1,19 @@
 <template>
     <input v-if="label_type == LabelType.None" type="week" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
-        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
-        :value="value" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required"
-        :class="tagclass" :id="tagdata.tagid" :step="step">
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value"
+        :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required" :class="tagclass"
+        :id="tagdata.tagid" :step="step">
     <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        {{ label }}
         <input type="week" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value"
-            :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required" :class="tagclass"
-            :id="tagdata.tagid" :step="step">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :autocomplete="autocomplete" :list="list"
+            :max="max" :min="min" :required="required" :class="tagclass" :id="tagdata.tagid" :step="step">
     </label>
     <label :style="position_css" v-else-if="label_type == LabelType.After">
         <input type="week" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value"
-            :autocomplete="autocomplete" :list="list" :max="max" :min="min" :required="required" :class="tagclass"
-            :id="tagdata.tagid" :step="step">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :autocomplete="autocomplete" :list="list"
+            :max="max" :min="min" :required="required" :class="tagclass" :id="tagdata.tagid" :step="step">
+        {{ label }}
     </label>
 </template>
 
@@ -35,8 +35,8 @@ export default class WeekTagView extends HTMLTagViewBase {
     required: boolean
     step: string
     tagclass: string
-    label_type: LabelType
-    label: string
+    label_type = LabelType.None
+    label = ""
 
     @Watch('name')
     @Watch('value')

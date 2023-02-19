@@ -3,14 +3,14 @@
         @dragover="on_dragover" readonly :class="tagclass" :id="tagdata.tagid" :style="position_css"
         @click.prevent.stop="onclick_tag" :value="value">
     <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        {{ label }}
         <input type="reset" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-            :class="tagclass" :id="tagdata.tagid"  @click.prevent.stop="onclick_tag"
-            :value="value">
+            :class="tagclass" :id="tagdata.tagid" @click.prevent.stop="onclick_tag" :value="value">
     </label>
     <label :style="position_css" v-else-if="label_type == LabelType.After">
         <input type="reset" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-            :class="tagclass" :id="tagdata.tagid"  @click.prevent.stop="onclick_tag"
-            :value="value">
+            :class="tagclass" :id="tagdata.tagid" @click.prevent.stop="onclick_tag" :value="value">
+        {{ label }}
     </label>
 </template>
 
@@ -24,8 +24,8 @@ export default class ResetTagView extends HTMLTagViewBase {
     LabelType = LabelType
     value: string
     tagclass: string
-    label_type: LabelType
-    label: string
+    label_type = LabelType.None
+    label = ""
 
     @Watch('value')
     @Watch('tagclass')

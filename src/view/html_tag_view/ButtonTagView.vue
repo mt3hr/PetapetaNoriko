@@ -27,8 +27,8 @@ export default class ButtonTagView extends HTMLTagViewBase {
     name: string
     value: string
     tagclass: string
-    label_type: LabelType
-    label: string
+    label_type = LabelType.None
+    label = ""
 
     @Watch('name')
     @Watch('value')

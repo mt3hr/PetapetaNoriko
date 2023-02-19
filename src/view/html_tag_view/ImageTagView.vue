@@ -1,22 +1,21 @@
 <template>
     <input v-if="label_type == LabelType.None" type="image" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
-        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
-        :value="value" :src="src" :alt="alt" :class="tagclass" :id="tagdata.tagid" :height="height" :width="width"
-        :formaciton="formaciton" :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
-        :formtarget="formtarget">
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value"
+        :src="src" :alt="alt" :class="tagclass" :id="tagdata.tagid" :height="height" :width="width" :formaciton="formaciton"
+        :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate" :formtarget="formtarget">
     <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        {{ label }}
         <input type="image" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :src="src" :alt="alt"
-            :class="tagclass" :id="tagdata.tagid" :height="height" :width="width" :formaciton="formaciton"
-            :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
-            :formtarget="formtarget">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :src="src" :alt="alt" :class="tagclass"
+            :id="tagdata.tagid" :height="height" :width="width" :formaciton="formaciton" :formenctype="formenctype"
+            :formmethod="formmethod" :formnovalidate="formnovalidate" :formtarget="formtarget">
     </label>
     <label :style="position_css" v-else-if="label_type == LabelType.After">
         <input type="image" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :src="src" :alt="alt"
-            :class="tagclass" :id="tagdata.tagid" :height="height" :width="width" :formaciton="formaciton"
-            :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
-            :formtarget="formtarget">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :src="src" :alt="alt" :class="tagclass"
+            :id="tagdata.tagid" :height="height" :width="width" :formaciton="formaciton" :formenctype="formenctype"
+            :formmethod="formmethod" :formnovalidate="formnovalidate" :formtarget="formtarget">
+        {{ label }}
     </label>
 </template>
 
@@ -40,8 +39,8 @@ export default class TagView extends HTMLTagViewBase {
     formnovalidate: boolean
     formtarget: string
     tagclass: string
-    label_type: LabelType
-    label: string
+    label_type = LabelType.None
+    label = ""
 
     @Watch('name')
     @Watch('value')

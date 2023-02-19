@@ -1,16 +1,18 @@
 <template>
     <input v-if="label_type == LabelType.None" type="radio" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
-        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
-        :value="value" :checked="checked" :class="tagclass" :id="tagdata.tagid" :required="required" />
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value"
+        :checked="checked" :class="tagclass" :id="tagdata.tagid" :required="required" />
     <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        {{ label }}
         <input type="radio" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :checked="checked"
-            :class="tagclass" :id="tagdata.tagid" :required="required" />
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :checked="checked" :class="tagclass"
+            :id="tagdata.tagid" :required="required" />
     </label>
     <label :style="position_css" v-else-if="label_type == LabelType.After">
         <input type="radio" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :checked="checked"
-            :class="tagclass" :id="tagdata.tagid" :required="required" />
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :checked="checked" :class="tagclass"
+            :id="tagdata.tagid" :required="required" />
+        {{ label }}
     </label>
 </template>
 
@@ -27,8 +29,8 @@ export default class RadioTagView extends HTMLTagViewBase {
     checked: boolean
     required: boolean
     tagclass: string
-    label_type: LabelType
-    label: string
+    label_type = LabelType.None
+    label = ""
 
     @Watch('name')
     @Watch('value')

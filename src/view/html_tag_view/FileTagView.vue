@@ -1,17 +1,18 @@
 <template>
     <input v-if="label_type == LabelType.None" type="file" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
-        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
-        :value="value" :size="size" :class="tagclass" :id="tagdata.tagid" :accept="accept" :multiple="multiple"
-        :required="required">
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value"
+        :size="size" :class="tagclass" :id="tagdata.tagid" :accept="accept" :multiple="multiple" :required="required">
     <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        {{ label }}
         <input type="file" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
-            :class="tagclass" :id="tagdata.tagid" :accept="accept" :multiple="multiple" :required="required">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size" :class="tagclass" :id="tagdata.tagid"
+            :accept="accept" :multiple="multiple" :required="required">
     </label>
     <label :style="position_css" v-else-if="label_type == LabelType.After">
         <input type="file" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
-            :class="tagclass" :id="tagdata.tagid" :accept="accept" :multiple="multiple" :required="required">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size" :class="tagclass" :id="tagdata.tagid"
+            :accept="accept" :multiple="multiple" :required="required">
+        {{ label }}
     </label>
 </template>
 
@@ -30,8 +31,8 @@ export default class FileTagView extends HTMLTagViewBase {
     multiple: boolean
     required: boolean
     tagclass: string
-    label_type: LabelType
-    label: string
+    label_type = LabelType.None
+    label = ""
 
     @Watch('name')
     @Watch('value')

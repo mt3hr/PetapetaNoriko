@@ -11,7 +11,7 @@ import HTMLTagViewBase from './HTMLTagViewBase';
 
 export default class OptionTagView extends HTMLTagViewBase {
     disabled: boolean
-    label: string
+    label = ""
     selected: boolean
     value: string
     tagclass: string

@@ -28,8 +28,8 @@ export default class ColorTagView extends HTMLTagViewBase {
     value: string
     autocomplete: string
     tagclass: string
-    label_type: LabelType
-    label: string
+    label_type = LabelType.None
+    label = ""
 
     @Watch('name')
     @Watch('value')

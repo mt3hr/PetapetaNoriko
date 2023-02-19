@@ -1,17 +1,18 @@
 <template>
     <input v-if="label_type == LabelType.None" type="range" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
-        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
-        :value="value" :class="tagclass" :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max"
-        :min="min" :step="step">
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value"
+        :class="tagclass" :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
     <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        {{ label }}
         <input type="range" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
-            :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass" :id="tagdata.tagid"
+            :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
     </label>
     <label :style="position_css" v-else-if="label_type == LabelType.After">
         <input type="range" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass"
-            :id="tagdata.tagid" :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :class="tagclass" :id="tagdata.tagid"
+            :autocomplete="autocomplete" :list="list" :max="max" :min="min" :step="step">
+        {{ label }}
     </label>
 </template>
 
@@ -31,8 +32,8 @@ export default class RangeTagView extends HTMLTagViewBase {
     min: string
     step: string
     tagclass: string
-    label_type: LabelType
-    label: string
+    label_type = LabelType.None
+    label = ""
 
     @Watch('name')
     @Watch('value')
