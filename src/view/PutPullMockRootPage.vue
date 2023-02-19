@@ -554,7 +554,7 @@ export default class PutPullMockRootPage extends Vue {
             settings = JSON.parse(document.cookie, deserialize)
         } catch (e) {
             this.save_settings_to_cookie()
-            let ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_settings'))
+            let ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_setting'))
             let ppmk_settings_value = ppmk_settings ? ppmk_settings.split('=')[1] : JSON.stringify(new Settings())
             settings = JSON.parse(ppmk_settings_value, deserialize)
         }
