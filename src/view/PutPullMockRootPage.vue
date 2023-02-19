@@ -118,9 +118,9 @@
                 </v-row>
             </v-card-title>
             <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-                                                          width: 200px;
-                                                          height: auto;
-                                                        }"></v-textarea>
+                                                              width: 200px;
+                                                              height: auto;
+                                                            }"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -154,7 +154,7 @@
             <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
             <v-textarea v-model="page_webfont" :rows="20"
                 placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-                                                        https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+                                                            https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -504,6 +504,7 @@ export default class PutPullMockRootPage extends Vue {
     @Watch('auto_scroll_tag_struct_view')
     @Watch('tag_list_view_mode')
     @Watch('use_undo')
+    @Watch('session_id')
     save_settings_to_cookie() {
         let settings = new Settings()
         settings.export_base64_image = this.export_base64_image
@@ -517,6 +518,7 @@ export default class PutPullMockRootPage extends Vue {
         settings.use_undo = this.use_undo
         settings.auto_focus_tag_property_view = this.auto_focus_tag_property_view
         settings.first_launch = this.first_launch
+        settings.session_id = this.session_id
         let php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
         let php_sessid_value = php_sessid ? php_sessid.split('=')[1] : "";
         document.cookie =
@@ -531,7 +533,9 @@ export default class PutPullMockRootPage extends Vue {
             return settings
         }
         try {
-            settings = JSON.parse(document.cookie, deserialize)
+            const ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_setting'))
+            const ppmk_settings_value = ppmk_settings ? ppmk_settings.split('=')[1] : JSON.stringify(new Settings())
+            settings = JSON.parse(ppmk_settings_value, deserialize)
         } catch (e) {
             this.save_settings_to_cookie()
             let ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_setting'))
@@ -1494,8 +1498,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     logined() {
-        let api = new API()
-        this.session_id = api.load_settings_from_cookie().session_id
+        this.session_id = this.api.session_id
         this.is_show_login_dialog = false
         this.flush_message = "ログインしました"
         this.is_show_flush_message = true
@@ -1504,7 +1507,6 @@ export default class PutPullMockRootPage extends Vue {
     save_to_server_jec_jy_graduationwork() {
         this.api.preparate_save_ppmk_project(this.project)
         let wm_id = this.$route.query["wm_id"] ? this.$route.query["wm_id"] : this.project.ppmk_project.project_id
-        console.log(wm_id)
         let data = {
             "wm_id": wm_id,
             "wm_name": this.project.ppmk_project.project_name,
