@@ -269,8 +269,9 @@ export default class API {
         } catch (e) {
             let settings = new Settings()
             this.save_settings_to_cookie(settings)
-            const ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_settings')).split('=')[1];
-            settings = JSON.parse(ppmk_settings, deserialize)
+            const ppmk_settings = document.cookie.split('; ').find(row => row.startsWith('ppmk_settings'))
+            const ppmk_settings_value = ppmk_settings ? ppmk_settings.split('=')[1] : JSON.stringify(new Settings())
+            settings = JSON.parse(ppmk_settings_value, deserialize)
         }
         return settings
     }
