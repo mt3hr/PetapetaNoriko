@@ -1,6 +1,6 @@
 # [PutPullMock](http://jec21jy0216.pya.jp/)
 PutPullMockはワイヤーフレーム作成支援アプリケーションです。  
-![ppmk](https://raw.githubusercontent.com/mt3hr/PutPullMock/main/devdocs/resources/screenshot.1672967496.png)
+![ppmk](https://raw.githubusercontent.com/mt3hr/PutPullMock/main/devdocs/resources/screenshot.1677014929.png)
 
 ## インストール、ビルドなど
 
