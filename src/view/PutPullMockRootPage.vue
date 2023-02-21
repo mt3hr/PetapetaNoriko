@@ -128,9 +128,9 @@
                     </v-row>
                 </v-card-title>
                 <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-                                                          width: 200px;
-                                                          height: auto;
-                                                        }"></v-textarea>
+                                                                  width: 200px;
+                                                                  height: auto;
+                                                                }"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
                         <v-btn color="primary" @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -158,20 +158,6 @@
                         <v-btn color="primary" @click="is_show_readin_dialog = false">閉じる</v-btn>
                     </v-col>
                     <v-spacer />
-                </v-row>
-            </v-card>
-        </v-dialog>
-        <v-dialog v-model="is_show_webfont_dialog">
-            <v-card class="pa-5">
-                <v-card-title>ページウェブフォント</v-card-title>
-                <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
-                <v-textarea v-model="page_webfont" :rows="20"
-                    placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-                                                        https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
-                <v-row>
-                    <v-col cols="auto">
-                        <v-btn color="primary" @click="is_show_webfont_dialog = false">閉じる</v-btn>
-                    </v-col>
                 </v-row>
             </v-card>
         </v-dialog>
@@ -217,6 +203,9 @@
                     <v-col v-if="login_system && session_id" cols="auto" class="btn_margin">
                         <v-btn color="primary" class="btn_margin" @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
                     </v-col>
+                    <v-col v-if="php_sessid != ''" cols="auto">
+                        <v-btn color="primary" @click="save_to_server_jec_jy_graduationwork">プロジェクトをサーバに保存</v-btn>
+                    </v-col>
                 </v-row>
             </v-card>
         </v-dialog>
@@ -236,78 +225,15 @@
                 </v-row>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="is_show_readin_dialog" width="unset">
-            <v-card class="pa-5">
-                <v-row>
-                    <v-col>
-                        <input type="file" @change="read_ppmk_project" />
-                    </v-col>
-                </v-row>
-                <v-row v-if="login_system && session_id">
-                    <v-col>
-                        <ProjectSummariesList v-if="session_id" @loaded_project="loaded_project" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="auto">
-                        <v-btn @click="is_show_readin_dialog = false">閉じる</v-btn>
-                    </v-col>
-                    <v-spacer />
-                </v-row>
-            </v-card>
-        </v-dialog>
         <v-dialog v-model="is_show_webfont_dialog">
             <v-card class="pa-5">
                 <v-card-title>ページウェブフォント</v-card-title>
                 <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
                 <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-                                    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
-                    </v-col>
-                </v-row>
-            </v-card>
-        </v-dialog>
-        <v-dialog id="writeout_dialog" v-model="is_show_writeout_dialog">
-            <v-card class="pa-5">
-                <v-card-title>ページHTML</v-card-title>
-                <v-row>
-                    <v-col>
-                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
-                    </v-col>
-                    <v-col>
-                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
-                            :label="'埋め込み画像'" />
-                    </v-col>
-                    <v-col>
-                        <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
-                            :label="'位置情報'" />
-                    </v-col>
-                </v-row>
-                <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
-                <v-row>
-                    <v-col cols="auto">
-                        <v-btn @click="is_show_writeout_dialog = false">閉じる</v-btn>
-                    </v-col>
-                    <v-spacer />
-                    <v-col cols="auto">
-                        <v-btn @click="print_this_page">このページを印刷する</v-btn>
-                    </v-col>
-                    <v-col cols="auto">
-                        <v-btn @click="save_ppmk_html_css_this_page">このページをHTMLファイルに保存</v-btn>
-                    </v-col>
-                    <v-col cols="auto">
-                        <v-btn @click="save_ppmk_html_css_all_pages">すべてのページをHTMLファイルに保存</v-btn>
-                    </v-col>
-                    <v-col cols="auto">
-                        <v-btn @click="save_ppmk_project">プロジェクトを保存</v-btn>
-                    </v-col>
-                    <v-col v-if="login_system && session_id" cols="auto">
-                        <v-btn @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
-                    </v-col>
-                    <v-col v-if="php_sessid != ''" cols="auto">
-                        <v-btn @click="save_to_server_jec_jy_graduationwork">プロジェクトをサーバに保存</v-btn>
+                        <v-btn color="primary" @click="is_show_webfont_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -412,7 +338,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="auto">
-                        <v-btn :color="'primary'" @click="is_show_options_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" @click="is_show_options_dialog = false">閉じる</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
