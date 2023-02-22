@@ -12,14 +12,13 @@
                         v-model="property.value" :disabled="is_editable_property(property)"
                         @keyup="(e) => updated_property_value(e, property)"></textarea>
                     <select class="textbox" v-else-if="property.type == 'label_type'"
-                        @change="(e) => updated_label_type(e, property)">
+                        @change="(e) => updated_label_type(e, property)" v-model=property.value>
                         <option :value="LabelType.None">なし</option>
                         <option :value="LabelType.Before">前置</option>
                         <option :value="LabelType.After">後置</option>
                     </select>
                     <input class="textbox" v-else type="text" :ref="'input_' + property.name" v-model="property.value"
-                        :disabled="is_editable_property(property)"
-                        @keyup="(e) => updated_property_value(e, property)" />
+                        :disabled="is_editable_property(property)" @keyup="(e) => updated_property_value(e, property)" />
                 </td>
             </tr>
         </table>
