@@ -19,14 +19,15 @@ func init() {
 	cmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", proxy, "proxy")
 	cmd.PersistentFlags().Uint16VarP(&port, "port", "p", port, "port")
 	cmd.PersistentFlags().BoolVarP(&register, "register", "r", register, "register")
-	cmd.PersistentFlags().BoolVarP(&loginSystem, "login_system", "s", loginSystem,
-		`login_system
+	cmd.PersistentFlags().BoolVarP(&system, "system", "s", system,
+		`system
 		環境変数を設定して起動してください
 		PPMK_EMAIL_HOSTNAME: パスワードリセット用メールのホスト名
 		PPMK_EMAIL_PORT:     パスワードリセット用メールのポート番号
 		PPMK_EMAIL_USERNAME: パスワードリセット用メールのユーザ名
-		PPMK_EMAIL_PASSWORD: パスワードリセット用メールのパスワード`)
-	cmd.PersistentFlags().StringVarP(&dbfilename, "dbfilename", "d", dbfilename, "dbfilename")
+		PPMK_EMAIL_PASSWORD: パスワードリセット用メールのパスワード
+		PPMK_EMAIL_LAN: ローカルエリアアドレスを使用する場合はtrueを設定`)
+	cmd.PersistentFlags().StringVarP(&dbfilename, "db_filename", "d", dbfilename, "dbfilename")
 }
 
 var (
@@ -35,7 +36,7 @@ var (
 
 	port         = uint16(51520)
 	proxy        = ""
-	loginSystem  = false
+	system       = false
 	dbfilename   = "ppmk.db"
 	register     = false
 	serverStatus = ServerStatus{}
@@ -64,12 +65,12 @@ func openbrowser(url string) error {
 }
 
 func launchServer() error {
-	if loginSystem {
+	if system {
 		initializeSystemVariable()
 	}
 
 	serverStatus.EnableRegister = register
-	serverStatus.LoginSystem = loginSystem
+	serverStatus.LoginSystem = system
 	serverStatus.EnableResetPassword = serverStatus.LoginSystem &&
 		(emailhostname != "" &&
 			emailport != 0 &&
@@ -81,7 +82,7 @@ func launchServer() error {
 	if err != nil {
 		return err
 	}
-	if loginSystem {
+	if system {
 		ppmkDB, err := newPPMKDB(dbfilename)
 		if err != nil {
 			panic(err)
@@ -101,25 +102,36 @@ func launchServer() error {
 		http.FileServer(http.FS(html)).ServeHTTP(w, r)
 	})
 
-	router.PathPrefix("/reset_password").Handler(http.StripPrefix("/reset_password", hf))
-	router.PathPrefix("/login").Handler(http.StripPrefix("/login", hf))
-	router.PathPrefix("/register").Handler(http.StripPrefix("/login", hf))
+	router.PathPrefix(resetPasswordAddress).Handler(http.StripPrefix(resetPasswordAddress, hf))
 	router.PathPrefix("/").Handler(hf)
 
 	var handler http.Handler = router
-	/*
-		ln, err := net.Listen("tcp4", ":"+fmt.Sprintf("%d", port))
-		if err != nil {
-			panic(err)
-		}
-		return http.Serve(ln, handler)
-	*/
 	err = http.ListenAndServe(":"+fmt.Sprintf("%d", port), handler)
 	if err != nil {
 		err = fmt.Errorf("failed to launch server: %w", err)
 		return err
 	}
 	return nil
+}
+
+func getGlobalIPAddress() (string, error) {
+	httpbinOrgIP := "http://httpbin.org/ip"
+	res, err := http.Get(httpbinOrgIP)
+	if err != nil {
+		err = fmt.Errorf("error at http get %s: %w", httpbinOrgIP, err)
+		return "", err
+	}
+	defer res.Body.Close()
+
+	ip := &struct {
+		IP string `json:"origin"`
+	}{}
+	err = json.NewDecoder(res.Body).Decode(ip)
+	if err != nil {
+		err = fmt.Errorf("error at response decode to json: %w", err)
+		return "", err
+	}
+	return ip.IP, nil
 }
 
 type ServerStatus struct {

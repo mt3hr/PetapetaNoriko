@@ -118,9 +118,9 @@
                 </v-row>
             </v-card-title>
             <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-                                                                  width: 200px;
-                                                                  height: auto;
-                                                                }"></v-textarea>
+                                                                      width: 200px;
+                                                                      height: auto;
+                                                                    }"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -154,7 +154,7 @@
             <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
             <v-textarea v-model="page_webfont" :rows="20"
                 placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-                                                                https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+                                                                    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -400,7 +400,7 @@ import ProjectSummariesList from '@/view/login_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
 import Login from './login_system/Login.vue'
 import Register from './login_system/Register.vue'
-import ResetPassword from './login_system/ResetPassword.vue'
+import ResetPassword from './login_system/RequestResetPassword.vue'
 
 @Options({
     components: {

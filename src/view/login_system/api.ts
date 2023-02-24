@@ -8,7 +8,10 @@ import TagListViewMode from "../TagListViewMode"
 export const status_address = "/ppmk_server/status"
 export const login_address = "/ppmk_server/login"
 export const logout_address = "/ppmk_server/logout"
-export const reset_password_address = "/ppmk_server/reset_password"
+export const request_reset_password_address = "/ppmk_server/request_reset_password"
+export const reset_password_address = "/reset_password"
+export const do_reset_password_address = "/ppmk_server/reset_password"
+export const get_reset_password_id_info_address = "/ppmk_server/get_reset_password_id_info"
 export const register_address = "/ppmk_server/register"
 export const list_project_summaries_address = "/ppmk_server/list_project_summaries"
 export const get_project_address = "/ppmk_server/get_project"
@@ -70,11 +73,30 @@ export class LogoutRequest {
     session_id: string
 }
 
-export class ResetPasswordRequest {
+export class RequestResetPasswordRequest {
     email: string
 }
 
+export class RequestResetPasswordResponse {
+    error: string
+}
+
+export class ResetPasswordRequest {
+    reset_id: string
+    email: string
+    new_password_md5: string
+}
+
 export class ResetPasswordResponse {
+    error: string
+}
+
+export class GetRequestResetPasswordIDInfoRequest {
+    reset_id: string
+}
+
+export class GetRequestResetPasswordIDInfoResponse {
+    email: string
     error: string
 }
 
@@ -329,11 +351,29 @@ export default class API {
         return this.load_settings_from_cookie().session_id
     }
 
-    async reset_password(email: string): Promise<ResetPasswordResponse> {
-        const reset_password_request = new ResetPasswordRequest()
+    async request_reset_password(email: string): Promise<RequestResetPasswordResponse> {
+        const reset_password_request = new RequestResetPasswordRequest()
         reset_password_request.email = email
 
-        const res = await fetch(reset_password_address, {
+        const res = await fetch(request_reset_password_address, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(reset_password_request),
+        })
+        const json = await res.json()
+        const response: RequestResetPasswordResponse = json
+        return response
+    }
+
+    async reset_password(reset_id: string, email: string, new_password: string): Promise<ResetPasswordResponse> {
+        const reset_password_request = new ResetPasswordRequest()
+        reset_password_request.reset_id = reset_id
+        reset_password_request.email = email
+        reset_password_request.new_password_md5 = md5(new_password)
+
+        const res = await fetch(do_reset_password_address, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
@@ -342,6 +382,22 @@ export default class API {
         })
         const json = await res.json()
         const response: ResetPasswordResponse = json
+        return response
+    }
+
+    async get_reset_password_id_info(reset_password_id: string): Promise<GetRequestResetPasswordIDInfoResponse> {
+        const get_reset_password_info_request = new GetRequestResetPasswordIDInfoRequest()
+        get_reset_password_info_request.reset_id = reset_password_id
+
+        const res = await fetch(get_reset_password_id_info_address, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(get_reset_password_info_request),
+        })
+        const json = await res.json()
+        const response: GetRequestResetPasswordIDInfoResponse = json
         return response
     }
 
