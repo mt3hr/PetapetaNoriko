@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/fs"
 	"math"
+	"net"
 	"net/http"
 	"net/smtp"
 	"os"
@@ -59,11 +60,30 @@ type LogoutRequest struct {
 	SessionId string `json:"session_id"`
 }
 
-type ResetPasswordRequest struct {
+type RequestResetPasswordRequest struct {
 	Email string `json:"email"`
 }
 
+type RequestResetPasswordResponse struct {
+	Error string `json:"error"`
+}
+
+type ResetPasswordRequest struct {
+	ResetID        string `json:"reset_id"`
+	Email          string `json:"email"`
+	NewPasswordMD5 string `json:"new_password_md5"`
+}
+
 type ResetPasswordResponse struct {
+	Error string `json:"error"`
+}
+
+type GetResetPasswordIDInfoRequest struct {
+	ResetID string `json:"reset_id"`
+}
+
+type GetResetPasswordIDInfoResponse struct {
+	Email string `json:"email"`
 	Error string `json:"error"`
 }
 
@@ -168,6 +188,13 @@ type UpdateProjectShareResponse struct {
 	Error string `json:"error"`
 }
 
+type DoResetPasswordRequest struct {
+}
+
+type DoResetPasswordResponse struct {
+	Error string `json:"error"`
+}
+
 type WatchSharedProjectViewMessageType int
 
 const (
@@ -200,7 +227,12 @@ const (
 	statusAddress                  = "/ppmk_server/status"
 	loginAddress                   = "/ppmk_server/login"
 	logoutAddress                  = "/ppmk_server/logout"
-	resetPasswordAddress           = "/ppmk_server/reset_password"
+	requestResetPasswordAddress    = "/ppmk_server/request_reset_password"
+	resetPasswordAddress           = "/reset_password"
+	doResetPasswordAddress         = "/ppmk_server/reset_password"
+	resetPasswordIDInfoAddress     = "/ppmk_server/reset_password_id_info"
+	getResetPasswordIDInfoAddress  = "/ppmk_server/get_reset_password_id_info"
+	setNewPasswordAddress          = "/ppmk_server/set_new_password"
 	registerAddress                = "/ppmk_server/register"
 	listProjectSummariesAddress    = "/ppmk_server/list_project_summaries"
 	getProjectDataAddress          = "/ppmk_server/get_project_data"
@@ -224,10 +256,11 @@ var (
 	emailusername string
 	emailpassword string
 	emailaddress  string
+	emaillan      bool
 )
 
 func initializeSystemVariable() {
-	if !loginSystem {
+	if !system {
 		return
 	}
 	emailhostname = os.Getenv("PPMK_EMAIL_HOSTNAME")
@@ -240,12 +273,14 @@ func initializeSystemVariable() {
 	emailport = uint16(emailportUint64)
 	emailusername = os.Getenv("PPMK_EMAIL_USERNAME")
 	emailpassword = os.Getenv("PPMK_EMAIL_PASSWORD")
+	emaillan, _ = strconv.ParseBool(os.Getenv("PPMK_EMAIL_LAN"))
 
 	fmt.Printf("PPMK_EMAIL_HOSTNAME = %+v\n", emailhostname)
 	fmt.Printf("PPMK_EMAIL_ADDRESS = %+v\n", emailaddress)
 	fmt.Printf("PPMK_EMAIL_PORT = %+v\n", emailport)
 	fmt.Printf("PPMK_EMAIL_USERNAME = %+v\n", emailusername)
 	fmt.Printf("PPMK_EMAIL_PASSWORD = %+v\n", "**********")
+	fmt.Printf("PPMK_EMAIL_LAN = %+v\n", emaillan)
 }
 
 func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
@@ -315,15 +350,15 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			return
 		}
 	}))
-	router.PathPrefix(resetPasswordAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	router.PathPrefix(requestResetPasswordAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		w.Header().Set("Content-Type", "application/json")
 
-		resetPasswordRequest := &ResetPasswordRequest{}
-		resetPasswordResponse := &ResetPasswordResponse{}
+		resetPasswordRequest := &RequestResetPasswordRequest{}
+		resetPasswordResponse := &RequestResetPasswordResponse{}
 
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&resetPasswordRequest)
@@ -339,11 +374,74 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			return
 		}
 
-		subject := "PPMK パスワードリセットメール"
-		//TODO
-		body := "送信テスト"
+		user, err := ppmkDB.GetUserFromEmail(r.Context(), resetPasswordRequest.Email)
+		if err != nil {
+			resetPasswordResponse.Error = "エラー"
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(resetPasswordResponse)
+			if e != nil {
+				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+				decoder.Decode(resetPasswordResponse)
+				return
+			}
+			return
+		}
 
-		err = sendResetPasswordMail(resetPasswordRequest.Email, subject, body)
+		resetPasswordID := uuid.New().String()
+		user.ResetPasswordID = resetPasswordID
+		err = ppmkDB.UpdateUser(r.Context(), user)
+		if err != nil {
+			resetPasswordResponse.Error = "エラー"
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(resetPasswordResponse)
+			if e != nil {
+				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+				decoder.Decode(resetPasswordResponse)
+				return
+			}
+			return
+		}
+
+		ipAddress := ""
+		address := ""
+		link := ""
+		if emaillan {
+			conn, err := net.Dial("tcp", fmt.Sprintf("localhost:%d", port))
+			if err != nil {
+				resetPasswordResponse.Error = "エラー"
+				encoder := json.NewEncoder(w)
+				e := encoder.Encode(resetPasswordResponse)
+				if e != nil {
+					resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+					decoder.Decode(resetPasswordResponse)
+					return
+				}
+				return
+			}
+			defer conn.Close()
+			ipAddress = conn.LocalAddr().(*net.TCPAddr).IP.String()
+		} else {
+			ipAddress, err = getGlobalIPAddress()
+			if err != nil {
+				resetPasswordResponse.Error = "エラー"
+				encoder := json.NewEncoder(w)
+				e := encoder.Encode(resetPasswordResponse)
+				if e != nil {
+					resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+					decoder.Decode(resetPasswordResponse)
+					return
+				}
+				return
+			}
+		}
+		address = fmt.Sprintf("http://%s:%d/%s?reset_password_id=%s", ipAddress, port, resetPasswordAddress, resetPasswordID)
+		link = address
+
+		subject := "PPMK パスワードリセットメール"
+		body := `下記のリンクからPPMKのパスワードをリセットできます。
+` + link
+
+		err = sendEmail(resetPasswordRequest.Email, subject, body)
 		if err != nil {
 			resetPasswordResponse.Error = "メール送信エラー"
 			encoder := json.NewEncoder(w)
@@ -364,6 +462,123 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			return
 		}
 	}))
+
+	router.PathPrefix(doResetPasswordAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		resetPasswordRequest := &ResetPasswordRequest{}
+		resetPasswordResponse := &ResetPasswordResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&resetPasswordRequest)
+		if err != nil {
+			resetPasswordResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(resetPasswordResponse)
+			if e != nil {
+				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+				encoder.Encode(resetPasswordResponse)
+				return
+			}
+			return
+		}
+
+		user, err := ppmkDB.GetUserFromEmail(r.Context(), resetPasswordRequest.Email)
+		if err != nil {
+			resetPasswordResponse.Error = fmt.Sprintf("ユーザが見つかりませんでした")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(resetPasswordResponse)
+			if e != nil {
+				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+				encoder.Encode(resetPasswordResponse)
+				return
+			}
+			return
+		}
+
+		if user.ResetPasswordID != user.ResetPasswordID {
+			resetPasswordResponse.Error = fmt.Sprintf("エラー")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(resetPasswordResponse)
+			if e != nil {
+				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+				encoder.Encode(resetPasswordResponse)
+				return
+			}
+			return
+		}
+
+		user.PasswordHashMD5 = resetPasswordRequest.NewPasswordMD5
+		err = ppmkDB.UpdateUser(r.Context(), user)
+		if err != nil {
+			resetPasswordResponse.Error = fmt.Sprintf("ユーザが見つかりませんでした")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(resetPasswordResponse)
+			if e != nil {
+				resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+				encoder.Encode(resetPasswordResponse)
+				return
+			}
+			return
+		}
+		encoder := json.NewEncoder(w)
+		e := encoder.Encode(resetPasswordResponse)
+		if e != nil {
+			resetPasswordResponse.Error = fmt.Sprintf("サーバ内エラー")
+			encoder.Encode(resetPasswordResponse)
+			return
+		}
+	}))
+	router.PathPrefix(getResetPasswordIDInfoAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+
+		getResetPasswordIDInfoRequest := &GetResetPasswordIDInfoRequest{}
+		getResetPasswordIDInfoResponse := &GetResetPasswordIDInfoResponse{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&getResetPasswordIDInfoRequest)
+		if err != nil {
+			getResetPasswordIDInfoResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(getResetPasswordIDInfoResponse)
+			if e != nil {
+				getResetPasswordIDInfoResponse.Error = fmt.Sprintf("サーバ内エラー")
+				encoder.Encode(getResetPasswordIDInfoResponse)
+				return
+			}
+			return
+		}
+
+		user, err := ppmkDB.GetUserFromResetPasswordID(r.Context(), getResetPasswordIDInfoRequest.ResetID)
+		if err != nil {
+			getResetPasswordIDInfoResponse.Error = fmt.Sprintf("ユーザが見つかりませんでした")
+			encoder := json.NewEncoder(w)
+			e := encoder.Encode(getResetPasswordIDInfoResponse)
+			if e != nil {
+				getResetPasswordIDInfoResponse.Error = fmt.Sprintf("サーバ内エラー")
+				encoder.Encode(getResetPasswordIDInfoResponse)
+				return
+			}
+			return
+		}
+
+		getResetPasswordIDInfoResponse.Email = user.Email
+
+		encoder := json.NewEncoder(w)
+		e := encoder.Encode(getResetPasswordIDInfoResponse)
+		if e != nil {
+			getResetPasswordIDInfoResponse.Error = fmt.Sprintf("サーバ内エラー")
+			encoder.Encode(getResetPasswordIDInfoResponse)
+			return
+		}
+	}))
+
 	router.PathPrefix(registerAddress).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
@@ -1572,7 +1787,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 	}))
 }
 
-func sendResetPasswordMail(address string, subject string, body string) error {
+func sendEmail(address string, subject string, body string) error {
 	auth := smtp.PlainAuth("", emailusername, emailpassword, emailhostname)
 	if err := smtp.SendMail(
 		fmt.Sprintf("%s:%d", emailhostname, emailport),
@@ -1589,6 +1804,7 @@ type ppmkDB interface {
 	GetUsers(ctx context.Context) ([]*User, error)
 	GetUser(ctx context.Context, userid string) (*User, error)
 	GetUserFromEmail(ctx context.Context, email string) (*User, error)
+	GetUserFromResetPasswordID(ctx context.Context, resetPasswordID string) (*User, error)
 	AddUser(ctx context.Context, user *User) error
 	DeleteUser(ctx context.Context, userID string) error
 	UpdateUser(ctx context.Context, user *User) error
@@ -1710,6 +1926,19 @@ func (p *ppmkDBImpl) GetUser(ctx context.Context, userid string) (*User, error) 
 func (p *ppmkDBImpl) GetUserFromEmail(ctx context.Context, email string) (*User, error) {
 	statement := `SELECT UserID, Email, UserName, PasswordHashMD5, ResetPasswordID FROM User WHERE Email='` +
 		escapeSQLite(email) + `';`
+	row := p.db.QueryRowContext(ctx, statement)
+
+	user := &User{}
+	err := row.Scan(&user.UserID, &user.Email, &user.UserName, &user.PasswordHashMD5, &user.ResetPasswordID)
+	if err != nil {
+		err = fmt.Errorf("error at scan row from %s: %w", p.filename, err)
+		return nil, err
+	}
+	return user, nil
+}
+
+func (p *ppmkDBImpl) GetUserFromResetPasswordID(ctx context.Context, resetPasswordID string) (*User, error) {
+	statement := `SELECT UserID, Email, UserName, PasswordHashMD5, ResetPasswordID FROM User WHERE ResetPasswordID='` + escapeSQLite(resetPasswordID) + `';`
 	row := p.db.QueryRowContext(ctx, statement)
 
 	user := &User{}

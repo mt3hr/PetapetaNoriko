@@ -422,7 +422,7 @@ import ProjectSummariesList from '@/view/login_system/ProjectSummariesList.vue'
 import ProjectPropertyView from './ProjectPropertyView.vue'
 import Login from './login_system/Login.vue'
 import Register from './login_system/Register.vue'
-import ResetPassword from './login_system/ResetPassword.vue'
+import ResetPassword from './login_system/RequestResetPassword.vue'
 
 @Options({
     components: {

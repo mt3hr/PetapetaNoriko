@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import RootPanel from '@/view/PutPullMockRootPage.vue'
+import ResetPassword from '@/view/login_system/ResetPassword.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -7,6 +8,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'rootpanel',
     component: RootPanel,
   },
+  {
+    path: '/reset_password',
+    name: 'reset_password',
+    component: ResetPassword,
+  }
 ]
 
 const router = createRouter({
