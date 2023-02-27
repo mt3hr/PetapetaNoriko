@@ -21,9 +21,9 @@ export default class OptionTagData extends HTMLTagDataBase {
         if (this.label != "") html += " label=\"" + this.label + "\""
         if (this.selected) html += " selected"
         if (this.value != "") html += " value=\"" + this.value + "\""
-        html += ">\n"
-        html += indent
-        html += "</option>\n"
+        html += ">"
+        html += this.label
+        html += "</option>"
         return html
     }
     override to_string(): string {

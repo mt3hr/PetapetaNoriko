@@ -24,7 +24,7 @@ export default class WeekTagData extends HTMLTagDataBase {
         html += indent
         if (this.label_type != LabelType.None) html += "<label>"
         if (this.label_type == LabelType.Before) html += this.label
-        html += "<input type=\"date-time-local\""
+        html += "<input type=\"week\""
         if (options.export_id) html += " id=\"" + this.tagid + "\""
         if (this.tagclass != "") html += " class=\"" + this.tagclass + "\""
         if (this.name != "") html += " name=\"" + this.name + "\""
