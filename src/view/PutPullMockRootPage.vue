@@ -128,9 +128,9 @@
                     </v-row>
                 </v-card-title>
                 <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-                                                                  width: 200px;
-                                                                  height: auto;
-                                                                }"></v-textarea>
+    width: 200px;
+    height: auto;
+}"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
                         <v-btn color="primary" @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -230,7 +230,7 @@
                 <v-card-title>ページウェブフォント</v-card-title>
                 <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
                 <v-textarea v-model="page_webfont" :rows="20" placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
                         <v-btn color="primary" @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -396,9 +396,6 @@
 </template>
 
 <script lang="ts">
-// グローバルナビゲーション 横並びリストはCSSに3行追加すればいいだけだから実装しなくていいか
-//TODO 卒業制作用POSTからProjectDataを読み込むやつ
-//TODO 卒業制作用サーバにデータを保存するやつ。
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView from '@/view/TagListView.vue'
@@ -497,6 +494,7 @@ export default class PutPullMockRootPage extends Vue {
     project = new Project()
 
     login_system = false
+    enable_share_view_feature = false
 
     first_launch = true
 
@@ -637,6 +635,7 @@ export default class PutPullMockRootPage extends Vue {
 
             this.api.status().then((server_status: ServerStatus) => {
                 this.login_system = server_status.login_system
+                this.enable_share_view_feature = server_status.enable_share_view_feature
             }).catch((e) => {
                 this.login_system = false
             })

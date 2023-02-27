@@ -17,7 +17,7 @@
                         @keydown="update_project_info" />
                 </td>
             </tr>
-            <tr class="share_link" v-if="login_system && session_id">
+            <tr class="share_link" v-if="login_system && session_id && enable_share_view_feature">
                 <td>
                     共有
                 </td>
@@ -53,6 +53,7 @@ export default class ProjectPropertyView extends Vue {
     @Prop() editor_mode: boolean
     @Prop() session_id: string
     @Prop() login_system: boolean
+    @Prop() enable_share_view_feature: boolean
     project: Project = new Project()
     project_name = ""
     is_shared_view = false

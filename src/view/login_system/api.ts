@@ -52,6 +52,7 @@ export class ServerStatus {
     enable_reset_password: boolean
     enable_register: boolean
     jec_jy_graduationwork: boolean
+    enable_share_view_feature: boolean
 }
 
 export class PPMKProjectSummary {

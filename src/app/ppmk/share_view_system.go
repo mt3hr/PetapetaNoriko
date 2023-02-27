@@ -275,12 +275,14 @@ func initializeSystemVariable() {
 	emailpassword = os.Getenv("PPMK_EMAIL_PASSWORD")
 	emaillan, _ = strconv.ParseBool(os.Getenv("PPMK_EMAIL_LAN"))
 
-	fmt.Printf("PPMK_EMAIL_HOSTNAME = %+v\n", emailhostname)
-	fmt.Printf("PPMK_EMAIL_ADDRESS = %+v\n", emailaddress)
-	fmt.Printf("PPMK_EMAIL_PORT = %+v\n", emailport)
-	fmt.Printf("PPMK_EMAIL_USERNAME = %+v\n", emailusername)
-	fmt.Printf("PPMK_EMAIL_PASSWORD = %+v\n", "**********")
-	fmt.Printf("PPMK_EMAIL_LAN = %+v\n", emaillan)
+	/*
+		fmt.Printf("PPMK_EMAIL_HOSTNAME = %+v\n", emailhostname)
+		fmt.Printf("PPMK_EMAIL_ADDRESS = %+v\n", emailaddress)
+		fmt.Printf("PPMK_EMAIL_PORT = %+v\n", emailport)
+		fmt.Printf("PPMK_EMAIL_USERNAME = %+v\n", emailusername)
+		fmt.Printf("PPMK_EMAIL_PASSWORD = %+v\n", "**********")
+		fmt.Printf("PPMK_EMAIL_LAN = %+v\n", emaillan)
+	*/
 }
 
 func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
@@ -512,6 +514,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		}
 
 		user.PasswordHashMD5 = resetPasswordRequest.NewPasswordMD5
+		user.ResetPasswordID = ""
 		err = ppmkDB.UpdateUser(r.Context(), user)
 		if err != nil {
 			resetPasswordResponse.Error = fmt.Sprintf("ユーザが見つかりませんでした")
