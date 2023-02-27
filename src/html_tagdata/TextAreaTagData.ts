@@ -36,7 +36,9 @@ export default class TextAreaTagData extends HTMLTagDataBase {
         if (this.required) html += " required"
         if (this.rows != "") html += " rows=\"" + this.rows + "\""
         if (this.wrap != "") html += " wrap=\"" + this.wrap + "\""
-        html += ">"
+        html += ">\n"
+        html += indent
+        html += "</textarea>"
         return html
     }
     override to_string(): string {
