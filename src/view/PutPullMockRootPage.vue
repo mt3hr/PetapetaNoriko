@@ -375,9 +375,6 @@
 </template>
 
 <script lang="ts">
-// グローバルナビゲーション 横並びリストはCSSに3行追加すればいいだけだから実装しなくていいか
-//TODO 卒業制作用POSTからProjectDataを読み込むやつ
-//TODO 卒業制作用サーバにデータを保存するやつ。
 import { Vue, Options } from 'vue-class-component'
 import PageListView from '@/view/PageListView.vue'
 import TagListView from '@/view/TagListView.vue'
