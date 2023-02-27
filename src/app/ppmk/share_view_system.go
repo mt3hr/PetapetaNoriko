@@ -512,6 +512,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		}
 
 		user.PasswordHashMD5 = resetPasswordRequest.NewPasswordMD5
+		user.ResetPasswordID = ""
 		err = ppmkDB.UpdateUser(r.Context(), user)
 		if err != nil {
 			resetPasswordResponse.Error = fmt.Sprintf("ユーザが見つかりませんでした")

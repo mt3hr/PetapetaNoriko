@@ -35,8 +35,6 @@ ppmk_server
 - PPMK_EMAIL_USERNAME: ログイン機能で使用する、パスワードリセット用メールのユーザ名  
 - PPMK_EMAIL_PASSWORD: ログイン機能で使用する、パスワードリセット用メールのパスワード     
 すべて設定してから起動するとパスワードリセットメール送信機能が有効になります。  
-まだ実装してないですけど。
-//TODO
 
 <details>
 <summary>開発者向け</summary>
