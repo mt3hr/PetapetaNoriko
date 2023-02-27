@@ -16,10 +16,11 @@ import (
 
 func init() {
 	cobra.MousetrapHelpText = "" // Windowsでマウスから起動しても怒られないようにする
-	cmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", proxy, "proxy")
-	cmd.PersistentFlags().Uint16VarP(&port, "port", "p", port, "port")
-	cmd.PersistentFlags().BoolVarP(&register, "register", "r", register, "register")
-	cmd.PersistentFlags().BoolVarP(&system, "system", "s", system,
+	cmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", proxy, "アプリケーションの使用するproxy")
+	cmd.PersistentFlags().Uint16VarP(&port, "port", "p", port, "アプリケーションのポート番号")
+	cmd.PersistentFlags().BoolVarP(&register, "enable_register", "r", register, "システムのユーザ新規登録機能を有効化する")
+	cmd.PersistentFlags().BoolVarP(&system, "enable_share_view_feature", "v", enableShareViewFeature, "画面共有機能（FireFoxのみ動作。Beta版機能であり、不安定）")
+	cmd.PersistentFlags().BoolVarP(&system, "enable_system", "s", system,
 		`system
 		環境変数を設定して起動してください
 		PPMK_EMAIL_HOSTNAME: パスワードリセット用メールのホスト名
@@ -27,19 +28,22 @@ func init() {
 		PPMK_EMAIL_USERNAME: パスワードリセット用メールのユーザ名
 		PPMK_EMAIL_PASSWORD: パスワードリセット用メールのパスワード
 		PPMK_EMAIL_LAN: ローカルエリアアドレスを使用する場合はtrueを設定`)
-	cmd.PersistentFlags().StringVarP(&dbfilename, "db_filename", "d", dbfilename, "dbfilename")
+	cmd.PersistentFlags().StringVarP(&dbfilename, "db_filename", "d", dbfilename, "システムのデータが保存されるDBファイル名")
+	cmd.PersistentFlags().BoolVarP(&resetPassword, "enable_reset_password", "c", resetPassword, "システムのパスワードリセット機能を有効化する")
 }
 
 var (
 	//go:embed embed
 	htmlFS embed.FS // htmlファイル郡
 
-	port         = uint16(51520)
-	proxy        = ""
-	system       = false
-	dbfilename   = "ppmk.db"
-	register     = false
-	serverStatus = ServerStatus{}
+	port                   = uint16(51520)
+	proxy                  = ""
+	system                 = false
+	dbfilename             = "ppmk.db"
+	register               = false
+	serverStatus           = ServerStatus{}
+	resetPassword          = false
+	enableShareViewFeature = false
 )
 
 func Execute() {
@@ -71,11 +75,15 @@ func launchServer() error {
 
 	serverStatus.EnableRegister = register
 	serverStatus.LoginSystem = system
-	serverStatus.EnableResetPassword = serverStatus.LoginSystem &&
-		(emailhostname != "" &&
-			emailport != 0 &&
-			emailusername != "" &&
-			emailpassword != "")
+	serverStatus.EnableResetPassword = resetPassword
+	serverStatus.EnableShareViewFeature = enableShareViewFeature
+	/*
+		serverStatus.EnableResetPassword = serverStatus.LoginSystem &&
+			(emailhostname != "" &&
+				emailport != 0 &&
+				emailusername != "" &&
+				emailpassword != "")
+	*/
 	router := mux.NewRouter()
 
 	html, err := fs.Sub(htmlFS, "embed/dist")
@@ -135,7 +143,8 @@ func getGlobalIPAddress() (string, error) {
 }
 
 type ServerStatus struct {
-	LoginSystem         bool `json:"login_system"`
-	EnableResetPassword bool `json:"enable_reset_password"`
-	EnableRegister      bool `json:"enable_register"`
+	LoginSystem            bool `json:"login_system"`
+	EnableResetPassword    bool `json:"enable_reset_password"`
+	EnableRegister         bool `json:"enable_register"`
+	EnableShareViewFeature bool `json:"enable_share_view_feature"`
 }

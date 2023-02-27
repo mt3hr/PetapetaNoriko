@@ -31,7 +31,8 @@
                             <ProjectPropertyView class="component project_view" ref="project_view" v-show="editor_mode"
                                 :session_id="session_id" :login_system="login_system" :editor_mode="editor_mode"
                                 @new_project="show_new_project_dialog" @updated_project_info="update_project_info"
-                                @updated_share_view="update_is_share_view" />
+                                @updated_share_view="update_is_share_view"
+                                :enable_share_view_feature="enable_share_view_feature" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -118,9 +119,9 @@
                 </v-row>
             </v-card-title>
             <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-                                                                      width: 200px;
-                                                                      height: auto;
-                                                                    }"></v-textarea>
+                                                                                      width: 200px;
+                                                                                      height: auto;
+                                                                                    }"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -154,7 +155,7 @@
             <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
             <v-textarea v-model="page_webfont" :rows="20"
                 placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-                                                                    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+                                                                                    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -475,6 +476,7 @@ export default class PutPullMockRootPage extends Vue {
     project = new Project()
 
     login_system = false
+    enable_share_view_feature = false
 
     first_launch = true
 
@@ -615,6 +617,7 @@ export default class PutPullMockRootPage extends Vue {
 
             this.api.status().then((server_status: ServerStatus) => {
                 this.login_system = server_status.login_system
+                this.enable_share_view_feature = server_status.enable_share_view_feature
             }).catch((e) => {
                 this.login_system = false
             })
