@@ -10,21 +10,21 @@
                 </v-col>
                 <v-spacer />
                 <v-col cols="auto">
-                    <v-checkbox class="checkbox white_box" v-if="editor_mode" v-model="show_border">
+                    <v-checkbox class="checkbox white_box header_items" v-if="editor_mode" v-model="show_border">
                         <template v-slot:label>
                             <span class="checkboxLabel">境界を表示</span>
                         </template>
                     </v-checkbox>
                 </v-col>
                 <v-col v-if="login_system" cols="auto">
-                    <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
-                    <v-btn v-else @click="logout">ログアウト</v-btn>
+                    <v-btn class="header_items" v-if="!session_id" @click="login">ログイン</v-btn>
+                    <v-btn class="header_items" v-else @click="logout">ログアウト</v-btn>
                 </v-col>
 
                 <v-col v-if="is_jec_jy_graduationwork" cols="auto">
-                    <v-btn v-if="php_sessid == ''" @click="location.href = '/1index.php'">ログイン</v-btn>
-                    <v-btn v-if="php_sessid != ''" @click="location.href = '/1loginTransitionTeacherStudent.php'">メニュー</v-btn>
-                    <v-btn v-if="php_sessid != ''" @click="location.href = '/10logout.php'">ログアウト</v-btn>
+                    <v-btn class="header_items" v-if="php_sessid == ''" @click="location.href='/1index.php'">ログイン</v-btn>
+                    <v-btn class="header_items" v-if="php_sessid != ''" @click="location.href='/1loginTransitionTeacherStudent.php'">メニュー</v-btn>
+                    <v-btn class="header_items" v-if="php_sessid != ''" @click="location.href='/10logout.php'">ログアウト</v-btn>
                 </v-col>
                 <v-btn class="setting" icon v-if="editor_mode" @click="show_options_dialog">
                     <v-icon>mdi-cog</v-icon>
@@ -102,13 +102,13 @@
             </v-row>
             <v-row class="ppmk_row" v-if="editor_mode">
                 <v-col cols="auto">
-                    <v-btn color="primary" @click="is_show_css_dialog = true">CSS</v-btn>
-                    <v-btn color="primary" @click="is_show_webfont_dialog = true">WebFont</v-btn>
+                    <v-btn class="btn_margin v-btn_" color="primary" @click="is_show_css_dialog = true">CSS</v-btn>
+                    <v-btn class="btn_margin v-btn_" color="primary" @click="is_show_webfont_dialog = true">WebFont</v-btn>
                 </v-col>
                 <v-spacer />
                 <v-col cols="auto">
-                    <v-btn color="primary" @click="show_readin_dialog">読み込み</v-btn>
-                    <v-btn color="primary" @click="show_writeout_dialog">書き出し</v-btn>
+                    <v-btn class="btn_margin v-btn_" color="primary" @click="show_readin_dialog">読み込み</v-btn>
+                    <v-btn class="btn_margin v-btn_" color="primary" @click="show_writeout_dialog">書き出し</v-btn>
                 </v-col>
             </v-row>
         </v-container>
@@ -165,7 +165,7 @@
             <v-card class="pa-5">
                 <v-card-title>ページHTML</v-card-title>
                 <v-row>
-                    <v-col>
+                    <v-col v-if="false">
                         <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_head"
                             :label="'ヘッダ'" />
                     </v-col>
@@ -181,30 +181,34 @@
                 <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
                 <v-row>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" @click="is_show_writeout_dialog = false">閉じる</v-btn>
+                        <v-btn color="primary" class="v-btn_ btn_margin" @click="is_show_writeout_dialog = false">閉じる</v-btn>
                     </v-col>
                     <v-spacer />
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" title="印刷"
+                        <v-btn color="primary" class="v-btn_ btn_margin" title="印刷"
                             @click="print_this_page"><v-icon>mdi-printer</v-icon></v-btn>
                     </v-col>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" title="このページをHTMLファイルに保存"
+                        <v-btn color="primary" class="v-btn_ btn_margin" title="このページをHTMLファイルに保存"
                             @click="save_ppmk_html_css_this_page"><v-icon>mdi-content-save</v-icon></v-btn>
                     </v-col>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" title="すべてのページをHTMLファイルに保存"
+                        <v-btn color="primary" class="v-btn_ btn_margin" title="すべてのページをHTMLファイルに保存"
                             @click="save_ppmk_html_css_all_pages"><v-icon>mdi-content-save-all</v-icon></v-btn>
                     </v-col>
                     <v-col cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" title="プロジェクトを保存"
+                        <v-btn color="primary" class="v-btn_ btn_margin" title="プロジェクトを保存"
                             @click="save_ppmk_project"><v-icon>mdi-folder-download</v-icon></v-btn>
                     </v-col>
                     <v-col v-if="login_system && session_id" cols="auto" class="btn_margin">
-                        <v-btn color="primary" class="btn_margin" @click="show_save_to_server_dialog">プロジェクトをサーバに保存</v-btn>
+                        <v-btn color="primary" class="v-btn_ btn_margin" @click="show_save_to_server_dialog" title="プロジェクトをサーバに保存">
+                            <v-icon>mdi-server</v-icon>
+                        </v-btn>
                     </v-col>
-                    <v-col v-if="php_sessid != ''" cols="auto">
-                        <v-btn color="primary" @click="save_to_server_jec_jy_graduationwork">プロジェクトをサーバに保存</v-btn>
+                    <v-col v-if="php_sessid != ''" cols="auto" class="btn_margin">
+                        <v-btn color="primary" class="v-btn_ btn_margin" @click="save_to_server_jec_jy_graduationwork" title="プロジェクトをサーバに保存">
+                            <v-icon>mdi-server</v-icon>
+                        </v-btn>
                     </v-col>
                 </v-row>
             </v-card>
@@ -318,7 +322,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                         <h3>出力画面</h3>
                     </v-col>
                 </v-row>
-                <v-row>
+                <v-row v-if="false">
                     <v-col cols="auto">
                         <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html" v-model="export_head"
                             :label="'ヘッダ'" />
@@ -1698,11 +1702,11 @@ export default class PutPullMockRootPage extends Vue {
     margin-left: 20px;
 }
 
-.v-btn {
+.v-btn_ {
     margin: 0px 0px 0px 10px;
 }
 
-.v-btn:first-child {
+.btn_margin:first-child {
     margin: 0px 0px 0px 0px;
 }
 
@@ -1714,7 +1718,6 @@ export default class PutPullMockRootPage extends Vue {
     margin-left: 10px !important;
 }
 
-/* さいとうさんへ。結合したらスタイルが適用されなくなってしまいました。しばらくコードを見ていたのですが解決しなかったので、次回以降見てほしいです。 */
 .file_btn {
     display: inline-block;
     overflow: hidden;
@@ -1743,5 +1746,16 @@ export default class PutPullMockRootPage extends Vue {
 
 .logo {
     font-family: 'Teko', sans-serif;
+}
+
+.header_items {
+    margin-top: 16px;
+    margin-left: 10px;
+}
+
+.setting {
+    margin-top: 11px;
+    margin-right: 10px;
+    margin-left: 10px;
 }
 </style>
