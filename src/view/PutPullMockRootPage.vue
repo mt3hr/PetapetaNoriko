@@ -23,7 +23,7 @@
 
                 <v-col v-if="is_jec_jy_graduationwork" cols="auto">
                     <v-btn v-if="php_sessid == ''" @click="location.href = '/1index.php'">ログイン</v-btn>
-                    <v-btn v-if="php_sessid != ''" @click="location.href = '/11MenuK.php'">メニュー</v-btn>
+                    <v-btn v-if="php_sessid != ''" @click="location.href = '/1loginTransitionTeacherStudent.php'">メニュー</v-btn>
                     <v-btn v-if="php_sessid != ''" @click="location.href = '/10logout.php'">ログアウト</v-btn>
                 </v-col>
                 <v-btn class="setting" icon v-if="editor_mode" @click="show_options_dialog">
