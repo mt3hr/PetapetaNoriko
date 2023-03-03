@@ -1530,7 +1530,11 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     save_to_server_jec_jy_graduationwork() {
-        this.api.preparate_save_ppmk_project(this.project)
+        try {
+            this.api.preparate_save_ppmk_project(this.project)
+        } catch (e) {
+            // share_view_system用の処理をするためエラーが飛ぶので無視
+        }
         let wm_id = this.$route.query["wm_id"] ? this.$route.query["wm_id"] : this.project.ppmk_project.project_id
         let data = {
             "wm_id": wm_id,
