@@ -1511,7 +1511,9 @@ export default class PutPullMockRootPage extends Vue {
             // share_view_system用の処理をするためエラーが飛ぶので無視
         }
         let wm_id = this.$route.query["wm_id"] ? this.$route.query["wm_id"] : this.project.ppmk_project.project_id
+        let owner_user_id =  this.$route.query["owner_user_id"] ? this.$route.query["owner_user_id"] : ""
         let data = {
+            "owner_user_id": owner_user_id,
             "wm_id": wm_id,
             "wm_name": this.project.ppmk_project.project_name,
             "register_date_time": this.project.ppmk_project_data.saved_time,
