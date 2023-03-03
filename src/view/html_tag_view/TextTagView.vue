@@ -1,16 +1,32 @@
 <template>
-    <input type="text" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-        :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
-        :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder"
+    <input v-if="label_type == LabelType.None" type="text" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value"
+        :size="size" :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder"
         :class="tagclass" :id="tagdata.tagid" :required="required" :list="list">
+    <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        {{ label }}
+        <input type="text" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+            :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
+            :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder"
+            :class="tagclass" :id="tagdata.tagid" :required="required" :list="list">
+    </label>
+    <label :style="position_css" v-else-if="label_type == LabelType.After">
+        <input type="text" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
+            :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value" :size="size"
+            :maxlength="maxlength" :autocomplete="autocomplete" :pattern="pattern" :placeholder="placeholder"
+            :class="tagclass" :id="tagdata.tagid" :required="required" :list="list">
+        {{ label }}
+    </label>
 </template>
 
 <script lang="ts">
+import { LabelType } from '@/html_tagdata/LabelType';
 import TextTagData from '@/html_tagdata/TextTagData';
 import { Watch } from 'vue-property-decorator';
 import HTMLTagViewBase from './HTMLTagViewBase';
 
 export default class TextTagView extends HTMLTagViewBase {
+    LabelType = LabelType
     name: string
     value: string
     size: string
@@ -22,6 +38,8 @@ export default class TextTagView extends HTMLTagViewBase {
     required: boolean
     list: string
     tagclass: string
+    label_type: LabelType
+    label: string
 
     @Watch('name')
     @Watch('value')
@@ -34,6 +52,8 @@ export default class TextTagView extends HTMLTagViewBase {
     @Watch('required')
     @Watch('list')
     @Watch('tagclass')
+    @Watch('label')
+    @Watch('label_type')
     update_tagdata() {
         let tagdata: TextTagData = new TextTagData()
         tagdata.tagid = this.tagdata.tagid
@@ -49,6 +69,8 @@ export default class TextTagView extends HTMLTagViewBase {
         tagdata.required = this.required
         tagdata.list = this.list
         tagdata.tagclass = this.tagclass
+        tagdata.label_type = this.label_type
+        tagdata.label = this.label
         this.$emit("updated_tagdata", tagdata)
     }
 
@@ -67,6 +89,8 @@ export default class TextTagView extends HTMLTagViewBase {
         this.required = this.tagdata_typed.required
         this.list = this.tagdata_typed.list
         this.tagclass = this.tagdata_typed.tagclass
+        this.label = this.tagdata_typed.label
+        this.label_type = this.tagdata_typed.label_type
     }
 
     created(): void {

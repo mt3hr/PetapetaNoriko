@@ -3,6 +3,7 @@
         @contextmenu.prevent.stop="show_contextmenu" :class="tagclass" :id="tagdata.tagid"
         @drop="(e) => on_drop(e, tagdata)" :colspan="colspan" :rowspan="rowspan" :headers="headers"
         @dragover.prevent="on_dragover">
+        {{ text }}
         <HTMLTagView v-for="(child_tagdata, index) in tagdata_typed.child_tagdatas" :key="index"
             :editor_mode="editor_mode" :copied_tagdata="copied_tagdata" :clicked_tagdata="clicked_tagdata"
             @updated_tagdatas_root="updated_tagdatas_root" :show_border="show_border" :tagdatas_root="tagdatas_root"
@@ -153,11 +154,13 @@ export default class TDTagView extends HTMLTagViewBase {
     colspan: string
     rowspan: string
     headers: string
+    text: string
 
     @Watch('tagclass')
     @Watch('colspan')
     @Watch('rowspan')
     @Watch('headers')
+    @Watch('text')
     update_tagdata() {
         let tagdata: TDTagData = new TDTagData()
         tagdata.tagid = this.tagdata.tagid
@@ -165,6 +168,7 @@ export default class TDTagView extends HTMLTagViewBase {
         tagdata.colspan = this.colspan
         tagdata.rowspan = this.rowspan
         tagdata.headers = this.headers
+        tagdata.text = this.text
         this.$emit("updated_tagdata", tagdata)
     }
 
@@ -176,6 +180,7 @@ export default class TDTagView extends HTMLTagViewBase {
         this.colspan = this.tagdata_typed.colspan
         this.rowspan = this.tagdata_typed.rowspan
         this.headers = this.tagdata_typed.headers
+        this.text = this.tagdata_typed.text
     }
 
     created(): void {
