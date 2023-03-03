@@ -6,6 +6,7 @@ export default class TDTagData extends HTMLTagDataBase {
     colspan = ""
     rowspan = ""
     headers = ""
+    text = ""
     constructor() {
         super()
         this.tagname = "td"
@@ -21,6 +22,7 @@ export default class TDTagData extends HTMLTagDataBase {
         if (this.rowspan != "") html += " rowspan=\"" + this.rowspan + "\""
         if (this.headers != "") html += " headers=\"" + this.headers + "\""
         html += ">\n"
+        html += this.text
         for (let i = 0; i < this.child_tagdatas.length; i++) {
             html += this.child_tagdatas[i].generate_html(options, indent + "    ")
             html += "\n"
@@ -49,6 +51,7 @@ export default class TDTagData extends HTMLTagDataBase {
         c.colspan = this.colspan
         c.rowspan = this.rowspan
         c.headers = this.headers
+        c.text = this.text
         return c
     }
 }

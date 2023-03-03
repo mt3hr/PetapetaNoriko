@@ -1,19 +1,21 @@
 <template>
     <input v-if="label_type == LabelType.None" type="submit" dropzone="true" @drop="(e) => on_drop(e, tagdata)"
-        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name"
-        :value="value" :formaction="formaction" :class="tagclass" :id="tagdata.tagid" :formenctype="formenctype"
-        :formmethod="formmethod" :formnovalidate="formnovalidate" :formtarget="formtarget">
+        @dragover="on_dragover" readonly :style="position_css" @click.prevent.stop="onclick_tag" :name="name" :value="value"
+        :formaction="formaction" :class="tagclass" :id="tagdata.tagid" :formenctype="formenctype" :formmethod="formmethod"
+        :formnovalidate="formnovalidate" :formtarget="formtarget">
     <label :style="position_css" v-else-if="label_type == LabelType.Before">
+        {{ label }}
         <input type="submit" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :formaction="formaction"
-            :class="tagclass" :id="tagdata.tagid" :formenctype="formenctype" :formmethod="formmethod"
-            :formnovalidate="formnovalidate" :formtarget="formtarget">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :formaction="formaction" :class="tagclass"
+            :id="tagdata.tagid" :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
+            :formtarget="formtarget">
     </label>
     <label :style="position_css" v-else-if="label_type == LabelType.After">
         <input type="submit" dropzone="true" @drop="(e) => on_drop(e, tagdata)" @dragover="on_dragover" readonly
-             @click.prevent.stop="onclick_tag" :name="name" :value="value" :formaction="formaction"
-            :class="tagclass" :id="tagdata.tagid" :formenctype="formenctype" :formmethod="formmethod"
-            :formnovalidate="formnovalidate" :formtarget="formtarget">
+            @click.prevent.stop="onclick_tag" :name="name" :value="value" :formaction="formaction" :class="tagclass"
+            :id="tagdata.tagid" :formenctype="formenctype" :formmethod="formmethod" :formnovalidate="formnovalidate"
+            :formtarget="formtarget">
+        {{ label }}
     </label>
 </template>
 
