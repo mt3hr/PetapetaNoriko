@@ -119,9 +119,9 @@
                 </v-row>
             </v-card-title>
             <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-                                                                                      width: 200px;
-                                                                                      height: auto;
-                                                                                    }"></v-textarea>
+                                                                                          width: 200px;
+                                                                                          height: auto;
+                                                                                        }"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -155,7 +155,7 @@
             <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
             <v-textarea v-model="page_webfont" :rows="20"
                 placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-                                                                                    https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+                                                                                        https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -1505,7 +1505,11 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     save_to_server_jec_jy_graduationwork() {
-        this.api.preparate_save_ppmk_project(this.project)
+        try {
+            this.api.preparate_save_ppmk_project(this.project)
+        } catch (e) {
+            // share_view_system用の処理をするためエラーが飛ぶので無視
+        }
         let wm_id = this.$route.query["wm_id"] ? this.$route.query["wm_id"] : this.project.ppmk_project.project_id
         let data = {
             "wm_id": wm_id,
