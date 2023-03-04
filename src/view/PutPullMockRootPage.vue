@@ -119,9 +119,9 @@
                 </v-row>
             </v-card-title>
             <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-                                                                                          width: 200px;
-                                                                                          height: auto;
-                                                                                        }"></v-textarea>
+                                                                                              width: 200px;
+                                                                                              height: auto;
+                                                                                            }"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -155,7 +155,7 @@
             <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
             <v-textarea v-model="page_webfont" :rows="20"
                 placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-                                                                                        https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+                                                                                            https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -901,6 +901,9 @@ export default class PutPullMockRootPage extends Vue {
                 project.ppmk_project_data = JSON.parse(JSON.stringify(json.ppmk_project_data), deserialize)
                 this.project = project
                 this.update_project(project)
+                this.$nextTick(() => {
+                    this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+                })
             })
         }
         // 卒制ここまで
@@ -1511,7 +1514,7 @@ export default class PutPullMockRootPage extends Vue {
             // share_view_system用の処理をするためエラーが飛ぶので無視
         }
         let wm_id = this.$route.query["wm_id"] ? this.$route.query["wm_id"] : this.project.ppmk_project.project_id
-        let owner_user_id =  this.$route.query["owner_user_id"] ? this.$route.query["owner_user_id"] : ""
+        let owner_user_id = this.$route.query["owner_user_id"] ? this.$route.query["owner_user_id"] : ""
         let data = {
             "owner_user_id": owner_user_id,
             "wm_id": wm_id,
