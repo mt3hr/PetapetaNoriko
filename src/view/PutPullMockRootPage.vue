@@ -926,6 +926,9 @@ export default class PutPullMockRootPage extends Vue {
                 project.ppmk_project_data = JSON.parse(JSON.stringify(json.ppmk_project_data), deserialize)
                 this.project = project
                 this.update_project(project)
+                this.$nextTick(() => {
+                    this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+                })
             })
         }
         // 卒制ここまで
@@ -1536,7 +1539,7 @@ export default class PutPullMockRootPage extends Vue {
             // share_view_system用の処理をするためエラーが飛ぶので無視
         }
         let wm_id = this.$route.query["wm_id"] ? this.$route.query["wm_id"] : this.project.ppmk_project.project_id
-        let owner_user_id =  this.$route.query["owner_user_id"] ? this.$route.query["owner_user_id"] : ""
+        let owner_user_id = this.$route.query["owner_user_id"] ? this.$route.query["owner_user_id"] : ""
         let data = {
             "owner_user_id": owner_user_id,
             "wm_id": wm_id,
