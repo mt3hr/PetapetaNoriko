@@ -280,7 +280,9 @@ export default class API {
         project.ppmk_project.owner_user_id = user_id
         project.ppmk_project_data.author = user_id
         project.ppmk_project_data.project_data_id = generateUUID()
-        project.ppmk_project_data.saved_time = new Date(Date.now()).toISOString()
+        const now = new Date(Date.now())
+        const diff = now.getTimezoneOffset() * 60 * 1000
+        project.ppmk_project_data.saved_time = new Date(now.getTime() - diff).toISOString().replaceAll("Z", "")
     }
 
     save_settings_to_cookie(settings: Settings) {
