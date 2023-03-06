@@ -267,7 +267,12 @@ export default class API {
 
 
     async preparate_save_ppmk_project(project: Project) {
-        const user_id = (await this.get_user_id_by_session_id()).user_id
+        let user_id
+        try {
+            user_id = (await this.get_user_id_by_session_id()).user_id
+        } catch (e) {
+            // 卒制用ににぎりつぶす
+        }
         if (project.project_id == "" || !project.project_id) {
             project.project_id = generateUUID()
         }
