@@ -267,11 +267,12 @@ export default class API {
 
 
     async preparate_save_ppmk_project(project: Project) {
-        let user_id
-        try {
-            user_id = (await this.get_user_id_by_session_id()).user_id
-        } catch (e) {
-            // 卒制用ににぎりつぶす
+        let user_id = ""
+        const php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
+        const php_sessid_value = php_sessid ? php_sessid.split('=')[1] : "";
+        if (php_sessid_value == "") {
+            const res = await this.get_user_id_by_session_id()
+            user_id = res.user_id
         }
         if (project.project_id == "" || !project.project_id) {
             project.project_id = generateUUID()
@@ -279,7 +280,7 @@ export default class API {
         project.ppmk_project.owner_user_id = user_id
         project.ppmk_project_data.author = user_id
         project.ppmk_project_data.project_data_id = generateUUID()
-        project.ppmk_project_data.saved_time = new Date().toISOString()
+        project.ppmk_project_data.saved_time = new Date(Date.now()).toISOString()
     }
 
     save_settings_to_cookie(settings: Settings) {
