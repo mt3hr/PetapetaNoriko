@@ -1,0 +1,12 @@
+fix 位置情報のCSS
+
+インデントが汚かったのを修正しました
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch sanekata
+# Your branch is up to date with 'origin/sanekata'.
+#
+# Changes to be committed:
+#	modified:   src/html_tagdata/HTMLTagDataBase.ts
+#
