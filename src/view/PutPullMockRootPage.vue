@@ -1402,6 +1402,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     add_page() {
+        this.update_project(this.project)
         this.page_list_view.add_page()
         this.save_project_to_localstorage()
         this.update_project(this.project)
