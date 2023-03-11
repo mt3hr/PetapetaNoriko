@@ -33,9 +33,9 @@ export default class HTMLTagDataBase {
     generate_position_css(): string {
         let style = "#" + this.tagid + " {\n"
         if (this.position_style == PositionStyle.Absolute) {
-            style += "position: absolute;\n  left: " + this.position_x + "px;\n" + "  top: " + this.position_y + "px;\n"
+            style += "  position: absolute;\n  left: " + this.position_x + "px;\n" + "  top: " + this.position_y + "px;\n"
         } else {
-            style += "position: initial;\n"
+            style += "  position: initial;\n"
         }
         style += "}\n"
         return style
