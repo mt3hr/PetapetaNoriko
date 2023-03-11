@@ -175,7 +175,7 @@
                     </v-col>
                     <v-col>
                         <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html"
-                            v-model="export_position_css" :label="'位置情報'" />
+                            v-model="export_position_css" :label="'タグの位置情報'" />
                     </v-col>
                 </v-row>
                 <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
@@ -337,7 +337,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
                 <v-row>
                     <v-col cols="auto">
                         <v-checkbox class="checkbox" color="#4682b4" @change="update_page_html"
-                            v-model="export_position_css" :label="'位置情報'" />
+                            v-model="export_position_css" :label="'タグの位置情報'" />
                     </v-col>
                 </v-row>
                 <v-row>
