@@ -175,7 +175,7 @@
                         :label="'埋め込み画像'" />
                 </v-col>
                 <v-col>
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css" :label="'位置情報'" />
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css" :label="'タグの位置情報'" />
                 </v-col>
             </v-row>
             <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
@@ -311,7 +311,7 @@
             </v-row>
             <v-row>
                 <v-col cols="auto">
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css" :label="'位置情報'" />
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css" :label="'タグの位置情報'" />
                 </v-col>
             </v-row>
             <v-row>
