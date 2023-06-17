@@ -1,9 +1,9 @@
 .DS_Store
 node_modules
-/dist
-/src/app/ppmk/embed/dist/*
-/src/app/go.mod
-/src/app/go.sum
+dist
+src/app/ppmk/embed/dist/*
+src/app/go.mod
+src/app/go.sum
 
 
 # local env files
