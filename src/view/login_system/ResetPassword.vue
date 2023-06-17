@@ -46,7 +46,6 @@ export default class ResetPassword extends Vue {
     }
 
     async submit() {
-        //TODO retype一致確認
         if (this.password != this.password_retype) {
             this.error_message = "再入力されたパスワードが一致しません"
             this.show_error_message_snackbar = true

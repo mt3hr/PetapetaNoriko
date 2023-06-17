@@ -19,7 +19,7 @@ func init() {
 	cmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", proxy, "アプリケーションの使用するproxy")
 	cmd.PersistentFlags().Uint16VarP(&port, "port", "p", port, "アプリケーションのポート番号")
 	cmd.PersistentFlags().BoolVarP(&register, "enable_register", "r", register, "システムのユーザ新規登録機能を有効化する")
-	cmd.PersistentFlags().BoolVarP(&system, "enable_share_view_feature", "v", enableShareViewFeature, "画面共有機能（FireFoxのみ動作。Beta版機能であり、不安定）")
+	cmd.PersistentFlags().BoolVarP(&enableShareViewFeature, "enable_share_view_feature", "v", enableShareViewFeature, "画面共有機能（FireFoxのみ動作。Beta版機能であり、不安定）")
 	cmd.PersistentFlags().BoolVarP(&system, "enable_system", "s", system,
 		`system
 		環境変数を設定して起動してください

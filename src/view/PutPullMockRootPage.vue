@@ -31,7 +31,6 @@
                             <ProjectPropertyView class="component project_view" ref="project_view" v-show="editor_mode"
                                 :session_id="session_id" :login_system="login_system" :editor_mode="editor_mode"
                                 @new_project="show_new_project_dialog" @updated_project_info="update_project_info"
-                                @updated_share_view="update_is_share_view"
                                 :enable_share_view_feature="enable_share_view_feature" />
                         </v-col>
                     </v-row>
@@ -54,7 +53,7 @@
             </v-col>
 
             <!--ドロップゾーン-->
-            <v-col cols="auto" class="dropzone_wrap">
+            <v-col cols="auto" class="dropzone_wrap" :style="dropzone_wrap_style">
                 <DropZone :show_border="show_border" class="component dropzone" ref="dropzone" :editor_mode="editor_mode"
                     :clicked_tagdata="clicked_tagdata" @updated_tagdatas_root="updated_htmltagdatas" @add_page="add_page"
                     @updated_htmltagdatas="updated_htmltagdatas" :copied_tagdata="copied_tagdata" @copy_tag="copy_tag"
@@ -175,7 +174,8 @@
                         :label="'埋め込み画像'" />
                 </v-col>
                 <v-col>
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css" :label="'タグの位置情報'" />
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
+                        :label="'タグの位置情報'" />
                 </v-col>
             </v-row>
             <v-textarea v-model="page_html" :readonly="true" :rows="20"></v-textarea>
@@ -311,7 +311,8 @@
             </v-row>
             <v-row>
                 <v-col cols="auto">
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css" :label="'タグの位置情報'" />
+                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_position_css"
+                        :label="'タグの位置情報'" />
                 </v-col>
             </v-row>
             <v-row>
@@ -417,6 +418,8 @@ import ResetPassword from './login_system/RequestResetPassword.vue'
 })
 
 export default class PutPullMockRootPage extends Vue {
+    editor_mode = true
+
     jec_jy_graduationwork = true
     page_list_view: any
     dropzone: any
@@ -427,8 +430,8 @@ export default class PutPullMockRootPage extends Vue {
 
     TagListViewMode = TagListViewMode
     api = new API()
-    width_dropzone = window.innerWidth - 300 - 300 - 19
-    height_dropzone = window.innerHeight - 159 + 18
+    width_dropzone = this.editor_mode ? window.innerWidth - 300 - 300 - 19 : window.innerWidth - 300 - 19
+    height_dropzone = this.editor_mode ? window.innerHeight - 159 + 18 : window.innerHeight - 37
 
     is_show_css_dialog = false
     is_show_writeout_dialog = false
@@ -465,8 +468,6 @@ export default class PutPullMockRootPage extends Vue {
     use_undo = true
 
     auto_focus_tag_property_view = false
-
-    editor_mode = true
 
     session_id = ""
 
@@ -601,7 +602,12 @@ export default class PutPullMockRootPage extends Vue {
             let message = new ShareViewMessage()
             message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
             this.share_socket.send(JSON.stringify(message))
-            this.share_socket.close()
+            this.share_socket = undefined
+
+            message = new ShareViewMessage()
+            message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
+            this.receive_socket.send(JSON.stringify(message))
+            this.receive_socket = undefined
         })
 
         try {
@@ -832,7 +838,10 @@ export default class PutPullMockRootPage extends Vue {
         if (shared_project_id != "" && shared_project_id) {
             this.receive_socket = new WebSocket(watch_share_view_websocket_address)
             window.addEventListener("onclose", () => {
-                this.receive_socket.close()
+                const message = new ShareViewMessage()
+                message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
+                this.receive_socket.send(JSON.stringify(message))
+                this.receive_socket = undefined
             })
             let receive_socket = this.receive_socket
             this.receive_socket.onopen = (event) => {
@@ -865,7 +874,10 @@ export default class PutPullMockRootPage extends Vue {
                             break
                         }
                         case WatchSharedProjectViewMessageType.FINISH_SHARE: {
-                            this.receive_socket.close()
+                            this.flush_message = "共有が停止されました"
+                            this.is_show_flush_message = true
+                            this.update_project(new Project())
+                            this.dropzone.html_tagdatas = null
                             break
                         }
                     }
@@ -1083,8 +1095,8 @@ export default class PutPullMockRootPage extends Vue {
             this.page_property_view.page_data = null
             this.dropzone.html_tagdatas = null
 
-            this.width_dropzone = window.innerWidth - 300 - 300 - 19
-            this.height_dropzone = window.innerHeight - 159 + 18
+            this.width_dropzone = this.editor_mode ? window.innerWidth - 300 - 300 - 19 : window.innerWidth - 300 - 19
+            this.height_dropzone = this.editor_mode ? window.innerHeight - 159 + 18 : window.innerHeight - 37
             return
         }
         let html_tagdatas = pagedata.html_tagdatas
@@ -1137,6 +1149,7 @@ export default class PutPullMockRootPage extends Vue {
         }
         this.tag_property_view.html_tagdata = updated_tagdata
         this.save_project_to_localstorage()
+        this.append_history()
     }
     updated_page_property(page_data: PageData) {
         for (let i = 0; i < this.project.ppmk_project_data.project_data.length; i++) {
@@ -1152,6 +1165,7 @@ export default class PutPullMockRootPage extends Vue {
             this.update_struct_view(this.project.ppmk_project_data.project_data[this.page_list_view.selected_index].html_tagdatas)
             this.save_project_to_localstorage()
         }
+        this.append_history()
     }
 
     update_struct_view(tagdatas: Array<HTMLTagDataBase>) {
@@ -1285,7 +1299,7 @@ export default class PutPullMockRootPage extends Vue {
         this.save_project_to_localstorage()
     }
 
-    append_history() {
+    async append_history() {
         if (!this.preparated) return
         if (!this.editor_mode) return
         if (!this.use_undo) return
@@ -1306,50 +1320,20 @@ export default class PutPullMockRootPage extends Vue {
         this.histories.index++
 
         if (this.share_socket && !this.project.ppmk_project.is_shared_view) {
+            this.preparated = false
             let message = new ShareViewMessage()
             message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
             this.share_socket.send(JSON.stringify(message))
             this.share_socket = undefined
+            this.preparated = true
         }
-        if (this.project.ppmk_project.is_shared_view && this.is_firefox) {
-            if (!this.share_socket) {
-                this.share_socket = new WebSocket(share_view_websocket_address)
-                this.share_socket.onmessage = (e) => {
-                    let res: WatchSharedProjectViewMessage = e.data
-                    switch (res.message_type) {
-                        case WatchSharedProjectViewMessageType.CONFIRM_CONNECTION: {
-                            break
-                        }
-                        case WatchSharedProjectViewMessageType.ERROR: {
-                            this.flush_message = res.error
-                            this.is_show_flush_message = true
-                            break
-                        }
-                        case WatchSharedProjectViewMessageType.FINISH_SHARE: {
-                            this.share_socket.close()
-                            break
-                        }
-                        case WatchSharedProjectViewMessageType.UPDATE_PROJECT: {
-                            break
-                        }
-                    }
-                }
-                let share_socket = this.share_socket
-                this.share_socket.onopen = (event) => {
-                    let message = new ShareViewMessage()
-                    message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
-                    message.project_id = this.project.ppmk_project.project_id
-                    message.project = clone_project(this.project)
-                    this.api.preparate_save_ppmk_project(message.project)
-                    share_socket.send(JSON.stringify(message))
-                    this.share_ws_is_ready = true
-                }
-            } else if (this.share_ws_is_ready) {
+        if (this.project.ppmk_project.is_shared_view && this.is_firefox && this.preparated) {
+            if (this.share_ws_is_ready) {
                 let message = new ShareViewMessage()
                 message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
                 message.project_id = this.project.ppmk_project.project_id
                 message.project = clone_project(this.project)
-                this.api.preparate_save_ppmk_project(message.project)
+                await this.api.preparate_save_ppmk_project(message.project)
                 this.share_ws_is_ready = false
                 this.share_socket.send(JSON.stringify(message))
                 this.share_ws_is_ready = true
@@ -1370,10 +1354,11 @@ export default class PutPullMockRootPage extends Vue {
         this.update_struct_view(null)
         this.onclick_tag(null)
 
-        this.width_dropzone = window.innerWidth - 300 - 300 - 19
-        this.height_dropzone = window.innerHeight - 159 + 18
+        this.width_dropzone = this.editor_mode ? window.innerWidth - 300 - 300 - 19 : window.innerWidth - 300 - 19
+        this.height_dropzone = this.editor_mode ? window.innerHeight - 159 + 18 : window.innerHeight - 37
 
         this.save_project_to_localstorage()
+        this.append_history()
     }
 
     add_page() {
@@ -1462,6 +1447,7 @@ export default class PutPullMockRootPage extends Vue {
 
     @Watch('project')
     save_project_to_localstorage() {
+        if (!this.editor_mode) return
         if (!this.preparated) return
         if (this.auto_save_project_data_to_localstorage) {
             try {
@@ -1482,23 +1468,61 @@ export default class PutPullMockRootPage extends Vue {
         }
     }
 
-    update_is_share_view() {
-        this.api.preparate_save_ppmk_project(this.project)
-        this.api.update_project(this.project)
-    }
-
-    update_project_info(project_info: PPMKProject) {
-        let project = this.project
-        project.ppmk_project = project_info
-        this.update_project(project)
+    async update_project_info(project_info: PPMKProject) {
+        if (!this.share_socket && project_info.is_shared_view) {
+            this.share_socket = new WebSocket(share_view_websocket_address)
+            this.share_socket.onmessage = (e) => {
+                let res: WatchSharedProjectViewMessage = e.data
+                switch (res.message_type) {
+                    case WatchSharedProjectViewMessageType.CONFIRM_CONNECTION: {
+                        break
+                    }
+                    case WatchSharedProjectViewMessageType.ERROR: {
+                        this.flush_message = res.error
+                        this.is_show_flush_message = true
+                        break
+                    }
+                    case WatchSharedProjectViewMessageType.FINISH_SHARE: {
+                        this.share_socket = undefined
+                        break
+                    }
+                    case WatchSharedProjectViewMessageType.UPDATE_PROJECT: {
+                        break
+                    }
+                }
+            }
+            let share_socket = this.share_socket
+            this.share_socket.onopen = (event) => {
+                let message = new ShareViewMessage()
+                message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
+                message.project_id = this.project.ppmk_project.project_id
+                message.project = clone_project(this.project)
+                this.api.preparate_save_ppmk_project(message.project)
+                share_socket.send(JSON.stringify(message))
+                this.share_ws_is_ready = true
+            }
+        }
+        this.project.ppmk_project = project_info
+        await this.api.preparate_save_ppmk_project(this.project)
+        if (this.share_socket && !this.project.ppmk_project.is_shared_view) {
+            this.preparated = false
+            const message = new ShareViewMessage()
+            message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
+            this.share_socket.send(JSON.stringify(message))
+            this.share_socket = undefined
+            this.preparated = true
+        }
+        this.update_project(this.project)
         this.save_project_to_localstorage()
         this.append_history()
+        this.api.update_ppmk_project(this.project.ppmk_project)
     }
 
     update_pagedatas(pagedatas: Array<PageData>) {
         let project = this.project
         project.ppmk_project_data.project_data = pagedatas
         this.update_project(project)
+        this.append_history()
     }
 
     logined() {
@@ -1508,9 +1532,9 @@ export default class PutPullMockRootPage extends Vue {
         this.is_show_flush_message = true
     }
 
-    save_to_server_jec_jy_graduationwork() {
+    async save_to_server_jec_jy_graduationwork() {
         try {
-            this.api.preparate_save_ppmk_project(this.project)
+            await this.api.preparate_save_ppmk_project(this.project)
         } catch (e) {
             // share_view_system用の処理をするためエラーが飛ぶので無視
         }
@@ -1533,6 +1557,23 @@ export default class PutPullMockRootPage extends Vue {
             this.is_show_writeout_dialog = false
         })
     }
+    get dropzone_wrap_style() {
+        if (this.editor_mode) {
+            return {
+                "white-space": "pre-line",
+                "height": "calc(100vh - 104px + 18px)",
+                "width": "calc(100vw - 300px - 300px)",
+                "overflow": "scroll",
+            }
+        } else {
+            return {
+                "white-space": "pre-line",
+                "height": "calc(100vh - 49px)",
+                "width": "calc(100vw - 300px)",
+                "overflow": "scroll",
+            }
+        }
+    }
 }
 </script>
 <style scoped>
@@ -1542,14 +1583,7 @@ export default class PutPullMockRootPage extends Vue {
     width: 300px;
 }
 
-.dropzone_wrap {
-    white-space: pre-line;
-    height: calc(100vh - 104px + 18px);
-    width: calc(100vw - 300px - 300px);
-    overflow: scroll;
-}
-
-.dropzone {
+.dropzone_wrap .dropzone {
     width: fit-content;
 }
 

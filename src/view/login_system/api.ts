@@ -21,6 +21,7 @@ export const delete_project_data_address = "/ppmk_server/delete_project_data"
 export const update_project_data_address = "/ppmk_server/update_project_data"
 export const delete_project_address = "/ppmk_server/delete_project"
 export const update_project_address = "/ppmk_server/update_project"
+export const update_ppmk_project_address = "/ppmk_server/update_ppmk_project"
 export const addProjectShareAddress = "/ppmk_server/add_project_share"
 export const deleteProjectShareAddress = "/ppmk_server/delete_project_share"
 export const updateProjectShareAddress = "/ppmk_server/update_project_share"
@@ -165,6 +166,15 @@ export class UpdateProjectResponse {
     error: string
 }
 
+export class UpdatePPMKProjectRequest {
+    session_id: string
+    ppmk_project: PPMKProject
+}
+
+export class UpdatePPMKProjectResponse {
+    error: string
+}
+
 export class GetProjectDataRequest {
     session_id: string
     project_data_id: string
@@ -268,12 +278,12 @@ export default class API {
 
     async preparate_save_ppmk_project(project: Project) {
         let user_id = ""
-        const php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
-        const php_sessid_value = php_sessid ? php_sessid.split('=')[1] : "";
-        if (php_sessid_value == "") {
-            const res = await this.get_user_id_by_session_id()
-            user_id = res.user_id
-        }
+        // const php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
+        // const php_sessid_value = php_sessid ? php_sessid.split('=')[1] : "";
+        // if (php_sessid_value == "") {
+        const res = await this.get_user_id_by_session_id()
+        user_id = res.user_id
+        // }
         if (project.project_id == "" || !project.project_id) {
             project.project_id = generateUUID()
         }
@@ -524,6 +534,23 @@ export default class API {
         })
         const json = await res.json()
         const response: UpdateProjectResponse = json
+        return response
+    }
+
+    async update_ppmk_project(ppmk_project: PPMKProject): Promise<UpdatePPMKProjectResponse> {
+        const update_ppmk_project_request = new UpdatePPMKProjectRequest()
+        update_ppmk_project_request.session_id = this.session_id
+        update_ppmk_project_request.ppmk_project = ppmk_project
+
+        const res = await fetch(update_ppmk_project_address, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(update_ppmk_project_request),
+        })
+        const json = await res.json()
+        const response: UpdatePPMKProjectResponse = json
         return response
     }
 

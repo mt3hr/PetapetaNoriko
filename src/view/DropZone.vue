@@ -9,7 +9,7 @@
             :style="dropzone_style" @contextmenu="show_contextmenu">
 
             <body id="dropzone_body" class="page" :style="dropzone_style">
-                <div v-if="html_tagdatas == null"
+                <div v-if="html_tagdatas == null && editor_mode"
                     :style="{ 'text-align': 'center', 'vertical-align': 'middle', 'height': '-webkit-fill-available' }">
                     <v-btn @click="add_page"
                         :style="{ 'margin': 'auto', 'position': 'rerative', 'top': '45%' }">ページを追加</v-btn>
@@ -251,7 +251,6 @@ export default class DropZone extends Vue {
             }
             return style
         } catch (error) {
-            console.log(error)
             return ""
         }
     }

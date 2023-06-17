@@ -26,7 +26,7 @@
             <v-card class="pa-5">
                 <v-card-title>共有管理</v-card-title>
                 <p v-if="!is_firefox">FireFoxでお試しください</p>
-                <v-checkbox :readonly="!is_firefox && !is_shared_view" v-model="is_shared_view" :label="'共有'" />
+                <v-checkbox :readonly="!is_firefox && !is_shared_view" v-model="is_shared_view" :label="'画面共有リンク'" />
                 <input type="url" readonly v-model="share_link" />
                 <v-row>
                     <v-col cols="auto">
@@ -66,6 +66,7 @@ export default class ProjectPropertyView extends Vue {
         } else {
             this.share_link = ""
         }
+        this.update_project_info()
     }
 
     updated_project() {

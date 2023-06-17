@@ -147,7 +147,7 @@ export default class Page extends Vue {
             return {}
         } else {
             return {
-                'height': window.innerHeight - 104 + "px !important"
+                'height': window.innerHeight - 48 + "px !important"
             }
         }
     }
