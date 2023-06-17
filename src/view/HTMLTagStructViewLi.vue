@@ -726,7 +726,7 @@ li {
     position: relative;
     top: 3.5px;
     display: inline-block;
-    width: 250px;
+    width: 230px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
