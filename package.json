@@ -1,12 +1,13 @@
 {
   "name": "ppmk",
-  "version": "0.1.0",
+  "version": "1.5.2",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed",
-    "install_app": "rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed && cd src/app && go install -ldflags \"-H windowsgui\"",
-    "install_server": "rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed && cd src/app/ppmk/ppmk_server && go install -tags=\"server\"",
+    "go_mod": "rimraf src/app/go.mod && rimraf src/app/go.sum && cd src/app && go mod init github.com/mt3hr/kftl/src/app && cd main/kftl && go mod tidy",
+    "install_app": "npm run go_mod && rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed && cd src/app && go install -ldflags \"-H windowsgui\"",
+    "install_server": "npm run go_mod && rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && move dist src/app/ppmk/embed && cd src/app/ppmk/ppmk_server && go install -tags=\"server\"",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
