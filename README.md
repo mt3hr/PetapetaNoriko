@@ -44,7 +44,7 @@ ppmk_server
 
 ### セットアップ
 1. [nodejs-v18.12.1](https://nodejs.org/download/release/v18.12.1/node-v18.12.1-x64.msi)をインストールする
-2. [golang-v1.19.4](https://go.dev/dl/go1.19.4.windows-amd64.msi)をインストールする
+2. [golang-v1.20.5](https://go.dev/dl/go1.20.5.windows-amd64.msi)をインストールする
 3. このRepositoryをCloneする
 ```powershell:clone_ppmk
 cd $HOME
