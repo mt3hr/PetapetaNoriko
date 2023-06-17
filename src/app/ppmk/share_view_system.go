@@ -296,7 +296,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		loginRequest := &LoginRequest{}
 		loginResponse := &LoginResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&loginRequest)
+		err := decoder.Decode(loginRequest)
 		if err != nil {
 			loginResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -343,7 +343,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 
 		logoutRequest := &LogoutRequest{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&logoutRequest)
+		err := decoder.Decode(logoutRequest)
 		if err != nil {
 			return
 		}
@@ -363,7 +363,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		resetPasswordResponse := &RequestResetPasswordResponse{}
 
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&resetPasswordRequest)
+		err := decoder.Decode(resetPasswordRequest)
 		if err != nil {
 			resetPasswordResponse.Error = "エラー" // リクエストデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -475,7 +475,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		resetPasswordRequest := &ResetPasswordRequest{}
 		resetPasswordResponse := &ResetPasswordResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&resetPasswordRequest)
+		err := decoder.Decode(resetPasswordRequest)
 		if err != nil {
 			resetPasswordResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -545,7 +545,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		getResetPasswordIDInfoRequest := &GetResetPasswordIDInfoRequest{}
 		getResetPasswordIDInfoResponse := &GetResetPasswordIDInfoResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&getResetPasswordIDInfoRequest)
+		err := decoder.Decode(getResetPasswordIDInfoRequest)
 		if err != nil {
 			getResetPasswordIDInfoResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -592,7 +592,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		registerRequest := &RegisterRequest{}
 		registerResponse := &RegisterResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&registerRequest)
+		err := decoder.Decode(registerRequest)
 		if err != nil {
 			registerResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -644,7 +644,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		listProjectSummariesRequest := &ListProjectSummariesRequest{}
 		listProjectSummariesResponse := &ListProjectSummariesResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&listProjectSummariesRequest)
+		err := decoder.Decode(listProjectSummariesRequest)
 		if err != nil {
 			listProjectSummariesResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -702,7 +702,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		getProjectDataRequest := &GetProjectDataRequest{}
 		getProjectDataResponse := &GetProjectDataResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&getProjectDataRequest)
+		err := decoder.Decode(getProjectDataRequest)
 		if err != nil {
 			getProjectDataResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -803,7 +803,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		saveProjectDataRequest := &SaveProjectDataRequest{}
 		saveProjectDataResponse := &SaveProjectDataResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&saveProjectDataRequest)
+		err := decoder.Decode(saveProjectDataRequest)
 		if err != nil {
 			saveProjectDataResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -904,7 +904,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		deleteProjectDataRequest := &DeleteProjectDataRequest{}
 		deleteProjectDataResponse := &DeleteProjectDataResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&deleteProjectDataRequest)
+		err := decoder.Decode(deleteProjectDataRequest)
 		if err != nil {
 			deleteProjectDataResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -1006,7 +1006,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		updateProjectDataRequest := &UpdateProjectDataRequest{}
 		updateProjectDataResponse := &UpdateProjectDataResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&updateProjectDataRequest)
+		err := decoder.Decode(updateProjectDataRequest)
 		if err != nil {
 			updateProjectDataResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -1099,7 +1099,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		deleteProjectRequest := &DeleteProjectRequest{}
 		deleteProjectResponse := &DeleteProjectResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&deleteProjectRequest)
+		err := decoder.Decode(deleteProjectRequest)
 		if err != nil {
 			deleteProjectResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -1201,7 +1201,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		updateProjectRequest := &UpdateProjectRequest{}
 		updateProjectResponse := &UpdateProjectResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&updateProjectRequest)
+		err := decoder.Decode(updateProjectRequest)
 		if err != nil {
 			updateProjectResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -1303,7 +1303,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		addProjectShareRequest := &AddProjectShareRequest{}
 		addProjectShareResponse := &AddProjectShareResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&addProjectShareRequest)
+		err := decoder.Decode(addProjectShareRequest)
 		if err != nil {
 			addProjectShareResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -1377,14 +1377,14 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		deleteProjectShareRequest := &DeleteProjectShareRequest{}
 		deleteProjectShareResponse := &DeleteProjectShareResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&deleteProjectShareRequest)
+		err := decoder.Decode(deleteProjectShareRequest)
 		if err != nil {
 			deleteProjectShareResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
 			e := encoder.Encode(deleteProjectShareResponse)
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				decoder.Decode(&deleteProjectShareRequest)
+				decoder.Decode(deleteProjectShareRequest)
 				return
 			}
 			return
@@ -1397,7 +1397,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectShareResponse)
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				decoder.Decode(&deleteProjectShareRequest)
+				decoder.Decode(deleteProjectShareRequest)
 				return
 			}
 			return
@@ -1408,7 +1408,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := ppmkDB.AddProject(r.Context(), project) //TODO ここおかしいぞ。errがあるときはprojectはnilなはず
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				decoder.Decode(&deleteProjectShareRequest)
+				decoder.Decode(deleteProjectShareRequest)
 				return
 			}
 		}
@@ -1427,7 +1427,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectShareResponse)
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				decoder.Decode(&deleteProjectShareRequest)
+				decoder.Decode(deleteProjectShareRequest)
 				return
 			}
 			return
@@ -1439,7 +1439,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(deleteProjectShareResponse)
 			if e != nil {
 				deleteProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				decoder.Decode(&deleteProjectShareRequest)
+				decoder.Decode(deleteProjectShareRequest)
 				return
 			}
 			return
@@ -1456,14 +1456,14 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		updateProjectShareRequest := &UpdateProjectShareRequest{}
 		updateProjectShareResponse := &UpdateProjectShareResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&updateProjectShareRequest)
+		err := decoder.Decode(updateProjectShareRequest)
 		if err != nil {
 			updateProjectShareResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
 			e := encoder.Encode(updateProjectShareResponse)
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				decoder.Decode(&updateProjectShareRequest)
+				decoder.Decode(updateProjectShareRequest)
 				return
 			}
 			return
@@ -1476,7 +1476,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectShareResponse)
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				decoder.Decode(&updateProjectShareRequest)
+				decoder.Decode(updateProjectShareRequest)
 				return
 			}
 			return
@@ -1487,7 +1487,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := ppmkDB.AddProject(r.Context(), project) //TODO ここおかしいぞ。errがあるときはprojectはnilなはず
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー:プロジェクトの作成に失敗しました")
-				decoder.Decode(&updateProjectShareRequest)
+				decoder.Decode(updateProjectShareRequest)
 				return
 			}
 		}
@@ -1506,7 +1506,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectShareResponse)
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				decoder.Decode(&updateProjectShareRequest)
+				decoder.Decode(updateProjectShareRequest)
 				return
 			}
 			return
@@ -1518,7 +1518,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			e := encoder.Encode(updateProjectShareResponse)
 			if e != nil {
 				updateProjectShareResponse.Error = fmt.Sprintf("サーバ内エラー")
-				decoder.Decode(&updateProjectShareRequest)
+				decoder.Decode(updateProjectShareRequest)
 				return
 			}
 			return
@@ -1535,7 +1535,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		getUserIDFromSessionIDRequest := &GetUserIDFromSessionIDRequest{}
 		getUserIDFromSessionIDResponse := &GetUserIDFromSessionIDResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&getUserIDFromSessionIDRequest)
+		err := decoder.Decode(getUserIDFromSessionIDRequest)
 		if err != nil {
 			getUserIDFromSessionIDResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
@@ -1582,7 +1582,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		getUserNameByUserIDRequest := &GetUserNameFromUserIDRequest{}
 		getUserNameByUserIDResponse := &GetUserNameFromUserIDResponse{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&getUserNameByUserIDRequest)
+		err := decoder.Decode(getUserNameByUserIDRequest)
 		if err != nil {
 			getUserNameByUserIDResponse.Error = fmt.Sprintf("エラー") // requestのデータがおかしい
 			encoder := json.NewEncoder(w)
