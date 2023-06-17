@@ -1,8 +1,16 @@
 <template>
     <div>
-        <h2>プロジェクト
-            <v-btn v-if="editor_mode" @click="new_project">+</v-btn>
-        </h2>
+        <v-container class="ma-0 pa-0">
+            <v-row class="ma-0 pa-0">
+                <v-col cols="auto" class="ma-0 pa-0">
+                    <h2>プロジェクト</h2>
+                </v-col>
+                <v-spacer />
+                <v-col cols="auto pa-0 ma-0">
+                    <v-btn v-if="editor_mode" @click="new_project" class="ma-0 pa-0">+</v-btn>
+                </v-col>
+            </v-row>
+        </v-container>
         <table>
             <tr>
                 <td class="project_name">

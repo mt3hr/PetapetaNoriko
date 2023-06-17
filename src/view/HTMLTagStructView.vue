@@ -389,4 +389,7 @@ li {
 .struct_view {
     width: fit-content;
 }
+ul {
+    list-style: none;
+}
 </style>

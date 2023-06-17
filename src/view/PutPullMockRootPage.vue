@@ -2,19 +2,19 @@
     <v-container>
         <v-row class="ppmk_row">
             <v-col cols="auto">
-                <h1><a @click="to_toppage" :style="title_style">PutPullMock</a></h1>
+                <h1>PutPullMock</h1>
             </v-col>
             <v-spacer />
-            <v-col cols="auto">
+            <v-col class="show_border_wrap" cols="auto">
                 <v-checkbox class="checkbox mx-3" v-if="editor_mode" v-model="show_border" :label="'境界を表示'" />
             </v-col>
 
-            <v-col v-if="is_jec_jy_graduationwork" cols="auto">
+            <v-col class="login_logout_wrap" v-if="is_jec_jy_graduationwork" cols="auto">
                 <v-btn v-if="php_sessid == ''" @click="location.href = '/1index.php'">ログイン</v-btn>
                 <v-btn v-if="php_sessid != ''" @click="location.href = './1loginTransitionTeacherStudent.php'">メニュー</v-btn>
                 <v-btn v-if="php_sessid != ''" @click="location.href = '/10logout.php'">ログアウト</v-btn>
             </v-col>
-            <v-col v-if="login_system && editor_mode" cols="auto">
+            <v-col class="login_logout_wrap" v-if="login_system && editor_mode" cols="auto">
                 <v-btn v-if="!session_id" @click="login">ログイン</v-btn>
                 <v-btn v-else @click="logout">ログアウト</v-btn>
             </v-col>
@@ -167,9 +167,6 @@
             <v-card-title>ページHTML</v-card-title>
             <v-row>
                 <v-col>
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
-                </v-col>
-                <v-col>
                     <v-checkbox class="checkbox" @change="update_page_html" v-model="export_base64_image"
                         :label="'埋め込み画像'" />
                 </v-col>
@@ -296,11 +293,6 @@
             <v-row>
                 <v-col cols="auto">
                     <h3>出力画面</h3>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="auto">
-                    <v-checkbox class="checkbox" @change="update_page_html" v-model="export_head" :label="'ヘッダ'" />
                 </v-col>
             </v-row>
             <v-row>
@@ -1376,13 +1368,6 @@ export default class PutPullMockRootPage extends Vue {
         if (this.editor_mode) return
         this.$router.push("/")
     }
-    get title_style(): any {
-        if (this.editor_mode) {
-            return { 'color': 'black', 'text-decoration': 'none', 'cursor': 'pointer' }
-        } else {
-            return { 'color': 'black', 'text-decoration': 'none' }
-        }
-    }
     login() {
         this.is_show_login_dialog = true
     }
@@ -1595,12 +1580,12 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .page_list_view {
-    height: 150px;
+    height: 200px;
     overflow-y: scroll;
 }
 
 .html_tag_list_view {
-    height: calc(100vh - 423px + 44px + 18px);
+    height: calc(100vh - 423px + 44px + 18px - 50px + 18px);
     overflow-y: scroll;
 }
 
@@ -1610,8 +1595,8 @@ export default class PutPullMockRootPage extends Vue {
 }
 
 .project_view {
-    height: 125px;
-    overflow: scroll;
+    height: 107px;
+    overflow-y: scroll;
 }
 
 .property_view {
@@ -1653,5 +1638,17 @@ export default class PutPullMockRootPage extends Vue {
 
 body {
     overflow: scroll !important;
+}
+
+.show_border_wrap {
+    position: relative;
+    top: 5px;
+    margin-right: 10px !important;
+}
+
+.login_logout_wrap {
+    position: relative;
+    top: 6px;
+    margin-right: 10px !important;
 }
 </style>

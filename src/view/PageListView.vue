@@ -1,9 +1,16 @@
 <template>
     <div :style="style">
-        <h2>
-            ページ一覧
-            <v-btn v-if="editor_mode" @click="add_page">+</v-btn>
-        </h2>
+        <v-container class="page_list_view_header ma-0 pa-0">
+            <v-row class="pa-0 ma-0">
+                <v-col cols="auto" class="ma-0 pa-0">
+                    <h2>ページ一覧</h2>
+                </v-col>
+                <v-spacer />
+                <v-col cols="auto pa-0 ma-0">
+                    <v-btn v-if="editor_mode" @click="add_page" class="ma-0 pa-0">+</v-btn>
+                </v-col>
+            </v-row>
+        </v-container>
         <ul>
             <PageListItem v-for="(pagedata, index) in project_data" :pagedata="pagedata" :key="pagedata.pageid"
                 :editor_mode="editor_mode" @copy_page="(pagedata) => copy_page(pagedata, index)"
@@ -67,7 +74,7 @@ export default class Page extends Vue {
             });
             project_data.splice(deleteindex, 1)
             if (this.project.project_id == "") return
-            this.$emit("updated_pagedatas", project_data) 
+            this.$emit("updated_pagedatas", project_data)
             this.$emit("deleted_page")
         }
     }
@@ -153,3 +160,17 @@ export default class Page extends Vue {
     }
 }
 </script>
+<style scoped>
+.page_list_view_header {
+    position: sticky !important;
+    height: 40px;
+    top: 0px;
+    background-color: white;
+    z-index: 1;
+}
+
+ul {
+    position: relative;
+    top: 0px;
+}
+</style>

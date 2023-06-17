@@ -3,8 +3,8 @@
         <h2>HTML要素一覧</h2>
         <h3>基本</h3>
         <ul>
-            <li v-for="basic_component_name, index in basic_component_names" :key="index" draggable="true"
-                :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, basic_component_name)">
+            <li class="html_tag_list_item" v-for="basic_component_name, index in basic_component_names" :key="index"
+                draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, basic_component_name)">
                 <table>
                     <tr>
                         <td :style="tagname_style"> {{ basic_component_name }} </td>
@@ -18,8 +18,8 @@
         </ul>
         <h3>見出し</h3>
         <ul>
-            <li v-for="headline_component_name, index in headline_component_names" :key="index" draggable="true"
-                :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, headline_component_name)">
+            <li class="html_tag_list_item" v-for="headline_component_name, index in headline_component_names" :key="index"
+                draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, headline_component_name)">
                 <table>
                     <tr>
                         <td :style="tagname_style"> {{ headline_component_name }}</td>
@@ -35,8 +35,8 @@
 
         <h3>構造</h3>
         <ul>
-            <li v-for="struct_component_name, index in struct_component_names" :key="index" draggable="true"
-                :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, struct_component_name)">
+            <li class="html_tag_list_item" v-for="struct_component_name, index in struct_component_names" :key="index"
+                draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, struct_component_name)">
                 <table>
                     <tr>
                         <td :style="tagname_style"> {{ struct_component_name }}</td>
@@ -51,7 +51,8 @@
         </ul>
         <h3>フォーム/input</h3>
         <ul>
-            <li v-for="form_input_component_name, index in form_imput_component_names" :key="index" draggable="true"
+            <li class="html_tag_list_item" v-for="form_input_component_name, index in form_imput_component_names"
+                :key="index" draggable="true"
                 :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, form_input_component_name)">
                 <table>
                     <tr>
@@ -67,8 +68,8 @@
         </ul>
         <h3>その他</h3>
         <ul>
-            <li v-for="othor_component_name, index in othor_component_names" :key="index" draggable="true"
-                :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, othor_component_name)">
+            <li class="html_tag_list_item" v-for="othor_component_name, index in othor_component_names" :key="index"
+                draggable="true" :ondragstart="(e: DragEvent) => ondrag_htmltag_listitem(e, othor_component_name)">
                 <table>
                     <tr>
                         <td :style="tagname_style"> {{ othor_component_name }}</td>
@@ -184,6 +185,7 @@ export default class TagListView extends Vue {
 </script>
 <style scoped>
 li {
+    position: relative;
     margin-left: 20px;
 }
 
@@ -197,5 +199,22 @@ td {
 
 li table {
     display: table-caption;
+}
+
+.html_tag_list_item::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background-color: black;
+    display: inline-block;
+    border-radius: 50%;
+    margin-right: 8px;
+    position: absolute;
+    top: 9px;
+    left: -13px;
+}
+
+ul {
+    list-style: none;
 }
 </style>

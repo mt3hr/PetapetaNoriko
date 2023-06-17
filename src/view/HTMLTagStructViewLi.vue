@@ -2,8 +2,8 @@
     <li ref="li" class="tag_struct_li" draggable="true" dropzone="true" @drop.prevent.stop="(e) => drop(e, tagdata)"
         @contextmenu.stop="show_contextmenu" @dragstart.stop="(e) => dragstart(e, tagdata)"
         @click.stop="() => onclick_tag(tagdata)" @dragover.prevent="dragover" :style="style">
-        <span>{{ tagdata.tagname }}:</span>
-        <span>({{ tagdata.to_string() }})</span>
+        <div class="tag_name">{{ tagdata.tagname }}:</div>
+        <div class="tag_description">({{ tagdata.to_string() }})</div>
         <ul v-if="tagdata.child_tagdatas.length != 0">
             <HTMLTagStructViewLi v-for="child_tagdata, index in tagdata.child_tagdatas" :key="index"
                 @updated_tagdata="updated_tagdata" :copied_tagdata="copied_tagdata"
@@ -173,7 +173,7 @@ export default class HTMLTagPropertyView extends Vue {
         if (this.clicked_tagdata && this.tagdata.tagid == this.clicked_tagdata.tagid) {
             if (this.auto_scroll_tag_struct_view) {
                 const el = this.$refs['li'] as HTMLElement;
-                el?.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
+                el?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
             }
             this.style = {
                 "background-color": "lightsteelblue",
@@ -714,18 +714,38 @@ export default class HTMLTagPropertyView extends Vue {
 }
 </script>
 <style scoped>
-li {
+.tag_struct_li {
+    position: relative;
     margin-left: 20px;
+    text-wrap: nowrap;
 }
 
-.tag_struct_li {
-    list-style-position: inline;
-    width: 260px;
+.tag_description,
+.tag_name {
+    display: inline-block;
     overflow: hidden;
+    max-width: 210px;
     text-wrap: nowrap;
+}
+
+.tag_struct_li::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background-color: black;
+    display: inline-block;
+    border-radius: 50%;
+    margin-right: 8px;
+    position: absolute;
+    top: 9px;
+    left: -13px;
 }
 
 .init_dialog {
     width: 280px;
+}
+
+ul {
+    list-style: none;
 }
 </style>
