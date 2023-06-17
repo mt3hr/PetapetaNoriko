@@ -5,8 +5,8 @@
         </component>
         <h2 v-if="editor_mode"><font color="#4682b4">ドロップゾーン</font></h2>
         <h2 v-else>画面</h2>
-        <div id="dropzone" class="dropzone" @click="onclick" @drop.stop.prevent="on_drop"
-            @dragover.prevent="on_dragover" :style="dropzone_style" @contextmenu="show_contextmenu">
+        <div id="dropzone" class="dropzone" @click="onclick" @drop.stop.prevent="on_drop" @dragover.prevent="on_dragover"
+            :style="dropzone_style" @contextmenu="show_contextmenu">
 
             <body id="dropzone_body" class="page" :style="dropzone_style">
                 <div v-if="html_tagdatas == null"
@@ -40,13 +40,13 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">行数</v-col>
-                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_table" type="number" v-model="table_rows"
-                                default="1" /></v-col>
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_table" type="number"
+                                v-model="table_rows" default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">列数</v-col>
-                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_table" type="number" v-model="table_cols"
-                                default="1" /></v-col>
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_table" type="number"
+                                v-model="table_cols" default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">
@@ -71,8 +71,8 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">アイテム数</v-col>
-                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_ul" type="number" v-model="ul_items"
-                                default="1" /></v-col>
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_ul" type="number"
+                                v-model="ul_items" default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">
@@ -97,8 +97,8 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">アイテム数</v-col>
-                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_ol" type="number" v-model="ol_items"
-                                default="1" /></v-col>
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_ol" type="number"
+                                v-model="ol_items" default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">
@@ -123,8 +123,8 @@
                     </v-card-title>
                     <v-row>
                         <v-col cols="auto">URL</v-col>
-                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_img" type="url" v-model="img_src"
-                                default="1" /></v-col>
+                        <v-col cols="auto"><input class="textbox" @keypress.enter="initialize_img" type="url"
+                                v-model="img_src" default="1" /></v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="auto">
@@ -349,6 +349,9 @@ export default class DropZone extends Vue {
             }
             if (move_in_root) return
 
+            let exist_in_root = false
+            let index = -1
+            let depth = 0
             let walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean { return false }
             walk_tagdatas = function (tagdatas: Array<HTMLTagDataBase>): boolean {
                 for (let i = 0; i < tagdatas.length; i++) {
@@ -363,11 +366,15 @@ export default class DropZone extends Vue {
                         html_tagdata.position_y = e.pageY - dropzone_y
                         if (e.dataTransfer.getData("ppmk/move_tag_offset_x")) html_tagdata.position_x -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_x"))
                         if (e.dataTransfer.getData("ppmk/move_tag_offset_y")) html_tagdata.position_y -= Number.parseInt(e.dataTransfer.getData("ppmk/move_tag_offset_y"))
+                        exist_in_root = depth == 0
+                        index = i
                         return true
                     }
+                    depth++
                     if (walk_tagdatas(tagdatas[i].child_tagdatas)) {
                         return true
                     }
+                    depth--
                 }
                 return false
             }
@@ -377,7 +384,11 @@ export default class DropZone extends Vue {
             } else if (e.ctrlKey) {
                 html_tagdatas_root.push(move_tagdata)
             } else {
-                html_tagdatas_root.unshift(move_tagdata)
+                if (exist_in_root) {
+                    html_tagdatas_root.splice(index, 0, move_tagdata)
+                } else {
+                    html_tagdatas_root.unshift(move_tagdata)
+                }
             }
 
             this.$emit('updated_htmltagdatas', html_tagdatas_root, null, true)
