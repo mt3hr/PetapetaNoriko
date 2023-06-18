@@ -1757,9 +1757,55 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		projectID = &projectIDTemp
 
 		defer func() {
+			ppmkProject, err := ppmkDB.GetProject(context.Background(), *projectID)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "プロジェクトの読み込みに失敗しました。共有者がサーバにプロジェクトを保存していない可能性があります。"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+			if !ppmkProject.IsSharedView {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "アクセス権限がありません"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+
+			projectDatas, err := ppmkDB.GetProjectDatas(context.Background(), ppmkProject.ProjectID)
+			if err != nil {
+				message := &WatchSharedProjectViewMessage{}
+				message.MessageType = ERROR
+				message.Error = "プロジェクトデータの取得に失敗しました"
+				websocket.JSON.Send(ws, message)
+
+				message = &WatchSharedProjectViewMessage{}
+				message.MessageType = FINISH_SHARE
+				websocket.JSON.Send(ws, message)
+				return
+			}
+
+			project := &Project{}
+			project.PPMKProject = ppmkProject
+			if len(projectDatas) >= 1 {
+				project.PPMKProjectData = projectDatas[0]
+			} else {
+				project.PPMKProjectData = &PPMKProjectData{}
+			}
+
 			for _, watcherWS := range watchShareViewSockets[*projectID] {
 				websocket.JSON.Send(watcherWS, &WatchSharedProjectViewMessage{
 					MessageType: FINISH_SHARE,
+					Project:     project,
 					ProjectID:   *projectID,
 				})
 				watcherWS.Close()
@@ -1824,7 +1870,9 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			appendSuccess = true
 		}
 		if err != nil {
-			panic(err)
+			if err != io.EOF {
+				panic(err)
+			}
 		}
 	}))
 
@@ -2302,7 +2350,7 @@ func (p *ppmkDBImpl) UpdateProject(ctx context.Context, project *PPMKProject) er
 
 func (p *ppmkDBImpl) GetProjectDatas(ctx context.Context, projectID string) ([]*PPMKProjectData, error) {
 	projectDatas := []*PPMKProjectData{}
-	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Author, Memo FROM PPMKProjectData;`
+	statement := `SELECT ProjectDataID, ProjectID, SavedTime, ProjectData, Author, Memo FROM PPMKProjectData WHERE ProjectID='` + projectID + `';`
 	rows, err := p.db.QueryContext(ctx, statement)
 	if err != nil {
 		if err == sql.ErrNoRows {

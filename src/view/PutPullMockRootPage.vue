@@ -117,10 +117,8 @@
                     </v-col>
                 </v-row>
             </v-card-title>
-            <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20" placeholder="img {
-                                                                                              width: 200px;
-                                                                                              height: auto;
-                                                                                            }"></v-textarea>
+            <v-textarea id="css_text_area" v-model="css" @keydown="updated_css" :rows="20"
+                :placeholder="css_placeholder"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_css_dialog = false">閉じる</v-btn>
@@ -152,9 +150,7 @@
         <v-card class="pa-5">
             <v-card-title>ページウェブフォント</v-card-title>
             <v-card-text>使用するウェブフォントのリンクを改行区切りで記述してください</v-card-text>
-            <v-textarea v-model="page_webfont" :rows="20"
-                placeholder="https://fonts.googleapis.com/css?family=M+PLUS+1p
-                                                                                            https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c"></v-textarea>
+            <v-textarea v-model="page_webfont" :rows="20" :placeholder="webfont_placeholder"></v-textarea>
             <v-row>
                 <v-col cols="auto">
                     <v-btn @click="is_show_webfont_dialog = false">閉じる</v-btn>
@@ -486,6 +482,15 @@ export default class PutPullMockRootPage extends Vue {
     is_jec_jy_graduationwork = false
     php_sessid = ""
     location = location
+
+    css_placeholder = `img {
+  width: 200px;
+  height: auto;
+}
+`
+    webfont_placeholder = `https://fonts.googleapis.com/css?family=M+PLUS+1p
+https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c
+`
 
     @Watch('export_base64_image')
     @Watch('export_head')
@@ -827,6 +832,43 @@ export default class PutPullMockRootPage extends Vue {
             })
         }
 
+        this.prepare_receive_socket()
+
+        // 卒制ここから
+        this.api.status().then(server_status => {
+            this.is_jec_jy_graduationwork = server_status.jec_jy_graduationwork
+        })
+        let php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
+        this.php_sessid = php_sessid ? php_sessid.split('=')[1] : "";
+        let wm_id = this.$route.query["wm_id"]
+        let version_id = this.$route.query["version_id"]
+        if (wm_id != "" && wm_id && version_id != "" && version_id) {
+            const request = {
+                wm_id: wm_id,
+                version_id: version_id,
+            }
+            fetch("/get_wm_data.php", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(request),
+            }).then(res => {
+                return res.json()
+            }).then((json) => {
+                const project: Project = json
+                project.ppmk_project_data = JSON.parse(JSON.stringify(json.ppmk_project_data), deserialize)
+                this.project = project
+                this.update_project(project)
+                this.$nextTick(() => {
+                    this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
+                })
+            })
+        }
+        // 卒制ここまで
+    }
+    prepare_receive_socket() {
+        let shared_project_id = this.$route.query["shared_project_id"]
         if (shared_project_id != "" && shared_project_id) {
             this.receive_socket = new WebSocket(watch_share_view_websocket_address)
             window.addEventListener("onclose", () => {
@@ -866,51 +908,25 @@ export default class PutPullMockRootPage extends Vue {
                             break
                         }
                         case WatchSharedProjectViewMessageType.FINISH_SHARE: {
-                            this.flush_message = "共有が停止されました"
+                            let project_any: any = message.project
+                            project_any.ppmk_project_data = JSON.parse(JSON.stringify(project_any.ppmk_project_data), deserialize)
+                            let project: Project = project_any
+                            this.project = project
+                            this.update_project(project)
+                            this.$nextTick(() => {
+                                this.show_page(project.ppmk_project_data.project_data[this.page_list_view.selected_index])
+                            })
+
+                            this.flush_message = "リアルタイム共有が停止されました。"
                             this.is_show_flush_message = true
-                            this.update_project(new Project())
-                            this.dropzone.html_tagdatas = null
+                            receive_socket.close()
+                            this.prepare_receive_socket()
                             break
                         }
                     }
                 }
             }
         }
-
-
-
-        // 卒制ここから
-        this.api.status().then(server_status => {
-            this.is_jec_jy_graduationwork = server_status.jec_jy_graduationwork
-        })
-        let php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
-        this.php_sessid = php_sessid ? php_sessid.split('=')[1] : "";
-        let wm_id = this.$route.query["wm_id"]
-        let version_id = this.$route.query["version_id"]
-        if (wm_id != "" && wm_id && version_id != "" && version_id) {
-            const request = {
-                wm_id: wm_id,
-                version_id: version_id,
-            }
-            fetch("/get_wm_data.php", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(request),
-            }).then(res => {
-                return res.json()
-            }).then((json) => {
-                const project: Project = json
-                project.ppmk_project_data = JSON.parse(JSON.stringify(json.ppmk_project_data), deserialize)
-                this.project = project
-                this.update_project(project)
-                this.$nextTick(() => {
-                    this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[0])
-                })
-            })
-        }
-        // 卒制ここまで
     }
 
     get page_css_view_style(): any {
@@ -1294,41 +1310,44 @@ export default class PutPullMockRootPage extends Vue {
     async append_history() {
         if (!this.preparated) return
         if (!this.editor_mode) return
-        if (!this.use_undo) return
         if (!this.project) return
+        try {
+            if (!this.use_undo) return
 
-        if (this.histories.histories[this.histories.index - 1]) {
-            if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(this.project)) {
-                return
+            if (this.histories.histories[this.histories.index - 1]) {
+                if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(this.project)) {
+                    return
+                }
             }
-        }
 
-        this.histories.histories.length = this.histories.index
-        this.histories.histories[this.histories.index] = clone_project(this.project)
-        this.histories.page_index.length = this.histories.index + 1
-        if (this.page_list_view) {
-            this.histories.page_index[this.histories.index] = this.page_list_view.selected_index
-        }
-        this.histories.index++
+            this.histories.histories.length = this.histories.index
+            this.histories.histories[this.histories.index] = clone_project(this.project)
+            this.histories.page_index.length = this.histories.index + 1
+            if (this.page_list_view) {
+                this.histories.page_index[this.histories.index] = this.page_list_view.selected_index
+            }
+            this.histories.index++
 
-        if (this.share_socket && !this.project.ppmk_project.is_shared_view) {
-            this.preparated = false
-            let message = new ShareViewMessage()
-            message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
-            this.share_socket.send(JSON.stringify(message))
-            this.share_socket = undefined
-            this.preparated = true
-        }
-        if (this.project.ppmk_project.is_shared_view && this.is_firefox && this.preparated) {
-            if (this.share_ws_is_ready) {
+            if (this.share_socket && !this.project.ppmk_project.is_shared_view) {
+                this.preparated = false
                 let message = new ShareViewMessage()
-                message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
-                message.project_id = this.project.ppmk_project.project_id
-                message.project = clone_project(this.project)
-                await this.api.preparate_save_ppmk_project(message.project)
-                this.share_ws_is_ready = false
+                message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
                 this.share_socket.send(JSON.stringify(message))
-                this.share_ws_is_ready = true
+                this.share_socket = undefined
+                this.preparated = true
+            }
+        } finally {
+            if (this.project.ppmk_project.is_shared_view && this.is_firefox && this.preparated) {
+                if (this.share_ws_is_ready) {
+                    let message = new ShareViewMessage()
+                    message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
+                    message.project_id = this.project.ppmk_project.project_id
+                    message.project = clone_project(this.project)
+                    await this.api.preparate_save_ppmk_project(message.project)
+                    this.share_ws_is_ready = false
+                    this.share_socket.send(JSON.stringify(message))
+                    this.share_ws_is_ready = true
+                }
             }
         }
     }
