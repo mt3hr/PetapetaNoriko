@@ -265,6 +265,11 @@
                     <v-checkbox class="checkbox" v-model="auto_scroll_tag_struct_view" :label="'構造ビュー自動スクロール'" />
                 </v-col>
             </v-row>
+            <v-row v-if="login_system">
+                <v-col cols="auto">
+                    <v-checkbox class="checkbox" v-model="save_to_server_ctrl_s" :label="'ログインしている場合のCTRL+Sをサーバ保存に置換'" />
+                </v-col>
+            </v-row>
             <v-row>
                 <v-col cols="auto">
                     <v-text>HTML要素一覧の表示</v-text>
@@ -459,6 +464,8 @@ export default class PutPullMockRootPage extends Vue {
 
     session_id = ""
 
+    save_to_server_ctrl_s = false
+
     project = new Project()
 
     login_system = false
@@ -516,6 +523,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c
         settings.auto_focus_tag_property_view = this.auto_focus_tag_property_view
         settings.first_launch = this.first_launch
         settings.session_id = this.session_id
+        settings.save_to_server_ctrl_s = this.save_to_server_ctrl_s
         let php_sessid = document.cookie.split('; ').find(row => row.startsWith('PHPSESSID'))
         let php_sessid_value = php_sessid ? php_sessid.split('=')[1] : "";
         document.cookie =
@@ -552,6 +560,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c
         this.auto_focus_tag_property_view = settings.auto_focus_tag_property_view
         this.session_id = settings.session_id
         this.first_launch = settings.first_launch
+        this.save_to_server_ctrl_s = settings.save_to_server_ctrl_s
         return settings
     }
 
@@ -627,7 +636,11 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c
                     e.preventDefault()
                     e.stopPropagation()
                     this.save_project_to_localstorage()
-                    this.save_ppmk_project()
+                    if (this.save_to_server_ctrl_s) {
+                        this.show_save_to_server_dialog()
+                    } else {
+                        this.save_ppmk_project()
+                    }
                 }
                 if (e.code == "KeyP" && e.ctrlKey) {
                     e.preventDefault()
@@ -663,6 +676,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c
                             this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
                             this.$nextTick(() => {
                                 this.preparated = true
+                                this.send_to_share_ws()
                             })
                         })
                     }
@@ -685,6 +699,7 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c
                             this.page_list_view.clicked_page(this.project.ppmk_project_data.project_data[this.histories.page_index[this.histories.index]])
                             this.$nextTick(() => {
                                 this.preparated = true
+                                this.send_to_share_ws()
                             })
                         })
                     }
@@ -784,7 +799,6 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c
                     this.dropzone.delete_tagdata(this.clicked_tagdata)
                 }
             })
-
         })
 
         if (this.load_settings_from_cookie().first_launch) {
@@ -1311,43 +1325,43 @@ https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c
         if (!this.preparated) return
         if (!this.editor_mode) return
         if (!this.project) return
-        try {
-            if (!this.use_undo) return
-
-            if (this.histories.histories[this.histories.index - 1]) {
-                if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(this.project)) {
-                    return
-                }
+        if (!this.use_undo) return
+        if (this.histories.histories[this.histories.index - 1]) {
+            if (JSON.stringify(this.histories.histories[this.histories.index - 1]) == JSON.stringify(this.project)) {
+                return
             }
+        }
 
-            this.histories.histories.length = this.histories.index
-            this.histories.histories[this.histories.index] = clone_project(this.project)
-            this.histories.page_index.length = this.histories.index + 1
-            if (this.page_list_view) {
-                this.histories.page_index[this.histories.index] = this.page_list_view.selected_index
-            }
-            this.histories.index++
+        this.histories.histories.length = this.histories.index
+        this.histories.histories[this.histories.index] = clone_project(this.project)
+        this.histories.page_index.length = this.histories.index + 1
+        if (this.page_list_view) {
+            this.histories.page_index[this.histories.index] = this.page_list_view.selected_index
+        }
+        this.histories.index++
 
-            if (this.share_socket && !this.project.ppmk_project.is_shared_view) {
-                this.preparated = false
+        if (this.share_socket && !this.project.ppmk_project.is_shared_view) {
+            this.preparated = false
+            let message = new ShareViewMessage()
+            message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
+            this.share_socket.send(JSON.stringify(message))
+            this.share_socket = undefined
+            this.preparated = true
+        }
+        this.send_to_share_ws()
+    }
+
+    async send_to_share_ws() {
+        if (this.project.ppmk_project.is_shared_view && this.is_firefox && this.preparated) {
+            if (this.share_ws_is_ready) {
                 let message = new ShareViewMessage()
-                message.message_type = WatchSharedProjectViewMessageType.FINISH_SHARE
+                message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
+                message.project_id = this.project.ppmk_project.project_id
+                message.project = clone_project(this.project)
+                await this.api.preparate_save_ppmk_project(message.project)
+                this.share_ws_is_ready = false
                 this.share_socket.send(JSON.stringify(message))
-                this.share_socket = undefined
-                this.preparated = true
-            }
-        } finally {
-            if (this.project.ppmk_project.is_shared_view && this.is_firefox && this.preparated) {
-                if (this.share_ws_is_ready) {
-                    let message = new ShareViewMessage()
-                    message.message_type = WatchSharedProjectViewMessageType.UPDATE_PROJECT
-                    message.project_id = this.project.ppmk_project.project_id
-                    message.project = clone_project(this.project)
-                    await this.api.preparate_save_ppmk_project(message.project)
-                    this.share_ws_is_ready = false
-                    this.share_socket.send(JSON.stringify(message))
-                    this.share_ws_is_ready = true
-                }
+                this.share_ws_is_ready = true
             }
         }
     }
