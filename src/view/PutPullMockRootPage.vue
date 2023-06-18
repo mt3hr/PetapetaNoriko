@@ -1454,7 +1454,7 @@ export default class PutPullMockRootPage extends Vue {
     }
 
     async update_project_info(project_info: PPMKProject) {
-        if (!this.share_socket && project_info.is_shared_view) {
+        if (!this.share_socket && project_info.is_shared_view && this.session_id) {
             this.share_socket = new WebSocket(share_view_websocket_address)
             this.share_socket.onmessage = (e) => {
                 let res: WatchSharedProjectViewMessage = e.data
@@ -1515,6 +1515,7 @@ export default class PutPullMockRootPage extends Vue {
         this.is_show_login_dialog = false
         this.flush_message = "ログインしました"
         this.is_show_flush_message = true
+        this.update_project_info(this.project.ppmk_project)
     }
 
     async save_to_server_jec_jy_graduationwork() {

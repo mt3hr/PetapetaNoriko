@@ -1,13 +1,16 @@
 <template>
-    <li ref="li" @contextmenu.prevent="show_contextmenu" @click="clicked_page" @drop.stop="drop" @dragover.prevent="dragover"
-        :style="style" draggable="true" @dragstart.stop="on_drag_start">
+    <li v-if="editor_mode" ref="li" @contextmenu.prevent="show_contextmenu" @click="clicked_page" @drop.stop="drop"
+        @dragover.prevent="dragover" :style="style" draggable="true" @dragstart.stop="on_drag_start">
+        {{ pagedata.pagename }}
+        <v-menu v-model="is_show_contextmenu" :style="contextmenu_style" v-if="editor_mode">
+            <v-list>
+                <v-list-item @click="copy_page()">コピーを作成</v-list-item>
+                <v-list-item @click="delete_page()">削除</v-list-item>
+            </v-list>
+        </v-menu>
+    </li>
+    <li v-else ref="li" @contextmenu.prevent="show_contextmenu" @click="clicked_page" :style="style">
         {{ pagedata.pagename }}</li>
-    <v-menu v-model="is_show_contextmenu" :style="contextmenu_style" v-if="editor_mode">
-        <v-list>
-            <v-list-item @click="copy_page()">コピーを作成</v-list-item>
-            <v-list-item @click="delete_page()">削除</v-list-item>
-        </v-list>
-    </v-menu>
 </template>
 <script lang="ts">
 import { deserialize } from '@/serializable/serializable';

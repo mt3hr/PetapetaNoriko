@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -1752,6 +1751,7 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		var projectID *string
 		first := true
 		var err error
+		appendSuccess := false
 
 		projectIDTemp := ""
 		projectID = &projectIDTemp
@@ -1772,9 +1772,10 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 					break
 				}
 			}
-			deletedThisSocket = append(deletedThisSocket[:thisIndex], deletedThisSocket[thisIndex:]...)
-
-			shareViewSockets[*projectID] = deletedThisSocket
+			if appendSuccess {
+				deletedThisSocket = append(deletedThisSocket[:thisIndex], deletedThisSocket[thisIndex:]...)
+				shareViewSockets[*projectID] = deletedThisSocket
+			}
 			delete(sharedProjects, *projectID)
 			delete(watchShareViewSockets, *projectID)
 		}()
@@ -1782,9 +1783,8 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 		for err == nil {
 			message = &ShareViewMessage{}
 			err = receive(ws, message)
-			if errors.As(err, net.ErrClosed) {
-				err = nil
-				break Loop
+			if err != nil {
+				continue
 			}
 			if err != nil {
 				message := &WatchSharedProjectViewMessage{}
@@ -1821,8 +1821,11 @@ func applyShareViewSystem(router *mux.Router, ppmkDB ppmkDB) {
 			case FINISH_SHARE:
 				break Loop
 			}
+			appendSuccess = true
 		}
-
+		if err != nil {
+			panic(err)
+		}
 	}))
 
 	router.PathPrefix(watchShareViewWebsocketAddress).Handler(websocket.Handler(func(ws *websocket.Conn) {
