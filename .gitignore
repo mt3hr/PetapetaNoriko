@@ -2,6 +2,7 @@
 node_modules
 dist
 src/app/ppmk/embed/dist/*
+src/app/ppmk/embed/html/*
 src/app/go.mod
 src/app/go.sum
 
