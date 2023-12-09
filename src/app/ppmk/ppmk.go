@@ -86,7 +86,7 @@ func launchServer() error {
 	*/
 	router := mux.NewRouter()
 
-	html, err := fs.Sub(htmlFS, "embed/dist")
+	html, err := fs.Sub(htmlFS, "embed/html")
 	if err != nil {
 		return err
 	}
