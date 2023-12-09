@@ -6,8 +6,9 @@
     "serve": "vue-cli-service serve",
     "build": "rimraf src/app/ppmk/embed/dist && vue-cli-service --mode development build && copyfiles src/app/ppmk/embed",
     "go_mod": "rimraf src/app/go.mod && rimraf src/app/go.sum && cd src/app && go mod init github.com/mt3hr/PutPullMock/src/app/ppmk && go mod tidy",
-    "install_app": "npm run go_mod && rimraf src/app/ppmk/embed/dist && mkdirp src/app/ppmk/embed/html && && vue-cli-service --mode development build && copyfiles dist src/app/ppmk/embed && cd src/app && go install -ldflags \"-H windowsgui\"",
-    "install_server": "npm run go_mod && rimraf src/app/ppmk/embed/dist && mkdirp src/app/ppmk/embed/html && vue-cli-service --mode development build && copyfiles  dist src/app/ppmk/embed && cd src/app/ppmk/ppmk_server && go install -tags=\"server\"",
+    "copy_dist_to_app_embed": "mkdirp src/app/ppmk/embed/html && copyfiles -u 1 \"dist/**/*\" src/app/ppmk/embed/html",
+    "install_app": "npm run go_mod && npm run copy_dist_to_app_embed && vue-cli-service --mode development build && copyfiles dist src/app/ppmk/embed && cd src/app && go install -ldflags \"-H windowsgui\"",
+    "install_server": "npm run go_mod && npm run copy_dist_to_app_embed && vue-cli-service --mode development build && copyfiles  dist src/app/ppmk/embed && cd src/app/ppmk/ppmk_server && go install -tags=\"server\"",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
